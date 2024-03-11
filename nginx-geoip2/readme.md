@@ -14,7 +14,7 @@ v6.1.0-amd64
 
 Local para o dockerfile:
 ```
-containers/geoip2
+containers/nginx-geoip2
 ```
 
 Imagem argumentos:
