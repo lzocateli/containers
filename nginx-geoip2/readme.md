@@ -50,6 +50,11 @@ Pipeline: `pipelines-store/pipeline-templates/execute-geoip2-update.yml`
 
 
 ```bash
+# Para excluir a imgem e o container anterior
+podman rmi $(podman images --filter=reference='nginx-geoipupdate:' -q) -f
+# Para excluir apenas o container anterior
+podman rm nginx-geoipupdate -f
+
 podman run -d \
     --env-file /userapps/configs/geoip2/geoip2.env \
     -v /userapps/configs/geoip2/data:/usr/share/GeoIP \
