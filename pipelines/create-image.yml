@@ -1,0 +1,61 @@
+parameters:
+- name: imageName
+  displayName: "Name the image to be created, example: lzocateli/nginx"
+  type: string
+  default: ""
+- name: imageVersion
+  displayName: "Tag version for the image, example: 1.25.0-bullseye"
+  type: string
+  default: ""
+- name: DockerFilePath
+  displayName: "Dockerfile path, example: containers/nginx"
+  type: string
+  default: ""
+- name: imageArguments
+  displayName: "Image arguments, example: --build-arg Env_HttpProxy=proxy.xyz.com:80 --build-arg Env_NoProxy=xyz.com"
+  type: string
+  default: "--build-arg Env_HttpProxy="
+- name: proxyBypassConfig
+  displayName: "Array bypass example: xyz\\.com"
+  type: string
+  default: "  xyz\\.com"
+- name: executeInstallAgent
+  displayName: "Execute script to Install Agent DevOps ?"
+  type: boolean
+  default: false
+- name: agentTargetArch
+  displayName: "Target arch agent"
+  type: string
+  default: linux-x64
+  values:
+  - linux-x64
+  - linux-arm64
+  - linux-arm
+  - rhel.6-x64
+
+
+trigger: none
+
+
+resources:
+  repositories:
+  - repository: templates
+    type: git
+    name: SharedKernel/pipelines-store
+    endpoint: SharedProjects-Repos
+
+
+variables:
+- template: variables/global.yml@templates
+
+
+stages:
+- template: pipeline-templates/create-image-steps.yml@templates
+  parameters:
+    imageName: ${{ parameters.imageName }}
+    imageVersion: ${{ parameters.imageVersion }}
+    DockerFilePath: ${{ parameters.DockerFilePath }}
+    imageArguments: ${{ parameters.imageArguments }}
+    proxyBypassConfig: ${{ parameters.proxyBypassConfig }}
+    executeInstallAgent: ${{ parameters.executeInstallAgent }}
+    agentTargetArch: ${{ parameters.agentTargetArch }}

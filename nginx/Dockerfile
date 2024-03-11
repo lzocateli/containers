@@ -1,0 +1,18 @@
+ARG NGINX_VERSION=1.25.0-bullseye
+
+FROM nginx:$NGINX_VERSION AS buildbase
+
+RUN apt update -y \
+    && apt upgrade -y \
+    && apt install -y \
+    nginx-extras \
+    nano \
+    net-tools \
+    iputils-ping \
+    telnet
+
+COPY html /usr/share/nginx/html
+COPY ./nginx.conf /etc/nginx/nginx.conf
+COPY ./html/custom-error-page/custom-error.locations /etc/nginx/conf.d/
+
+RUN ln -s -f /usr/share/nginx/html/custom-error-page/custom-error-page.html /usr/share/nginx/html/index.html 

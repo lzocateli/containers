@@ -1,0 +1,45 @@
+### Informe os seguintes parametros para gerar a imagem
+
+Nome da Imagem:
+```
+lzocateli/mariadb-10.7.5-focal
+```
+
+Tag version:
+```
+1.0.0
+```
+
+Local para o dockerfile:
+```
+containers/mariadb
+```
+
+Imagem argumentos:
+```
+--build-arg Env_HttpProxy=proxy.xyz.com:80 --build-arg Env_NoProxy=xyz.com
+```
+
+Baypass proxy: (insera 2 espaços a esquerda para não utilizar)
+```
+  xyz\.com
+```
+
+
+### Documentação para uso da imagem
+
+Use o parametro `-it` no lugar `-d` para executar em modo iterativo
+
+
+```bash
+podman run -d \
+  -p 3808:3808 \
+  -v /userapps/volumes/wp-db-zocate.li:/var/lib/mysql \
+  -e MYSQL_DATABASE=zli \
+  -e MYSQL_USER=zocatel \
+  -e MYSQL_PASSWORD=teste!1 \
+  -e MYSQL_RANDOM_ROOT_PASSWORD=1 \
+  --network wp-zocate.li \
+  --name zocate-li-maria \
+  lzocateli/mariadb-10.7.5-focal
+```
