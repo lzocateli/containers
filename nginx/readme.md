@@ -15,12 +15,12 @@ Local para o dockerfile:
 containers/nginx
 ```
 
-Imagem argumentos: (insera 2 espaços a esquerda para não utilizar)
+Imagem argumentos: (insira 2 espaços a esquerda para não utilizar)
 ```
   --build-arg Env_HttpProxy=proxy.xyz.com:80 --build-arg Env_NoProxy=xyz.com
 ```
 
-Baypass proxy: (insera 2 espaços a esquerda para não utilizar)
+Baypass proxy: (insira 2 espaços a esquerda para não utilizar)
 ```
   xyz\.com
 ```
