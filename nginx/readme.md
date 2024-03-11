@@ -28,8 +28,6 @@ Baypass proxy: (insira 2 espaços a esquerda para não utilizar)
 
 ### Documentação para uso da imagem
 
-Use o parametro `-it` no lugar `-d` para executar em modo iterativo
-
 ```
 sudo su -
 ```
@@ -37,6 +35,11 @@ sudo su -
 Modo como serviço 
 
 ```bash
+# Para excluir a imgem e o container anterior
+podman rmi $(podman images --filter=reference='nginx:' -q) -f
+# Para excluir apenas o container anterior
+podman rm nginx -f
+
 podman run -d \
     -p 443:443 \
     -v /userapps/ssl:/etc/nginx/ssl \
@@ -61,8 +64,10 @@ Se desejar alterar a pagina de erro personalizada, faça nos fontes que estão n
 outra opção é incluir um volume ao iniciar um container, e então criar seu arquivo no volume do host, isso substituira
 automaticamente o volume dentro do container.
 
-```
-    -v /userapps/configs/html:/usr/share/nginx/html \
+```bash
+  -v /userapps/configs/html:/usr/share/nginx/html \
+  # ou apenas o arquivo
+  -v /userapps/configs/html/index.html:/usr/share/nginx/html/index.html \
 ```
 
 ## Site para auxilio de configurações do nginx
