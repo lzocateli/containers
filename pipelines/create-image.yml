@@ -34,15 +34,17 @@ parameters:
   - rhel.6-x64
 
 
-trigger: none
-
-
 resources:
   repositories:
   - repository: templates
     type: git
     name: SharedKernel/pipelines-store
     endpoint: SharedProjects-Repos
+
+
+trigger: none
+
+pr: none
 
 
 variables:
