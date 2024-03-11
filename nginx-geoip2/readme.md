@@ -4,7 +4,7 @@
 
 Nome da Imagem:
 ```
-nginx-geoipupdate
+lzocateli/nginx-geoipupdate
 ```
 
 Tag version:
