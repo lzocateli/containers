@@ -1,13 +1,15 @@
+## Criação da imagem
+
 - Informe os seguintes parametros para gerar a imagem
 
 Nome da Imagem:
 ```
-geoipupdate-4.10.0-amdx64
+nginx-geoipupdate
 ```
 
 Tag version:
 ```
-1.0.0
+v6.1.0-amd64
 ```
 
 Local para o dockerfile:
@@ -17,15 +19,40 @@ containers/geoip2
 
 Imagem argumentos:
 ```
---build-arg Env_HttpProxy=proxy.xyz.com:80 --build-arg Env_NoProxy=xyz.com
+  --build-arg Env_HttpProxy=proxy.xyz.com:80 --build-arg Env_NoProxy=xyz.com
 ```
 
-Baypass proxy: (insera 2 espaços a esquerda para não utilizar)
+Baypass proxy: (insira 2 espaços a esquerda para não utilizar)
 ```
-xyz\.com
+  xyz\.com
 ```
 
 ---
+---
 
-- Pasta com arquivo de configuração e readme.md para executar o container manualmente:
-https://dev.azure.com/nuuvers/SharedKernel/_git/SecurityFiles?path=/GeoIP2/readme.md
+## Documentação original
+https://github.com/maxmind/geoipupdate
+
+- Exemplo:
+
+```
+docker run --env-file <file> -v <database directory>:/usr/share/GeoIP ghcr.io/maxmind/geoipupdate:v6.1.0-amd64
+```
+
+- Exemplo para download manual usando a `License Key`
+https://dev.maxmind.com/geoip/updating-databases?lang=en
+
+## Script para executar o container
+
+- RunGeoIpUpdate.ps1
+
+Pipeline: `pipelines-store/pipeline-templates/execute-geoip2-update.yml`
+
+
+```bash
+podman run -d \
+    --env-file /userapps/configs/geoip2/geoip2.env \
+    -v /userapps/configs/geoip2/data:/usr/share/GeoIP \
+    --name geoipupdate \
+    lzocateli/nginx-geoipupdate:v6.1.0-amd64
+```
