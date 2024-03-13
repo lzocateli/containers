@@ -2,25 +2,25 @@
 
 Nome da Imagem:
 ```
-lzocateli/aspnet-3.1.32-focal-amd64
+lzocateli/dotnet-aspnet
 ```
 
 Tag version:
 ```
-1.0.0
+8.0.3-jammy-amd64
 ```
 
 Local para o dockerfile:
 ```
-containers/aspnet
+containers/dotnet-aspnet
 ```
 
 Imagem argumentos:
 ```
---build-arg Env_HttpProxy=proxy.nuuvify.com:80 --build-arg Env_NoProxy=nuuvify.com
+  --build-arg Env_HttpProxy=proxy.nuuvify.com:80 --build-arg Env_NoProxy=nuuvify.com
 ```
 
 Baypass proxy:
 ```
-nuuvify\.com
+  nuuvify\.com
 ```
