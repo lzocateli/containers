@@ -2,12 +2,12 @@
 
 Nome da Imagem:
 ```
-lzocateli/dbeaver-23.0.0
+lzocateli/dbeaver
 ```
 
 Tag version:
 ```
-1.0.0
+24.0.0
 ```
 
 Local para o dockerfile:
@@ -17,7 +17,7 @@ containers/dbeaver
 
 Imagem argumentos:
 ```
---build-arg Env_HttpProxy=proxy.xyz.com:80 --build-arg Env_NoProxy=xyz.com
+  --build-arg Env_HttpProxy=proxy.xyz.com:80 --build-arg Env_NoProxy=xyz.com
 ```
 
 Baypass proxy: (insira 2 espaços a esquerda para não utilizar)
@@ -45,7 +45,7 @@ podman run -d \
     -v $voldbeaver \
     --restart unless-stopped \
     --name cloudbeaver \
-    lzocateli/dbeaver-23.0.0:1.0.0
+    lzocateli/dbeaver:24.0.0
 ```
 
 Acesse: http://localhost:8978/
