@@ -43,7 +43,7 @@ podman run -i \
 -v /userapps/certs:/etc/letsencrypt:z \
 -v /userapps/certs/_logs:/var/log/letsencrypt:z \
 --entrypoint certbot \
-certbot/certbot \
+lzocateli/certbot \
 certonly \
 --webroot \
 --webroot-path /etc/letsencrypt \
@@ -66,7 +66,7 @@ podman run -i \
 -v /userapps/certs/_logs:/var/log/letsencrypt:z \
 -v /userapps/.secrets/cloudflare.ini:/root/.secrets/certbot/cloudflare.ini \
 --entrypoint certbot \
-certbot/dns-cloudflare:v2.9.0 \
+lzocateli/certbot:v2.9.0 \
   certonly \
   --noninteractive \
   --dns-cloudflare \
