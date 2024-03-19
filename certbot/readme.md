@@ -38,44 +38,46 @@ Baypass proxy: (insira 2 espaços a esquerda para não utilizar)
 
 ```bash
 podman run -i \
---rm \
---name certbot \
--v /userapps/certs:/etc/letsencrypt:z \
--v /userapps/certs/_logs:/var/log/letsencrypt:z \
---entrypoint certbot \
-lzocateli/certbot \
-certonly \
---webroot \
---webroot-path /etc/letsencrypt \
---noninteractive \
---force-renewal \
--d nuuve.com.br \
--d www.nuuve.com.br \
--d api.nuuve.com.br \
---email lzocateli00@outlook.com \
---agree-tos 
+  --rm \
+  --name certbot \
+  -v /userapps/certs:/etc/letsencrypt:z \
+  -v /userapps/certs/_logs:/var/log/letsencrypt:z \
+  --entrypoint certbot \
+  lzocateli/certbot:v2.9.0 \
+    certonly \
+    --webroot \
+    --webroot-path /etc/letsencrypt \
+    --noninteractive \
+    --force-renewal \
+    --max-log-backups 5 \
+    -d nuuve.com.br \
+    -d www.nuuve.com.br \
+    -d api.nuuve.com.br \
+    --email seuemail@outlook.com \
+    --agree-tos 
 ```
 
-- Se for CloudFlare use:
+- Se o seu DNS estiver na CloudFlare use o comando abaixo ou o plugin do seu servidor DNS
 
 ```bash
 podman run -i \
---rm \
---name certbot \
--v /userapps/certs:/etc/letsencrypt:z \
--v /userapps/certs/_logs:/var/log/letsencrypt:z \
--v /userapps/.secrets/cloudflare.ini:/root/.secrets/certbot/cloudflare.ini \
---entrypoint certbot \
-lzocateli/certbot:v2.9.0 \
-  certonly \
-  --noninteractive \
-  --dns-cloudflare \
-  --dns-cloudflare-credentials ~/.secrets/certbot/cloudflare.ini \
-  --force-renewal \
-  -d zocate.li \
-  -d credential.zocate.li \
-  --email lzocateli00@outlook.com \
-  --agree-tos
+  --rm \
+  --name certbot \
+  -v /userapps/certs:/etc/letsencrypt:z \
+  -v /userapps/certs/_logs:/var/log/letsencrypt:z \
+  -v /userapps/.secrets/cloudflare.ini:/root/.secrets/certbot/cloudflare.ini \
+  --entrypoint certbot \
+  lzocateli/certbot:v2.9.0 \
+    certonly \
+    --noninteractive \
+    --dns-cloudflare \
+    --dns-cloudflare-credentials ~/.secrets/certbot/cloudflare.ini \
+    --force-renewal \
+    --max-log-backups 5 \
+    -d zocate.li \
+    -d credential.zocate.li \
+    --email seuemail@outlook.com \
+    --agree-tos
 ```
 - Sera necessario criar um token de api com os seguintes acessos, e incluir o token no arquivo cloudflare.ini
 
@@ -90,13 +92,14 @@ lzocateli/certbot:v2.9.0 \
 --server https://acme-staging-v02.api.letsencrypt.org/directory
 ```
 
-- Logo apos a execução do certbot, execute o script abaixo para mover o ultimo certificado e key gerado, para a pasta de destino
-  onde o container do nginx através de -v (volume) devera consumir esse certificado.
-  Esse script deve ficar em `pipeline-store`
+- Logo apos a execução do certbot, copie o certificado para a pasta do seu web server, Exemplo:
 
 ```bash
-#Veja o help dentro do script para entender quais parametros são necessarios
-
-./MoveFileLastCreationTime.ps1
+cp /userapps/certs/live/zocate.li/fullchain.pem /userapps/ssl/zocate.li.pem
+cp /userapps/certs/live/zocate.li/privkey.pem /userapps/ssl/zocate.li.key
 ```
+- Reinicie o nginx
 
+```bash
+podman exec -it nginx nginx -s reload
+```
