@@ -2,7 +2,7 @@
 
 Nome da Imagem:
 ```
-lzocateli/certbot
+lzocateli/certbot ou lzocateli/certbot-dns-cloudflare
 ```
 
 Tag version:
@@ -67,7 +67,7 @@ podman run -i \
   -v /userapps/certs/_logs:/var/log/letsencrypt:z \
   -v /userapps/.secrets/cloudflare.ini:/root/.secrets/certbot/cloudflare.ini \
   --entrypoint certbot \
-  lzocateli/certbot:v2.9.0 \
+  lzocateli/certbot-dns-cloudflare:v2.9.0 \
     certonly \
     --noninteractive \
     --dns-cloudflare \
