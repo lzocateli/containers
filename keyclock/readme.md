@@ -32,27 +32,27 @@ Use o parametro `-it` no lugar `-d` para executar em modo iterativo
 
 
 ```bash
-sudo su -
-
-varkeyclock=/var/cloukeyclock/workspace
-volkeyclock="$($varkeyclock):/opt/cloukeyclock/workspace"
-
-mkdir -p $varkeyclock
-chmod -R 777 /var/cloukeyclock
-
-podman run -d \
-  -p 8077:8077 \
+podman run \
+  -p 8077:8443 \
   -e TERM=xterm \
   -e KEYCLOAK_ADMIN=admin \
   -e KEYCLOAK_ADMIN_PASSWORD=admin \
+  -e KC_DB=mssql \
+  -e KC_DB_URL=<DBURL> \
+  -e KC_DB_USERNAME=<DBUSERNAME> \
+  -e KC_DB_PASSWORD=<DBPASSWORD> \
+  -e KC_HOSTNAME=localhost \
+  -e KC_TRUSTSTORE_PATHS=/opt/truststore/myTrustStore.pfx,/opt/other-truststore/myOtherTrustStore.pem \
   -v /userapps/tmp:/tmp \
   --restart always \
+  --name keyclock \
   lzocateli/keycloak:24.0.1 \
-    start --hostname-port=8077 \
+    start --hostname-port=8077
 
 ```
 
 Acesse: http://localhost:8077/admin
+https://localhost:8443/health, https://localhost:8443/health/ready and https://localhost:8443/health/live
 
 ### Documentação oficial
 
