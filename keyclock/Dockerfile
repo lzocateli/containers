@@ -1,0 +1,3 @@
+ARG KEYCLOACK_VERSION=24.0.1
+
+FROM quay.io/keycloak/keycloak:$KEYCLOACK_VERSION
