@@ -2,7 +2,7 @@
 
 Nome da Imagem:
 ```
-lzocateli/keyclock
+lzocateli/keycloak
 ```
 
 Tag version:
@@ -12,7 +12,7 @@ Tag version:
 
 Local para o dockerfile:
 ```
-containers/keyclock
+containers/keycloak
 ```
 
 Imagem argumentos:
@@ -32,23 +32,22 @@ Use o parametro `-it` no lugar `-d` para executar em modo iterativo
 
 
 ```bash
-podman run \
-  -p 8077:8443 \
+podman run -it \
+  -p 5080:8080 \
   -e TERM=xterm \
   -e KEYCLOAK_ADMIN=admin \
   -e KEYCLOAK_ADMIN_PASSWORD=admin \
   -e KC_DB=mssql \
-  -e KC_DB_URL=<DBURL> \
-  -e KC_DB_USERNAME=<DBUSERNAME> \
-  -e KC_DB_PASSWORD=<DBPASSWORD> \
+  -e KC_DB_URL='jdbc:sqlserver://;serverName=eu-az-sql-serv1.database.windows.net;databaseName=xxxxxxxxxxxxx' \
+  -e KC_DB_USERNAME=meuuser \
+  -e KC_DB_PASSWORD='mypaspaspaspas' \
+  -e KC_TRANSACTION_XA_ENABLED=false \
   -e KC_HOSTNAME=localhost \
-  -e KC_TRUSTSTORE_PATHS=/opt/truststore/myTrustStore.pfx,/opt/other-truststore/myOtherTrustStore.pem \
-  -v /userapps/tmp:/tmp \
+  -v /tmp:/tmp \
   --restart always \
-  --name keyclock \
+  --name appkeycloak \
   lzocateli/keycloak:24.0.1 \
-    start --hostname-port=8077
-
+    start-dev
 ```
 
 Acesse: http://localhost:8077/admin
