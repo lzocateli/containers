@@ -50,8 +50,7 @@ podman run -it \
     start-dev
 ```
 
-Acesse: http://localhost:8077/admin
-https://localhost:8443/health, https://localhost:8443/health/ready and https://localhost:8443/health/live
+Acesse: http://localhost:5080/admin
 
 ### Documentação oficial
 
