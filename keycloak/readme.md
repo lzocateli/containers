@@ -67,3 +67,18 @@ Acesse: http://localhost:5080/admin
 
 https://www.keycloak.org/guides#server
 
+### Banco de dados
+
+- Caso queira excluir as tabelas do Keycloak, execute o seguinte comando no seu banco Sql Server
+
+```sql
+DECLARE @SQL NVARCHAR(MAX) = N'';
+
+SELECT @SQL += 'DROP TABLE ' + QUOTENAME(s.name) + '.' + QUOTENAME(t.name) + '; '
+FROM sys.tables AS t
+INNER JOIN sys.schemas AS s
+ON t.[schema_id] = s.[schema_id]
+WHERE s.name = N'dbo';
+
+EXEC sp_executesql @SQL;
+```
