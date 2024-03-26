@@ -52,9 +52,12 @@ podman run -it \
   -e KC_DB_URL='jdbc:sqlserver://;serverName=eu-az-sql-serv1.database.windows.net;databaseName=xxxxxxxxxxxxx' \
   -e KC_DB_USERNAME=meuuser \
   -e KC_DB_PASSWORD='mypaspaspaspas' \
-  -e KC_TRANSACTION_XA_ENABLED=false \
   -e KC_HOSTNAME=localhost \
+  -e KC_TRANSACTION_XA_ENABLED=false \
+  -e KC_HEALTH_ENABLED=true \
+  -e KC_METRICS_ENABLED=true \
   -v /tmp:/tmp \
+  -v ~/userapps/configs/keycloak/themes:/opt/keycloak/themes \
   --restart always \
   --name appkeycloak \
   lzocateli/keycloak:24.0.1 \
@@ -62,6 +65,47 @@ podman run -it \
 ```
 
 Acesse: http://localhost:5080/admin
+
+- Para produção:
+  - Deixe os arquivos de certificado .pem e .key com o acesso necessario
+
+```bash
+chmod 664 /userapps/ssl/*
+
+-rw-rw-r-- 1 dddd  241 Mar 19 23:09 zocate.li.key
+-rw-rw-r-- 1 dddd 3.3K Mar 19 23:09 zocate.li.pem
+```
+
+  - Execute o seguinte comando em produção
+
+```bash
+podman run -d \
+  -e TERM=xterm \
+  -e KEYCLOAK_ADMIN=admin \
+  -e KEYCLOAK_ADMIN_PASSWORD=admin \
+  -e KC_DB=mssql \
+  -e KC_DB_URL='jdbc:sqlserver://;serverName=eu-az-sql-serv1.database.windows.net;databaseName=xxxxxxxxxxxx' \
+  -e KC_DB_USERNAME=uuuuuuuuuuuuuuu \
+  -e KC_DB_PASSWORD='wwwwwwwwwwwwwwwwwwwww' \
+  -e KC_TRANSACTION_XA_ENABLED=false \
+  -e KC_HEALTH_ENABLED=true \
+  -e KC_METRICS_ENABLED=true \
+  -e KC_PROXY_HEADERS=forwarded \
+  -e KC_HOSTNAME_URL=https://seudominio.zocate.li \
+  -e KC_HOSTNAME_ADMIN_URL=https://seudominio.zocate.li \
+  -e KC_HTTPS_CERTIFICATE_FILE=/opt/keycloak/ssl/zocate.li.pem \
+  -e KC_HTTPS_CERTIFICATE_KEY_FILE=/opt/keycloak/ssl/zocate.li.key \
+  -v /tmp:/tmp \
+  -v /userapps/configs/keycloak/themes:/opt/keycloak/themes \
+  -v /userapps/ssl:/opt/keycloak/ssl \
+  --restart always \
+  --network=suarede \
+  --network-alias=appkeycloak \
+  --name appkeycloak \
+  lzocateli/keycloak:24.0.1 \
+    start --verbose
+```
+
 
 ### Documentação oficial
 
