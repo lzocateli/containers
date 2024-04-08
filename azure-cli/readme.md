@@ -7,7 +7,7 @@ lzocateli/azure-cli
 
 Tag version:
 ```
-2.59.0
+2.59.0-amd64
 ```
 
 Local para o dockerfile:
@@ -23,4 +23,10 @@ Imagem argumentos:
 Baypass proxy:
 ```
   nuuvify\.com
+```
+
+## Exemplo de uso
+
+```bash
+az devops security group list --org https://dev.azure.com/nuuvers --scope organization --subject-types aadgp | jq '.[] | {displayName: .displayName, description: .description}'
 ```
