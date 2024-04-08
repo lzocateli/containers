@@ -27,7 +27,7 @@ Baypass proxy:
 
 ## Exemplo de uso
 
-- Crie dois alias, um para o comando `az` e outro para  o comando `jq`, veja aqui [] como criar alias (super comandos com docker)
+- Crie dois alias, um para o comando `az` e outro para  o comando `jq`, veja aqui [https://github.com/lzocateli/containers] como criar alias (super comandos com docker)
 
 ```bash
 az devops security group list --org https://dev.azure.com/nuuvers --scope organization --subject-types aadgp | jq '.[] | {displayName: .displayName, description: .description}'
