@@ -1,6 +1,6 @@
-ARG AZ_VERSION=2.59.0-amd64
+ARG IMAGE_VERSION=2.59.0
 
-FROM mcr.microsoft.com/azure-cli:$AZ_VERSION AS buildbase
+FROM mcr.microsoft.com/azure-cli:$IMAGE_VERSION AS buildbase
 
 RUN apk update \
     && apk upgrade \
