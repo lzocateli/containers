@@ -39,7 +39,7 @@ Use o parametro `-it` no lugar `-d` para executar em modo iterativo
 ```
 - Importante: amensagem acima indica a porta interna do container, porém o acesso externo dever ser na porta indicada em `podman run`
 - A criação do banco geralmente demora 10 minutos, ou mais dependendo do local onde o banco esta hosteado.
-
+- **Verifique se seu provedor de banco de dados permite que você crie/modifique o shema, caso não permite, basta remover a instrução `-e KC_DB_SCHEMA=keycloak`**
 
 
 ```bash
@@ -49,6 +49,7 @@ podman run -it \
   -e KEYCLOAK_ADMIN=admin \
   -e KEYCLOAK_ADMIN_PASSWORD=admin \
   -e KC_DB=mssql \
+  -e KC_DB_SCHEMA=keycloak \
   -e KC_DB_URL='jdbc:sqlserver://;serverName=eu-az-sql-serv1.database.windows.net;databaseName=xxxxxxxxxxxxx' \
   -e KC_DB_USERNAME=meuuser \
   -e KC_DB_PASSWORD='mypaspaspaspas' \
@@ -84,6 +85,7 @@ podman run -d \
   -e KEYCLOAK_ADMIN=admin \
   -e KEYCLOAK_ADMIN_PASSWORD=admin \
   -e KC_DB=mssql \
+  -e KC_DB_SCHEMA=keycloak \
   -e KC_DB_URL='jdbc:sqlserver://;serverName=eu-az-sql-serv1.database.windows.net;databaseName=xxxxxxxxxxxx' \
   -e KC_DB_USERNAME=uuuuuuuuuuuuuuu \
   -e KC_DB_PASSWORD='wwwwwwwwwwwwwwwwwwwww' \
