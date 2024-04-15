@@ -39,16 +39,23 @@ voldbeaver="$($vardbeaver):/opt/cloudbeaver/workspace"
 mkdir -p $vardbeaver
 chmod -R 777 /var/cloudbeaver
 
-#Para Windows: -------------------------------------------
-vardbeaver=$HOME/cloudbeaver/workspace
-voldbeaver="$($vardbeaver):/opt/cloudbeaver/workspace"
-#---------------------------------------------------------
-
 podman run -d \
     -p 8978:8978 \
     -v $voldbeaver \
     --restart unless-stopped \
     --name cloudbeaver \
+    lzocateli/dbeaver:24.0.0
+```
+
+```powershell
+vardbeaver="$($HOME)/cloudbeaver/workspace"
+voldbeaver="$($vardbeaver):/opt/cloudbeaver/workspace"
+
+docker run -d `
+    -p 8978:8978 `
+    -v $voldbeaver `
+    --restart unless-stopped `
+    --name cloudbeaver `
     lzocateli/dbeaver:24.0.0
 ```
 
