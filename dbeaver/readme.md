@@ -36,9 +36,13 @@ sudo su -
 
 vardbeaver=/var/cloudbeaver/workspace
 voldbeaver="$($vardbeaver):/opt/cloudbeaver/workspace"
-
 mkdir -p $vardbeaver
 chmod -R 777 /var/cloudbeaver
+
+#Para Windows: -------------------------------------------
+vardbeaver=$HOME/cloudbeaver/workspace
+voldbeaver="$($vardbeaver):/opt/cloudbeaver/workspace"
+#---------------------------------------------------------
 
 podman run -d \
     -p 8978:8978 \
