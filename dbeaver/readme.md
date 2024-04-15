@@ -30,7 +30,7 @@ Baypass proxy: (insira 2 espaços a esquerda para não utilizar)
 
 Use o parametro `-it` no lugar `-d` para executar em modo iterativo
 
-
+- No Linux
 ```bash
 sudo su -
 
@@ -47,6 +47,7 @@ podman run -d \
     lzocateli/dbeaver:24.0.0
 ```
 
+- No Windows com docker desktop
 ```powershell
 vardbeaver="$($HOME)/cloudbeaver/workspace"
 voldbeaver="$($vardbeaver):/opt/cloudbeaver/workspace"
