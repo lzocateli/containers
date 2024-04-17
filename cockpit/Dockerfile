@@ -23,5 +23,4 @@ RUN apt-get install -y docker-ce docker-ce-cli containerd.io
 RUN apt-get install -y cockpit cockpit-podman
 EXPOSE 9090
 
-RUN ls -la /usr/sbin/
-#CMD ["/usr/sbin/cockpit-ws"]
+CMD ["/usr/lib/cockpit/cockpit-ws"]
