@@ -24,6 +24,10 @@ RUN . /etc/os-release && apt install -y -t ${VERSION_CODENAME}-backports cockpit
 RUN /usr/lib/cockpit/cockpit-certificate-ensure
 RUN /usr/lib/cockpit/cockpit-certificate-ensure --check
 
+RUN useradd -ms /bin/bash usercontainer
+USER usercontainer
+
+
 EXPOSE 9090
 
 CMD ["/usr/lib/cockpit/cockpit-ws"]
