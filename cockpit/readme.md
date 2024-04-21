@@ -38,5 +38,5 @@ podman run -d \
   -v /:/host \
   --pid=host \
   --name cockpit \
-  lzocateli/cockpit:86
+  lzocateli/cockpit:314
 ```
