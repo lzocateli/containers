@@ -7,7 +7,7 @@ lzocateli/cockpit
 
 Tag version:
 ```
-86
+314
 ```
 
 Local para o dockerfile:
@@ -32,11 +32,18 @@ Use o parametro `-it` no lugar `-d` para executar em modo iterativo
 
 - No Linux
 ```bash
+sudo su -
+apt remove cockpit
+apt autoremove
+apt install -y cockpit-system cockpit-bridge
+
+podman rmi $(podman images --filter=reference=lzocateli/cockpit -q) -f
+
 podman run -d \
   --privileged \
-  -p 9090:9090 \
+  -p 9091:9090 \
   -v /:/host \
   --pid=host \
-  --name cockpit \
+  --name cockpit-ws \
   lzocateli/cockpit:314
 ```
