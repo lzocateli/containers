@@ -35,7 +35,7 @@ Use o parametro `-it` no lugar `-d` para executar em modo iterativo
 sudo su -
 apt remove cockpit
 apt autoremove
-apt install -y cockpit-system cockpit-bridge
+apt install -y cockpit-system cockpit-bridge cockpit-podman
 
 podman rmi $(podman images --filter=reference=lzocateli/cockpit -q) -f
 
