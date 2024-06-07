@@ -7,7 +7,7 @@ lzocateli/node
 
 Tag version:
 ```
-16.14-bullseye
+16.14.2-bullseye
 ```
 
 Local para o dockerfile:
