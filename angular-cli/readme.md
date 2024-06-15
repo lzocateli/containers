@@ -2,17 +2,17 @@
 
 Nome da Imagem:
 ```
-lzocateli/node
+lzocateli/angular-cli
 ```
 
 Tag version:
 ```
-18.20.3-bullseye
+17.3.8
 ```
 
 Local para o dockerfile:
 ```
-containers/node
+containers/angular-cli
 ```
 
 Imagem argumentos: (insira 2 espaços a esquerda para não utilizar)
