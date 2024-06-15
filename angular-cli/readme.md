@@ -19,7 +19,7 @@ This image has the same usage as Angular CLI (https://cli.angular.io/)
 
  - I use the container as an alias, create the alias below:
 ```
-alias ng='podman run --rm -it -v "$(pwd):/workspace" -w /workspace -v /tmp/ng:/tmp/ng lzocateli/angular-cli:17.3.8 ng "$@"'
+alias ng='podman run --rm -it -p 4200:4200 -v "$(pwd):/workspace" -w /workspace -v /tmp/ng:/tmp/ng lzocateli/angular-cli:17.3.8 ng "$@"'
 ```
 
 ## Use the `ng` commands normally
