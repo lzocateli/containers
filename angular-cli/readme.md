@@ -17,22 +17,19 @@
 
 This image has the same usage as Angular CLI (https://cli.angular.io/)
 
-### Creating a project
-
+ - I use the container as an alias, create the alias below:
 ```
-docker run -it --rm -w /app -v $(pwd):/app lzocateli/angular-cli ng new my-project-name
-```
-
-### Generating a component
-
-```
-docker run -it --rm -w /app -v $(pwd)/my-project-name:/app lzocateli/angular-cli ng g component sample-component
+alias ng='podman run --rm -it -v "$(pwd):/workspace" -w /workspace -v /tmp/ng:/tmp/ng lzocateli/angular-cli:17.3.8 ng "$@"'
 ```
 
-### Serving
+## Use the `ng` commands normally
 
 ```
-docker run -it --rm -w /app -v $(pwd)/my-project-name:/app -p 4200:4200 lzocateli/angular-cli ng serve --host 0.0.0.0
+ng new my-project-name
+
+ng g component sample-component
+
+ng serve --host 0.0.0.0
 ```
 
 ## Credits
