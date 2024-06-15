@@ -5,12 +5,12 @@ ENV NG_CLI_ANALYTICS=false
 
 RUN apk update \
   && apk add --update alpine-sdk python3 \
-  && yarn global add @angular/cli@$ANGULAR_CLI_VERSION \
-  && ng config --global cli.packageManager yarn \
+  && npm install -g @angular/cli@$ANGULAR_CLI_VERSION \
+  && ng config --global cli.packageManager npm \
   && apk del alpine-sdk python3 \
   && rm -rf /tmp/* /var/cache/apk/* *.tar.gz ~/.npm \
   && npm cache clean --force \
-  && yarn cache clean \
   && sed -i -e "s/bin\/ash/bin\/sh/" /etc/passwd
+
 
 EXPOSE 4200
