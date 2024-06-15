@@ -17,4 +17,4 @@ EXPOSE 4200
 
 COPY docker-entrypoint.sh /usr/local/bin/
 
-CMD [ "ng" ]
+# CMD [ "ng" ]
