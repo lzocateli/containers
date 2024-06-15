@@ -14,7 +14,3 @@ RUN apk update \
   && sed -i -e "s/bin\/ash/bin\/sh/" /etc/passwd
 
 EXPOSE 4200
-
-# COPY docker-entrypoint.sh /usr/local/bin/
-
-# CMD [ "ng" ]
