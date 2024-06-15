@@ -1,26 +1,49 @@
-### Informe os seguintes parametros para gerar a imagem
-
-Nome da Imagem:
 ```
-lzocateli/angular-cli
-```
-
-Tag version:
-```
-17.3.8
+    _                      _                 ____ _     ___
+   / \   _ __   __ _ _   _| | __ _ _ __     / ___| |   |_ _|
+  / △ \ | '_ \ / _` | | | | |/ _` | '__|   | |   | |    | |
+ / ___ \| | | | (_| | |_| | | (_| | |      | |___| |___ | |
+/_/   \_\_| |_|\__, |\__,_|_|\__,_|_|       \____|_____|___|
+               |___/
 ```
 
-Local para o dockerfile:
+**package manager:** yarn<br/>
+**docker hub:** https://hub.docker.com/r/lzocateli/angular-cli/
+
+[![Docker Pulls](https://img.shields.io/docker/pulls/lzocateli/angular-cli.svg)](https://hub.docker.com/r/lzocateli/angular-cli/)
+[![Docker Stars](https://img.shields.io/docker/stars/lzocateli/angular-cli.svg)](https://hub.docker.com/r/lzocateli/angular-cli/)
+
+## Usage examples
+
+This image has the same usage as Angular CLI (https://cli.angular.io/)
+
+### Creating a project
+
 ```
-containers/angular-cli
+docker run -it --rm -w /app -v $(pwd):/app lzocateli/angular-cli ng new my-project-name
 ```
 
-Imagem argumentos: (insira 2 espaços a esquerda para não utilizar)
+### Generating a component
+
 ```
-  --build-arg Env_HttpProxy=proxy.xyz.com:80 --build-arg Env_NoProxy=xyz.com
+docker run -it --rm -w /app -v $(pwd)/my-project-name:/app lzocateli/angular-cli ng g component sample-component
 ```
 
-Baypass proxy: (insira 2 espaços a esquerda para não utilizar)
+### Serving
+
 ```
-  xyz\.com
+docker run -it --rm -w /app -v $(pwd)/my-project-name:/app -p 4200:4200 lzocateli/angular-cli ng serve --host 0.0.0.0
 ```
+
+## Credits
+
+Credits for the CLI go for [the Angular CLI team](https://github.com/angular/angular-cli) 
+
+Credits to [Alejandro Such ](https://github.com/alejandroSuch/angular-cli) who created the project that motivated me
+
+Maintainer:
+ - [Lincoln Zocateli](https://github.com/lzocateli)
+
+## License
+
+MIT
