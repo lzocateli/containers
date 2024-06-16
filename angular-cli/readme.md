@@ -17,8 +17,12 @@
 
 This image has the same usage as Angular CLI (https://cli.angular.io/)
 
- - I use the container as an alias, create the alias below:
-```
+ - I use the container as an alias, create the alias below:  
+
+  Para Linux
+```bash
+nano ~/.bash_aliases
+
 function ng() {
   if [[ $1 == "serve" ]]; then
     podman run --rm -it -p 4200:4200 -v "$(pwd):/workspace" -w /workspace -v /tmp/ng:/tmp/ng lzocateli/angular-cli:17.3.8 ng "$@"
@@ -29,9 +33,29 @@ function ng() {
 }
 ```
 
-## Use the `ng` commands normally
+  Para Windows PowerShell
+```powershell
+code  C:\Users\lzoca\OneDrive - zocateli\Documentos\WindowsPowerShell\profile.ps1
+
+Set-Alias ng FunNgCli -Option AllScope
+
+function FunNgCli {
+  param($firstArg)
+  if ($firstArg -eq "serve") {
+    C:\'Program Files'\Docker\Docker\resources\bin\docker.exe run --rm -it -p 4200:4200 -v "$(Get-Location):/workspace" -w /workspace -v "$($TEMP)/ng:/tmp/ng" lzocateli/angular-cli:17.3.8 ng $args
+    Stop-Process -Id (Get-NetTCPConnection -LocalPort 4200).OwningProcess -Force
+  } else {
+    C:\'Program Files'\Docker\Docker\resources\bin\docker.exe run --rm -it -v "$(Get-Location):/workspace" -w /workspace -v "$($TEMP)/ng:/tmp/ng" lzocateli/angular-cli:17.3.8 ng $args
+  }
+}
 
 ```
+
+
+
+## Use the `ng` commands normally
+
+```bash
 ng new my-project-name
 
 ng g component sample-component
