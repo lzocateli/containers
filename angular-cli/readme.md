@@ -18,7 +18,9 @@
 This image has the same usage as Angular CLI (https://cli.angular.io/)
 
  - I use the container as an alias, create the alias below:
-```
+```bash
+nano ~/.bash_aliases
+
 function ng() {
   if [[ $1 == "serve" ]]; then
     podman run --rm -it -p 4200:4200 -v "$(pwd):/workspace" -w /workspace -v /tmp/ng:/tmp/ng lzocateli/angular-cli:17.3.8 ng "$@"
@@ -31,7 +33,7 @@ function ng() {
 
 ## Use the `ng` commands normally
 
-```
+```bash
 ng new my-project-name
 
 ng g component sample-component
