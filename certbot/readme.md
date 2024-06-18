@@ -65,18 +65,18 @@ podman run -i \
   --name certbot \
   -v /userapps/certs:/etc/letsencrypt:z \
   -v /userapps/certs/_logs:/var/log/letsencrypt:z \
-  -v /userapps/.secrets/cloudflare.ini:/root/.secrets/certbot/cloudflare.ini \
+  -v /userapps/.secrets/cloudflare.ini:/root/.secrets/certbot/cloudflare.ini:z \
   --entrypoint certbot \
   lzocateli/certbot-dns-cloudflare:v2.9.0 \
     certonly \
     --noninteractive \
     --dns-cloudflare \
-    --dns-cloudflare-credentials ~/.secrets/certbot/cloudflare.ini \
+    --dns-cloudflare-credentials /root/.secrets/certbot/cloudflare.ini \
     --force-renewal \
     --max-log-backups 5 \
     -d zocate.li \
     -d credential.zocate.li \
-    --email seuemail@outlook.com \
+    --email seu_email@xxx.com \
     --agree-tos
 ```
 - Sera necessario criar um token de api com os seguintes acessos, e incluir o token no arquivo cloudflare.ini
