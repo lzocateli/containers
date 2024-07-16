@@ -20,7 +20,7 @@ RUN mkdir -p -m 777 /var/opt/mssql/log
 RUN mkdir -p -m 777 /var/opt/mssql/data
 RUN mkdir -p -m 777 /var/opt/sqlserver
 RUN chmod -R 777 /var/opt/mssql /var/opt/sqlserver /var/opt/mssql/data /var/opt/mssql/log
-RUN chown -R mssql /var/opt/mssql /var/opt/sqlserver /var/opt/mssql/data /var/opt/mssql/log
+#RUN chown -R mssql /var/opt/mssql /var/opt/sqlserver /var/opt/mssql/data /var/opt/mssql/log
 
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
@@ -29,4 +29,4 @@ RUN mkdir cd /home/mssql/
 
 RUN chown mssql /home/mssql/
 
-USER mssql
+#USER mssql
