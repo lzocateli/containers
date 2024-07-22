@@ -2,12 +2,12 @@
 
 Nome da Imagem:
 ```
-lzocateli/mariadb-10.7.5-focal
+lzocateli/mariadb
 ```
 
 Tag version:
 ```
-1.0.0
+11.2.4-jammy
 ```
 
 Local para o dockerfile:
