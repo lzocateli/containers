@@ -2,12 +2,12 @@
 
 Nome da Imagem:
 ```
-lzocateli/wordpress:php8.3
+lzocateli/wordpress
 ```
 
 Tag version:
 ```
-1.0.0
+6.6-php8.3
 ```
 
 Local para o dockerfile:
@@ -42,5 +42,5 @@ podman run -d \
   -e WORDPRESS_DB_NAME=zli \
   --network wp-lzo \
   --name wp-zocate-li \
-  lzocateli/wordpress:php8.3
+  lzocateli/wordpress:6.6-php8.3
 ```
