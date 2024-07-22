@@ -2,7 +2,7 @@
 
 Nome da Imagem:
 ```
-lzocateli/wordpress-php8.1
+lzocateli/wordpress:php8.3
 ```
 
 Tag version:
@@ -34,13 +34,13 @@ Use o parametro `-it` no lugar `-d` para executar em modo iterativo
 ```bash
 podman run -d \
   -p 8080:80 \
-  -v /userapps/volumes/wp-zocate.li-content:/var/www/html \
-  -v /userapps/volumes/wp-zocate.li-php:/usr/local/etc/php \
+  -v /userapps/wp-zocate.li-content:/var/www/html \
+  -v /userapps/wp-zocate.li-php:/usr/local/etc/php \
   -e WORDPRESS_DB_HOST=db \
   -e WORDPRESS_DB_USER=zocatel \
   -e WORDPRESS_DB_PASSWORD=teste!1 \
   -e WORDPRESS_DB_NAME=zli \
   --network wp-zocate.li \
   --name zocate-li-wp \
-  lzocateli/wordpress-php8.1
+  lzocateli/wordpress:php8.3
 ```
