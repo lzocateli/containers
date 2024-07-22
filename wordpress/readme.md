@@ -40,7 +40,7 @@ podman run -d \
   -e WORDPRESS_DB_USER=zocatel \
   -e WORDPRESS_DB_PASSWORD=teste!1 \
   -e WORDPRESS_DB_NAME=zli \
-  --network wp-lzoca \
+  --network wp-lzo \
   --name wp-zocate-li \
   lzocateli/wordpress:php8.3
 ```
