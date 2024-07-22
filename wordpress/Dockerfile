@@ -1,1 +1,1 @@
-FROM wordpress:php8.1
+FROM wordpress:php8.3
