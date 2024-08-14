@@ -24,3 +24,28 @@ Baypass proxy:
 ```
   nuuvify\.com
 ```
+
+## Verificar se tem algum serviço usando a porta 53
+```bash
+sudo lsof -i -P -n | grep LISTEN
+```
+
+## Para desabilitar o serviço systemd-resolved no Ubuntu Server 22.04, siga estes passos:
+- Desabilitar e parar o serviço:
+```bash
+sudo systemctl disable systemd-resolved.service
+sudo systemctl stop systemd-resolved.service
+```
+- Remover o link simbólico do resolv.conf:
+```bash
+sudo rm /etc/resolv.conf
+```
+- Criar um novo link simbólico para o resolv.conf:
+```bash
+sudo ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
+```
+- Reiniciar o NetworkManager:
+```bash
+sudo systemctl restart NetworkManager
+```
+Esses comandos irão desabilitar o systemd-resolved e garantir que o sistema utilize o arquivo resolv.conf padrão para a resolução de nomes DNS
