@@ -1,4 +1,4 @@
-FROM pihole/pihole:latest
+FROM pihole/pihole:2024.07.0
 
 ENV DEBIAN_FRONTEND=noninteractive
 
