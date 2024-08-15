@@ -17,3 +17,5 @@ RUN tee /etc/s6-overlay/s6-rc.d/unbound/up <<EOF
 foreground { echo "starting unbound..." }
 /etc/init.d/unbound start
 EOF
+
+SHELL ["/bin/bash", "-c"]
