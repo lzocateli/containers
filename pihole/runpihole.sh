@@ -2,12 +2,16 @@
 
 podman rm pihole -f
 
-# https://github.com/pi-hole/docker-pi-hole/blob/master/README.md
-
 # PIHOLE_BASE="${PIHOLE_BASE:-$(pwd)}"
-PIHOLE_BASE="${PIHOLE_BASE:-/userapps}"
+PIHOLE_BASE="${PIHOLE_BASE:-/userapps/vol-pihole}"
+PIHOLE_LOG="/userapps/var/log/pihole/"
+
 [[ -d "$PIHOLE_BASE" ]] || mkdir -p "$PIHOLE_BASE" || { echo "Couldn't create storage directory: $PIHOLE_BASE"; exit 1; }
 
+if [ ! -d "$PIHOLE_LOG" ]; then
+    mkdir -p $PIHOLE_LOG
+    touch unbound.log
+fi
 if [ ! -d "/userapps/secrets" ]; then
     mkdir -p /userapps/secrets
 fi
@@ -19,7 +23,6 @@ else
     echo "Criado."
 fi
 
-# Note: FTLCONF_LOCAL_IPV4 should be replaced with your external ip.
 podman run -d \
     --name pihole \
     -p 53:53/tcp \
@@ -29,16 +32,18 @@ podman run -d \
     -e VIRTUAL_HOST="pi.hole" \
     -e PROXY_LOCATION="pi.hole" \
     -e FTLCONF_LOCAL_IPV4="172.16.10.1" \
-    -e WEBPASSWORD= \
     -e WEBPASSWORD_FILE=pihole \
     -e DNSMASQ_LISTENING=all \
     -e DNSSEC=true \
-    -v "${PIHOLE_BASE}/etc-pihole:/etc/pihole" \
-    -v "${PIHOLE_BASE}/etc-dnsmasq.d:/etc/dnsmasq.d" \
-    --dns=127.0.0.1 \
-    --dns=1.1.1.2 \
+    -v "${PIHOLE_BASE}/etc/pihole:/etc/pihole" \
+    -v "${PIHOLE_BASE}/etc/dnsmasq.d:/etc/dnsmasq.d" \
+    -v "${PIHOLE_LOG}/unbound.log:/var/log/unbound/unbound.log" \
+    --secret pihole \
     --restart=unless-stopped \
     --hostname pi.hole \
-    pihole/pihole:2024.07.0
+    lzocateli/pihole-unbound:2024.07.0
+
+    # --dns=127.0.0.1 \
+    # --dns=1.1.1.1 \
 
 podman ps -a

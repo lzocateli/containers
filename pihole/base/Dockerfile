@@ -8,7 +8,7 @@ RUN apt-get update -y && \
 
 RUN mkdir -p /etc/unbound/unbound.conf.d/
 COPY ./pi-hole.conf /etc/unbound/unbound.conf.d/
-
+COPY ./99-edns.conf /etc/dnsmasq.d/
 
 RUN touch /etc/s6-overlay/s6-rc.d/user/contents.d/unbound
 RUN mkdir /etc/s6-overlay/s6-rc.d/unbound
