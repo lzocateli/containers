@@ -4,13 +4,16 @@ podman rm pihole -f
 
 # PIHOLE_BASE="${PIHOLE_BASE:-$(pwd)}"
 PIHOLE_BASE="${PIHOLE_BASE:-/userapps/vol-pihole}"
-PIHOLE_LOG="/userapps/var/log/pihole/"
+PIHOLE_LOG="/userapps/var/log/pihole"
 
-[[ -d "$PIHOLE_BASE" ]] || mkdir -p "$PIHOLE_BASE" || { echo "Couldn't create storage directory: $PIHOLE_BASE"; exit 1; }
-
-if [ ! -d "$PIHOLE_LOG" ]; then
+if [ ! -d "$PIHOLE_BASE" ]; then
+    mkdir -p "${PIHOLE_BASE}/etc/dnsmasq.d"
+    mkdir -p "${PIHOLE_BASE}/etc/pihole"
+    mkdir -p "${PIHOLE_BASE}/etc/unbound"
+fi
+if [ ! -d "$PIHOLE_LOG" ] || [ ! -f "${PIHOLE_LOG}/unbound.log" ]; then
     mkdir -p $PIHOLE_LOG
-    touch unbound.log
+    touch "${PIHOLE_LOG}/unbound.log"
 fi
 if [ ! -d "/userapps/secrets" ]; then
     mkdir -p /userapps/secrets
@@ -37,6 +40,7 @@ podman run -d \
     -e DNSSEC=true \
     -v "${PIHOLE_BASE}/etc/pihole:/etc/pihole" \
     -v "${PIHOLE_BASE}/etc/dnsmasq.d:/etc/dnsmasq.d" \
+    -v "${PIHOLE_BASE}/etc/unbound/pi-hole.conf:/etc/unbound/unbound.conf.d/pi-hole.conf" \
     -v "${PIHOLE_LOG}/unbound.log:/var/log/unbound/unbound.log" \
     --secret pihole \
     --restart=unless-stopped \
@@ -47,3 +51,4 @@ podman run -d \
     # --dns=1.1.1.1 \
 
 podman ps -a
+
