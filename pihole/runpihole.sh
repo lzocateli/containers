@@ -35,7 +35,6 @@ podman run -d \
     -p 53:53/udp \
     -p 80:80 \
     -e TZ="America/Sao_Paulo" \
-
     -e WEBPASSWORD_FILE=pihole \
     -e DNSMASQ_LISTENING=all \
     -e DNSSEC=true \
