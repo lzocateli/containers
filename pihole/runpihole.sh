@@ -35,9 +35,7 @@ podman run -d \
     -p 53:53/udp \
     -p 80:80 \
     -e TZ="America/Sao_Paulo" \
-    -e VIRTUAL_HOST="pi.hole" \
-    -e PROXY_LOCATION="pi.hole" \
-    -e FTLCONF_LOCAL_IPV4="172.16.10.1" \
+
     -e WEBPASSWORD_FILE=pihole \
     -e DNSMASQ_LISTENING=all \
     -e DNSSEC=true \
@@ -50,6 +48,9 @@ podman run -d \
     --hostname pi.hole \
     lzocateli/pihole-unbound:2024.07.0
 
+
+    # -e VIRTUAL_HOST="pi.hole" \
+    # -e PROXY_LOCATION="pi.hole" \
     # --dns=127.0.0.1 \
     # --dns=1.1.1.1 \
 
