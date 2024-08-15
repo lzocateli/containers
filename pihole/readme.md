@@ -28,6 +28,7 @@ Baypass proxy:
 ## Documentação de referencia
 
 - https://github.com/pi-hole/docker-pi-hole/blob/master/README.md
+- https://docs.pi-hole.net/guides/dns/unbound/
 - https://github.com/robwithtech/homelab/blob/main/docker%20compose/piholeunbound/pihole-unbound.yml
 
 ## Verificar se tem algum serviço usando a porta 53
