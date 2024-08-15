@@ -1,8 +1,8 @@
-- Informe os seguintes parametros para gerar a imagem
+## Informe os seguintes parametros para gerar a imagem BASE
 
 Nome da Imagem:
 ```
-lzocateli/pihole
+lzocateli/pihole-unbound
 ```
 
 Tag version:
@@ -12,7 +12,7 @@ Tag version:
 
 Local para o dockerfile:
 ```
-containers/pihole
+containers/pihole/base
 ```
 
 Imagem argumentos:
@@ -24,6 +24,11 @@ Baypass proxy:
 ```
   nuuvify\.com
 ```
+
+## Documentação de referencia
+
+- https://github.com/pi-hole/docker-pi-hole/blob/master/README.md
+- https://github.com/robwithtech/homelab/blob/main/docker%20compose/piholeunbound/pihole-unbound.yml
 
 ## Verificar se tem algum serviço usando a porta 53
 ```bash
