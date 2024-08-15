@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# /userapps/vol-pihole/etc/dnsmasq.d/99-edns.conf
+# /userapps/vol-pihole/etc/unbound/pi-hole.conf
+
 podman rm pihole -f
 
 # PIHOLE_BASE="${PIHOLE_BASE:-$(pwd)}"
