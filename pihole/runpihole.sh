@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# /userapps/vol-pihole/etc/dnsmasq.d/99-edns.conf
-# /userapps/vol-pihole/etc/unbound/pi-hole.conf
-
 podman rm pihole -f
 
 # PIHOLE_BASE="${PIHOLE_BASE:-$(pwd)}"
@@ -45,13 +42,12 @@ podman run -d \
     --secret pihole \
     --restart=unless-stopped \
     --hostname pi.hole \
+    --network=host \
     lzocateli/pihole-unbound:2024.07.0
 
 
-    # -e VIRTUAL_HOST="pi.hole" \
-    # -e PROXY_LOCATION="pi.hole" \
     # --dns=127.0.0.1 \
     # --dns=1.1.1.1 \
+#    -e FTLCONF_LOCAL_IPV4="172.16.10.1" \
 
 podman ps -a
-
