@@ -18,7 +18,4 @@ foreground { echo "starting unbound..." }
 /etc/init.d/unbound start
 EOF
 
-HEALTHCHECK --interval=1m --timeout=3s \
-    CMD dig +short +norecurse +retry=0 @127.0.0.1 pi.hole || exit 1
-
 SHELL ["/bin/bash", "-c"]
