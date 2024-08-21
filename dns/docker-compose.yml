@@ -35,13 +35,16 @@ services:
       # - "443:443/tcp"
     environment:
       TZ: 'America/Sao_Paulo'
-      WEBPASSWORD: 'password'
+      WEBPASSWORD_FILE: '/run/secrets/pihole'
       PIHOLE_DNS_: '172.16.10.51#5053'
       DNSMASQ_LISTENING: 'all'
       VIRTUAL_HOST: pihole.local
     volumes:
       - "${PIHOLE_BASE}/etc/pihole/:/etc/pihole/"
       - "${PIHOLE_BASE}/etc/dnsmasq.d/:/etc/dnsmasq.d/"
+    secrets:
+      - source: pihole
+        target: /run/secrets/pihole
     networks:
       dns_net:
         ipv4_address: 172.16.10.50
@@ -77,3 +80,7 @@ networks:
        
 #172.16.10.49 - 172.16.10.54
 #255.255.255.248
+
+secrets:
+  pihole:
+    external: true
