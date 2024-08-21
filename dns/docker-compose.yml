@@ -1,0 +1,79 @@
+version: "3.8"
+
+    
+services:
+
+  cloudflared:
+    container_name: cloudflared
+    image: lzocateli/cloudflared:2024.8.2-amd64
+    restart: unless-stopped
+    command: proxy-dns
+    environment:
+      TZ: 'America/Sao_Paulo'
+      TUNNEL_DNS_UPSTREAM: 'https://1.1.1.1/dns-query,https://1.0.0.1/dns-query,https://9.9.9.9/dns-query,https://149.112.112.9/dns-query'
+      TUNNEL_DNS_PORT: '5053'
+      TUNNEL_DNS_ADDRESS: '0.0.0.0'
+    networks:
+      dns_net:
+        ipv4_address: 172.16.10.52
+    security_opt:
+      - no-new-privileges:true
+
+
+  pihole:
+    container_name: pihole
+    image: lzocateli/pihole:2024.07.0
+    restart: unless-stopped
+    depends_on:
+      - cloudflared
+      - unbound
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      # - "67:67/udp"
+      - "80:80/tcp"
+      # - "443:443/tcp"
+    environment:
+      TZ: 'America/Sao_Paulo'
+      WEBPASSWORD: 'password'
+      PIHOLE_DNS_: '172.16.10.51#5053'
+      DNSMASQ_LISTENING: 'all'
+      VIRTUAL_HOST: pihole.local
+    volumes:
+      - "${PIHOLE_BASE}/etc/pihole/:/etc/pihole/"
+      - "${PIHOLE_BASE}/etc/dnsmasq.d/:/etc/dnsmasq.d/"
+    networks:
+      dns_net:
+        ipv4_address: 172.16.10.50
+      proxy:
+
+
+  unbound:
+    container_name: unbound
+    image: lzocateli/unbound:1.20.0
+    restart: unless-stopped
+    ports:
+      - "5053:53/tcp"
+      - "5053:53/udp"
+    environment:
+      TZ: 'America/Sao_Paulo'
+    volumes:
+      - "${PIHOLE_BASE}/etc/unbound/:/opt/unbound/etc/unbound"
+      - "${PIHOLE_LOG}/unbound.log:/var/log/unbound/unbound.log"
+    networks:
+      dns_net:
+        ipv4_address: 172.16.10.51
+
+
+networks:
+  dns_net:
+    driver: bridge
+    ipam:
+        config:
+        - subnet: 172.16.10.50/29
+    name: dns_net
+  proxy:
+    external: true
+       
+#172.16.10.49 - 172.16.10.54
+#255.255.255.248
