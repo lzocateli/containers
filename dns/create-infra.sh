@@ -43,10 +43,11 @@ else
 
    if ! podman network exists dns_net; then
       echo "Criando rede podman"
-      podman network create --driver bridge --subnet 172.16.53.0/29 dns_net
+      podman network create --driver bridge --subnet 172.16.10.0/23 dns_net
 
       echo "Edite o arquivo: nano /home/brazildevops/.config/cni/net.d/dns_net.conflist"
-      echo "Altere a versao do cniVersion para 0.4.0"
+      echo "copie o conteudo do arquivo dns_net.conflist dessa pasta"
+      echo "depois reinicie o servico do podman: systemctl restart podman"
    else
       echo "Rede dns_net ja existe"
    fi
