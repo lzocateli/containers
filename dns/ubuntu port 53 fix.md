@@ -1,5 +1,9 @@
-- run these commands to fix port bind error
+- Verificar se tem algum serviço usando a porta 53
+```bash
+sudo lsof -i -P -n | grep LISTEN
+```
 
+- run these commands to fix port bind error
 ```bash
 sudo sed -r -i.orig 's/#?DNSStubListener=yes/DNSStubListener=no/g' /etc/systemd/resolved.conf
 
