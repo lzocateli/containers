@@ -9,6 +9,7 @@ touch /userapps/var/log/unbound/unbound.log
 
 if [ ! -d "/userapps/secrets" ]; then
     mkdir -p /userapps/secrets
+    echo "Teste@1234" >/userapps/secrets/pihole
 fi
 if podman secret ls | grep -q 'pihole'; then
     echo "Secret 'pihole' já existe."
