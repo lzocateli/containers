@@ -40,8 +40,11 @@ services:
       DNSMASQ_LISTENING: 'all'
       VIRTUAL_HOST: pihole.lzoca
     volumes:
-      - /userapps/vol-pihole/etc/pihole/99-edns.conf:/etc/pihole/99-edns.conf
+#      - /userapps/vol-pihole/etc/pihole/99-edns.conf:/etc/pihole/99-edns.conf
+      - /userapps/vol-pihole/etc/pihole:/etc/pihole:rw
       - /userapps/vol-pihole/etc/dnsmasq.d:/etc/dnsmasq.d
+    cap_add:
+      - NET_ADMIN
 #    secrets:
 #      - source: pihole
 #        target: /run/secrets/pihole
