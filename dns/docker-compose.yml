@@ -1,6 +1,6 @@
 version: "3.8"
 
-    
+
 services:
 
   cloudflared:
@@ -15,15 +15,15 @@ services:
       TUNNEL_DNS_ADDRESS: '0.0.0.0'
     networks:
       dns_net:
-        ipv4_address: 172.16.10.52
-    security_opt:
-      - no-new-privileges:true
+        ipv4_address: 172.16.10.53
+#        ipv4_address: 172.16.53.4
 
 
   pihole:
     container_name: pihole
     image: lzocateli/pihole:2024.07.0
     restart: unless-stopped
+    hostname: pihole.lzoca
     depends_on:
       - cloudflared
       - unbound
@@ -35,20 +35,20 @@ services:
       # - "443:443/tcp"
     environment:
       TZ: 'America/Sao_Paulo'
-      WEBPASSWORD_FILE: '/run/secrets/pihole'
-      PIHOLE_DNS_: '172.16.10.51#5053'
+      WEBPASSWORD_FILE: 'password'  #'/run/secrets/pihole'
+      PIHOLE_DNS_: '172.16.10.52#5053'
       DNSMASQ_LISTENING: 'all'
-      VIRTUAL_HOST: pihole.local
+      VIRTUAL_HOST: pihole.lzoca
     volumes:
-      - "${PIHOLE_BASE}/etc/pihole/:/etc/pihole/"
-      - "${PIHOLE_BASE}/etc/dnsmasq.d/:/etc/dnsmasq.d/"
-    secrets:
-      - source: pihole
-        target: /run/secrets/pihole
+      - /userapps/vol-pihole/etc/pihole/99-edns.conf:/etc/pihole/99-edns.conf
+      - /userapps/vol-pihole/etc/dnsmasq.d:/etc/dnsmasq.d
+#    secrets:
+#      - source: pihole
+#        target: /run/secrets/pihole
     networks:
       dns_net:
-        ipv4_address: 172.16.10.50
-      proxy:
+        ipv4_address: 172.16.10.51
+#        ipv4_address: 172.16.53.2
 
 
   unbound:
@@ -61,25 +61,27 @@ services:
     environment:
       TZ: 'America/Sao_Paulo'
     volumes:
-      - "${PIHOLE_BASE}/etc/unbound/:/opt/unbound/etc/unbound"
-      - "${PIHOLE_LOG}/unbound.log:/var/log/unbound/unbound.log"
+      - /userapps/vol-pihole/etc/unbound:/opt/unbound/etc/unbound
+      - /userapps/var/log/unbound/unbound.log:/opt/unbound/etc/unbound/unbound.log
     networks:
       dns_net:
-        ipv4_address: 172.16.10.51
+        ipv4_address: 172.16.10.52
+#        ipv4_address: 172.16.53.3
 
 
 networks:
   dns_net:
     driver: bridge
-    ipam:
-        config:
-        - subnet: 172.16.10.50/29
+#    ipam:
+#        config:
+#        - subnet: 172.16.53.0/29
     name: dns_net
-  proxy:
-    external: true
-       
-#172.16.10.49 - 172.16.10.54
+#  proxy:
+#    external: true
+
+#172.16.53.1 - 172.16.53.6
 #255.255.255.248
+#172.16.53.0/29
 
 secrets:
   pihole:
