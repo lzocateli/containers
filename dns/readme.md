@@ -31,4 +31,5 @@ Baypass proxy:
 - https://docs.pi-hole.net/guides/dns/unbound/
 - https://github.com/robwithtech/homelab/blob/main/docker%20compose/piholeunbound/pihole-unbound.yml
 
+- Unbound: https://calomel.org/unbound_dns.html
 
