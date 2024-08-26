@@ -40,9 +40,9 @@ services:
       DNSMASQ_LISTENING: 'all'
       VIRTUAL_HOST: pihole.lzoca
     volumes:
-#      - /userapps/vol-pihole/etc/pihole/99-edns.conf:/etc/pihole/99-edns.conf
+      - /userapps/vol-pihole/etc/pihole/99-edns.conf:/etc/pihole/99-edns.conf:rw
       - /userapps/vol-pihole/etc/pihole:/etc/pihole:rw
-      - /userapps/vol-pihole/etc/dnsmasq.d:/etc/dnsmasq.d
+      - /userapps/vol-pihole/etc/dnsmasq.d:/etc/dnsmasq.d:rw
     cap_add:
       - NET_ADMIN
 #    secrets:
@@ -64,8 +64,8 @@ services:
     environment:
       TZ: 'America/Sao_Paulo'
     volumes:
-      - /userapps/vol-pihole/etc/unbound:/opt/unbound/etc/unbound
-      - /userapps/var/log/unbound/unbound.log:/opt/unbound/etc/unbound/unbound.log
+      - /userapps/vol-pihole/etc/unbound:/opt/unbound/etc/unbound:rw
+      - /userapps/var/log/unbound/unbound.log:/var/log/unbound/unbound.log:rw
     networks:
       dns_net:
         ipv4_address: 172.16.10.52
