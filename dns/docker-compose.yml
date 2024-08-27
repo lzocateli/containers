@@ -38,7 +38,7 @@ services:
       WEBPASSWORD_FILE: 'password'  #'/run/secrets/pihole'
       PIHOLE_DNS_: '172.16.10.53#5053'
       DNSMASQ_LISTENING: 'all'
-      VIRTUAL_HOST: pihole.lzoca
+      VIRTUAL_HOST: pihole.lzoca.local
     volumes:
       - /userapps/vol-pihole/etc/pihole/99-edns.conf:/etc/pihole/99-edns.conf
       - /userapps/vol-pihole/etc/pihole:/etc/pihole
