@@ -16,14 +16,13 @@ services:
     networks:
       dns_net:
         ipv4_address: 172.16.10.53
-#        ipv4_address: 172.16.53.4
 
 
   pihole:
     container_name: pihole
     image: lzocateli/pihole:2024.07.0
     restart: unless-stopped
-    hostname: pihole.lzoca
+    hostname: pi.hole
     depends_on:
       - cloudflared
  #     - unbound
@@ -35,10 +34,14 @@ services:
       # - "443:443/tcp"
     environment:
       TZ: 'America/Sao_Paulo'
-      WEBPASSWORD_FILE: 'password'  #'/run/secrets/pihole'
+      WEBPASSWORD_FILE: #'/run/secrets/pihole'
+      PIHOLE_DNS_: '127.0.0.1'
       PIHOLE_DNS_: '172.16.10.53#5053'
       DNSMASQ_LISTENING: 'all'
-      VIRTUAL_HOST: pihole.lzoca.local
+      VIRTUAL_HOST: 'pi.hole'
+      PROXY_LOCATION: 'pi.hole'
+      FTLCONF_LOCAL_IPV4: '127.0.0.1'
+      IPv6: 'false'
     volumes:
       - /userapps/vol-pihole/etc/pihole/99-edns.conf:/etc/pihole/99-edns.conf
       - /userapps/vol-pihole/etc/pihole:/etc/pihole
@@ -51,7 +54,6 @@ services:
     networks:
       dns_net:
         ipv4_address: 172.16.10.51
-#        ipv4_address: 172.16.53.2
 
 
 #  unbound:
@@ -69,7 +71,6 @@ services:
 #    networks:
 #      dns_net:
 #        ipv4_address: 172.16.10.52
-##        ipv4_address: 172.16.53.3
 
 
 networks:
