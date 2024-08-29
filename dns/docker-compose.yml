@@ -41,7 +41,7 @@ services:
       VIRTUAL_HOST: 'pi.hole'
       PROXY_LOCATION: 'pi.hole'
       FTLCONF_LOCAL_IPV4: '127.0.0.1'
-      IPv6: 'false'
+      FTLCONF_LOCAL_IPV6: 'fd28:fd43:c2c2::f78'
     volumes:
       - /userapps/vol-pihole/etc/pihole/99-edns.conf:/etc/pihole/99-edns.conf
       - /userapps/vol-pihole/etc/pihole:/etc/pihole
