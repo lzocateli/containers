@@ -24,3 +24,29 @@ Baypass proxy:
 ```
   nuuvify\.com
 ```
+
+### Para executar o container
+
+```bash
+#!/bin/bash
+
+#chmod -R 777 /userapps/tmp/redisgui/
+
+podman rm redisgui -f
+
+
+podman run -d \
+  -q \
+  -e RI_PROXY_PATH=/ \
+  -e TZ=America/Sao_Paulo \
+  -v /userapps/tmp/redisgui:/tmp \
+  -v /userapps/tmp/redisgui/data:/data \
+  --restart always \
+  --network=lzo \
+  --name redisgui \
+  lzocateli/redis-gui:2.54.0-amd64
+
+sleep 5
+podman ps -a
+podman logs redisgui
+```
