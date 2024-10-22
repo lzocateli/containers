@@ -1,6 +1,8 @@
 version: "3.8"
 
+
 services:
+
 
   pihole:
     container_name: pihole
@@ -8,6 +10,7 @@ services:
     restart: unless-stopped
     hostname: pi.hole
     depends_on:
+#      - cloudflared
       - unbound
     ports:
       - "53:53/tcp"
@@ -59,7 +62,16 @@ services:
 networks:
   dns_net:
     driver: bridge
+#    ipam:
+#        config:
+#        - subnet: 172.16.53.0/29
     name: dns_net
+#  proxy:
+#    external: true
+
+#172.16.53.1 - 172.16.53.6
+#255.255.255.248
+#172.16.53.0/29
 
 secrets:
   pihole:
