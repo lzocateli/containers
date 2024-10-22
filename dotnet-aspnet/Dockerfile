@@ -1,1 +1,1 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0.6-jammy-amd64
+FROM mcr.microsoft.com/dotnet/aspnet:8.0.8-jammy-amd64
