@@ -8,9 +8,9 @@ RUN apt update -y \
     nginx-extras \
     nano \
     net-tools \
-    iputils-ping \
     telnet
-
+    
+    # iputils-ping \
 COPY html /usr/share/nginx/html
 COPY ./nginx.conf /etc/nginx/nginx.conf
 COPY ./configs/custom-error.locations /etc/nginx/conf.d/
