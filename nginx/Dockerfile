@@ -1,4 +1,4 @@
-ARG NGINX_VERSION=1.25.0-bullseye
+ARG NGINX_VERSION=1.27.2-bookworm
 
 FROM nginx:$NGINX_VERSION AS buildbase
 
