@@ -6,6 +6,7 @@ RUN apt update -y \
     && apt upgrade -y
 
 RUN apt install -y wget nano net-tools apt-utils iputils-ping telnet
+RUN apt install -y nginx-plus-module-headers-more
 
 # RUN mkdir -p /etc/apt/keyrings
 # RUN wget -qO - https://nginx.org/packages/keys/nginx_signing.key | tee /etc/apt/keyrings/nginx_signing.key
