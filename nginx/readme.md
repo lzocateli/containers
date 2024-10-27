@@ -36,7 +36,7 @@ Modo como serviço
 
 ```bash
 # Para excluir a imgem e o container anterior
-podman rmi $(podman images --filter=reference='nginx:' -q) -f
+podman rmi $(podman images --filter=reference='nginx' -q) -f
 # Para excluir apenas o container anterior
 podman rm nginx -f
 
