@@ -5,8 +5,8 @@ FROM nginx:$NGINX_VERSION AS buildbase
 RUN apt update -y \
     && apt upgrade -y
 
-RUN apt install -y \
-    nginx-extras
+# RUN apt install -y \
+#     nginx-extras
     
     
     # nano
