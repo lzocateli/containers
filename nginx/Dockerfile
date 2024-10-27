@@ -6,9 +6,10 @@ RUN apt update -y \
     && apt upgrade -y
 
 RUN apt install -y \
-    nginx-extras \
-    nano
+    nginx-extras
     
+    
+    # nano
     # net-tools \
     # telnet
     
