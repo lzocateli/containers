@@ -5,7 +5,13 @@ FROM nginx:$NGINX_VERSION AS buildbase
 RUN apt update -y \
     && apt upgrade -y
 
-# RUN apt install -y \
+RUN mkdir -p /etc/apt/keyrings
+RUN wget -qO - https://nginx.org/packages/keys/nginx_signing.key | sudo tee /etc/apt/keyrings/nginx_signing.key
+
+RUN echo "deb [signed-by=/etc/apt/keyrings/nginx_signing.key] https://nginx.org/packages/debian bookworm nginx" | sudo tee /etc/apt/sources.list.d/nginx.list
+
+RUN apt update -y \
+ && apt install nginx-module-*
 #     nginx-extras
     
     
