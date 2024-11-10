@@ -30,18 +30,19 @@ Baypass proxy:
 ```bash
 #!/bin/bash
 
+mkdir -p ~/userapps/stirling-pdf/logs ~/userapps/stirling-pdf/extraConfigs ~/userapps/stirling-pdf/trainingData
 podman rm stirling-pdf -f
 
 docker run -d \
   -p 8080:8080 \
-  -v /location/of/trainingData:/usr/share/tessdata \
-  -v /location/of/extraConfigs:/configs \
-  -v /location/of/logs:/logs \
+  -v ~/userapps/stirling-pdf/trainingData:/usr/share/tessdata \
+  -v ~/userapps/stirling-pdf/extraConfigs:/configs \
+  -v ~/userapps/stirling-pdf/logs:/logs \
   -e DOCKER_ENABLE_SECURITY=false \
   -e INSTALL_BOOK_AND_ADVANCED_HTML_OPS=false \
-  -e LANGS=en_GB \
+  -e LANGS=pt_BR \
   --name stirling-pdf \
-  frooodle/s-pdf:latest
+  lzocateli/stirling-pdf:0.32.0
 
   Can also add these for customisation but are not required
   -v /location/of/customFiles:/customFiles \
