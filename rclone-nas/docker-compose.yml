@@ -1,0 +1,24 @@
+services:
+  rclone-david:
+    container_name: rclone-david
+    restart: unless-stopped
+    tty: true
+    environment:
+      - TZ=${TZ}
+      - RCLONE_DEST=onedrivedavid:/nas-backup
+    volumes:
+      - ${DOCKER_APPDATA_ROOT}/backup/rclone:/config/rclone:rw
+      - ${BACKUP_DATA_ROOT}/David:/data:ro
+    build: .
+
+  rclone-maria:
+    container_name: rclone-maria
+    restart: unless-stopped
+    tty: true
+    environment:
+      - TZ=${TZ}
+      - RCLONE_DEST=onedrivemaria:/nas-backup
+    volumes:
+      - ${DOCKER_APPDATA_ROOT}/backup/rclone:/config/rclone:rw
+      - ${BACKUP_DATA_ROOT}/Maria:/data:ro
+    build: .
