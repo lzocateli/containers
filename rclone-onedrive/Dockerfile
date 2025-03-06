@@ -1,6 +1,6 @@
 ARG BUILDPLATFORM=linux/amd64
 
-FROM --platform=$BUILDPLATFORM rclone:master
+FROM --platform=$BUILDPLATFORM rclone/rclone:master
 
 # FROM rclone/rclone
 
