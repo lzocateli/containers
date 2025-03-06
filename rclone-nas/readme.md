@@ -30,38 +30,8 @@ Baypass proxy: (insira 2 espaços a esquerda para não utilizar)
 
 Use o parametro `-it` no lugar `-d` para executar em modo iterativo
 
-- No Linux
-```bash
-sudo su -
+- RCLONE_DEST=onedrivelzocateli
+  Deve ser o mesmo nome do bloco incluido no arquivo `rclone.conf`
 
-vardbeaver=/var/cloudbeaver/workspace
-voldbeaver="$($vardbeaver):/opt/cloudbeaver/workspace"
-mkdir -p $vardbeaver
-chmod -R 777 /var/cloudbeaver
+- Use o arquivo docker-compose.yml para executar o container
 
-podman run -d \
-    -p 8978:8978 \
-    -v $voldbeaver \
-    --restart unless-stopped \
-    --name cloudbeaver \
-    lzocateli/dbeaver:24.0.0
-```
-
-- No Windows com docker desktop
-```powershell
-vardbeaver="$($HOME)/cloudbeaver/workspace"
-voldbeaver="$($vardbeaver):/opt/cloudbeaver/workspace"
-
-docker run -d `
-    -p 8978:8978 `
-    -v $voldbeaver `
-    --restart unless-stopped `
-    --name cloudbeaver `
-    lzocateli/dbeaver:24.0.0
-```
-
-Acesse: http://localhost:8978/
-
-### Documentação oficial
-
-https://github.com/dbeaver/cloudbeaver/wiki/Run-Docker-Container
