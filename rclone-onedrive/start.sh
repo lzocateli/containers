@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "Running backup on start..."
-/backup.sh
+/backup.sh 2>&1 | tee /var/log/bkp
 echo "Backup on start done"
 
 echo "Starting cron backups"
