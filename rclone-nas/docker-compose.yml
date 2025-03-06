@@ -1,5 +1,5 @@
 services:
-  rclone-david:
+  rclone-lzocateli:
     container_name: rclone-lzocateli
     restart: unless-stopped
     tty: true
@@ -7,8 +7,8 @@ services:
       - TZ=${TZ}
       - RCLONE_DEST=onedrivelzocateli:/nas-backup
     volumes:
-      - ${DOCKER_APPDATA_ROOT}/backup/rclone:/config/rclone:rw
-      - ${BACKUP_DATA_ROOT}/Davi:/data:ro
+      - /mnt/cybertron/configs/rclone:/config/rclone:rw
+      - /mnt/cybertron/lzocateli/onedrive:/data:ro
     build: .
 
   # rclone-maria:
