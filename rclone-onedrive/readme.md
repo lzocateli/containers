@@ -2,7 +2,7 @@
 
 Nome da Imagem:
 ```
-lzocateli/rclone-nas
+lzocateli/rclone-onedrive
 ```
 
 Tag version:
@@ -12,7 +12,7 @@ Tag version:
 
 Local para o dockerfile:
 ```
-containers/rclone-nas
+containers/rclone-onedrive
 ```
 
 Imagem argumentos:
