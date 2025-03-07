@@ -21,22 +21,6 @@ networks:
     external: true
 
 
-
-    
-
-# services:
-#   rclone-lzocateli:
-#     container_name: rclone-lzocateli
-#     restart: unless-stopped
-#     tty: true
-#     environment:
-#       - TZ=${TZ}
-#       - RCLONE_DEST=onedrivelzocateli:/nas-backup
-#     volumes:
-#       - /mnt/cybertron/configs/rclone:/config/rclone:rw
-#       - /mnt/cybertron/lzocateli/onedrive:/data:ro
-#     build: .
-
   # rclone-maria:
   #   container_name: rclone-maria
   #   restart: unless-stopped
