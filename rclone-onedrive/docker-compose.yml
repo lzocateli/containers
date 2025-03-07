@@ -9,7 +9,7 @@ services:
       - LOG_FILE_NAME=onedrivelzocateli
       - TZ=America/Sao_Paulo
     volumes:
-      - /mnt/cybertron/configs/userapps/var/log/onedrivelzocateli:/var/log/onedrivelzocateli
+      - /mnt/cybertron/configs/userapps/var/log/onedrivelzocateli:/var/log/${LOG_FILE_NAME}
       - /mnt/cybertron/configs/userapps/utils:/userapps/utils
       - /mnt/cybertron/configs/userapps/utils/cronjobs:/etc/crontabs/root
       - /mnt/cybertron/configs/rclone:/config/rclone
