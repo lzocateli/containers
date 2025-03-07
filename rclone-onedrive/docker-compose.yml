@@ -5,7 +5,7 @@ services:
     image: lzocateli/rclone-onedrive:1.0.0
     container_name: rclone-lzocateli
     environment:
-      - RCLONE_DEST=onedrivelzocateli:/my
+      - RCLONE_DEST=onedrivelzocateli:/
       - TZ=America/Sao_Paulo
     volumes:
       - /mnt/cybertron/configs/userapps/utils:/userapps/utils
@@ -17,6 +17,7 @@ services:
 networks:
   dockge_default:
     external: true
+
 
 
     
