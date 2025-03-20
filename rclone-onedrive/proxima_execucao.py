@@ -24,9 +24,13 @@ cron_expressions = get_cron_expressions()
 for expression in cron_expressions:
     print(f"Expressao CRON encontrada: {expression}")
 
+    # Extrair somente a parte de tempo da expressão
+    time_part = ' '.join(expression.split()[:5])
+    print(f"Parte de tempo: {time_part}")
+
     base_time = datetime.now()
 
-    iter = croniter(expression, base_time)
+    iter = croniter(time_part, base_time)
     next_run = iter.get_next(datetime)
 
     print("Proxima execucao:", next_run)
