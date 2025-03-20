@@ -5,7 +5,8 @@ FROM --platform=$BUILDPLATFORM rclone/rclone:master
 ARG TZ=America/Sao_Paulo
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
 
-RUN apk add --no-interactive openrc cronie
+RUN apk add --no-interactive openrc cronie python3 py3-pip
+RUN pip install croniter
 
 ENV LOG_FILE_NAME=bkp
 
