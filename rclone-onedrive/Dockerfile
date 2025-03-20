@@ -13,6 +13,7 @@ ENV LOG_FILE_NAME=bkp
 RUN mkdir -p /userapps/utils
 COPY --chmod=771 backup.sh /userapps/utils/
 COPY --chmod=771 start.sh /userapps/utils/
+COPY --chmod=771 proxima_execucao.py /userapps/utils/
 COPY cronjobs /etc/crontabs/root
 
 ENTRYPOINT /bin/sh /userapps/utils/start.sh
