@@ -10,6 +10,9 @@ RUN pip install croniter
 
 ENV LOG_FILE_NAME=bkp
 
+COPY requirements.txt /tmp/
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
+
 RUN mkdir -p /userapps/utils
 COPY --chmod=771 backup.sh /userapps/utils/
 COPY --chmod=771 start.sh /userapps/utils/
