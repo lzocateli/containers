@@ -10,8 +10,8 @@ services:
       - TZ=America/Sao_Paulo
     volumes:
       - /mnt/cybertron/configs/userapps/var/log/onedrivelzocateli:/var/log/${LOG_FILE_NAME}
-      - /mnt/cybertron/configs/userapps/utils:/userapps/utils
       - /mnt/cybertron/configs/userapps/utils/cronjobs:/etc/crontabs/root
+      - /mnt/cybertron/configs/userapps/utils/start.sh:/userapps/utils/start.sh
       - /mnt/cybertron/configs/rclone:/config/rclone
       - /mnt/cybertron/lzocateli/onedrive:/data
     networks:
@@ -27,8 +27,8 @@ services:
       - TZ=America/Sao_Paulo
     volumes:
       - /mnt/cybertron/configs/userapps/var/log/onedrivegsilveira:/var/log/${LOG_FILE_NAME}
-      - /mnt/cybertron/configs/userapps/utils:/userapps/utils
       - /mnt/cybertron/configs/userapps/utils/cronjobs:/etc/crontabs/root
+      - /mnt/cybertron/configs/userapps/utils/start.sh:/userapps/utils/start.sh
       - /mnt/cybertron/configs/rclone:/config/rclone
       - /mnt/cybertron/gsilveira/onedrive:/data
     networks:
