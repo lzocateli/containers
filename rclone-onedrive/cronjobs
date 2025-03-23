@@ -1,1 +1,2 @@
-30 3 * * * /userapps/utils/backup.sh > /var/log/${LOG_FILE_NAME} 2>&1
+* * * * * echo "Cron está funcionando $(date)" > /var/log/${LOG_FILE_NAME} 2>&1
+30 3 * * * /userapps/utils/backup.sh >> /var/log/${LOG_FILE_NAME} 2>&1
