@@ -13,8 +13,6 @@ RUN apt update -y && apt upgrade -y \
     net-tools iputils-ping curl wget \
     libxml2-dev
 
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
 RUN pip install --upgrade pip
 
 ARG TZ=America/Sao_Paulo
@@ -27,3 +25,5 @@ RUN echo "export PATH=$PATH:/root/.local/bin" >> ~/.zshrc \
 
 
 RUN sh -c "$(curl -fsSL https://ohmyposh.dev/install.sh)"
+
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
