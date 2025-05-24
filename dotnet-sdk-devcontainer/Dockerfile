@@ -27,5 +27,5 @@ RUN git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/cust
 RUN echo "plugins=(zsh-autosuggestions)" >> ~/.zshrc \
  && echo 'HISTFILE=~/.histfile' >> ~/.zshrc
 
-RUN dotnet dev-certs https --trust; dotnet dev-certs https -ep "/root/.aspnet/https/aspnetapp.pfx" -p "SecurePwdGoesHere"
+# RUN dotnet dev-certs https --trust; dotnet dev-certs https -ep "/root/.aspnet/https/aspnetapp.pfx" -p "SecurePwdGoesHere"
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
