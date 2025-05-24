@@ -1,6 +1,6 @@
 ARG BUILDPLATFORM=linux/amd64
 
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0.303-jammy
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0.410-jammy
 
 RUN apt update -y && apt upgrade -y \
  && apt install -y \
@@ -18,12 +18,13 @@ RUN pip install --upgrade pip
 ARG TZ=America/Sao_Paulo
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
 
-RUN apt install -y zsh zsh-autosuggestions
-RUN echo "export PATH=$PATH:/root/.local/bin" >> ~/.zshrc \
- && echo "plugins=(zsh-autosuggestions)" >> ~/.zshrc \
- && echo 'HISTFILE=~/.zsh_history' >> ~/.zshrc
-
+RUN apt install -y zsh
 
 RUN sh -c "$(curl -fsSL https://ohmyposh.dev/install.sh)"
+
+RUN git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+
+RUN echo "plugins=(zsh-autosuggestions)" >> ~/.zshrc \
+ && echo 'HISTFILE=~/.histfile' >> ~/.zshrc
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
