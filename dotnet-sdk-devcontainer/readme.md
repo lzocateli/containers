@@ -12,7 +12,7 @@ Tag version:
 
 Local para o dockerfile:
 ```
-containers/dotnet-sdk
+containers/dotnet-sdk-devcontainer
 ```
 
 Imagem argumentos:
