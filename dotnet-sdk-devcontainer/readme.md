@@ -1,3 +1,31 @@
+- Informe os seguintes parametros para gerar a imagem
+
+Nome da Imagem:
+```
+lzocateli/dotnet-sdk
+```
+
+Tag version:
+```
+8.0.410-jammy-dev
+```
+
+Local para o dockerfile:
+```
+containers/dotnet-sdk
+```
+
+Imagem argumentos:
+```
+  --build-arg Env_HttpProxy=proxy.nuuvify.com:80 --build-arg Env_NoProxy=nuuvify.com
+```
+
+Baypass proxy:
+```
+  nuuvify\.com
+```
+
+
 - Copiar uma imagem de um registro para outro localmente sem enviar a nova imagem para o novo registro.
 
 
