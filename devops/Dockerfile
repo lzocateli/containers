@@ -12,7 +12,7 @@ RUN wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/shar
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
  
 RUN pip install --upgrade pip
-
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
  
 # Instale o Ansible usando pip
 RUN apt-get install -y ssh
