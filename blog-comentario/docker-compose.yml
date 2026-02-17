@@ -1,0 +1,15 @@
+services:
+  comentario:
+    image: registry.gitlab.com/comentario/comentario:v3.16.0
+    container_name: blog-comentario
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      BASE_URL: http://localhost:8080
+      POSTGRES_DATASOURCE: postgres://blogadmin:blogdev123@postgres:5432/comentario?sslmode=disable
+      SECRET_KEY: dev-secret-key-change-in-production
+      SMTP_ENABLED: "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
