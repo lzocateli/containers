@@ -18,7 +18,6 @@ ENV BASE_URL="http://localhost:8080" \
   SMTP_FROM="" \
   TZ="America/Sao_Paulo"
 
-ENV TZ=America/Sao_Paulo
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Porta padrão do Comentario
