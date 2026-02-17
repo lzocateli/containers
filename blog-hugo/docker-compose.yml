@@ -1,0 +1,11 @@
+services:
+  hugo:
+    image: lzocateli/hugo:exts-0.147.0
+    container_name: blog-hugo
+    ports:
+      - "1313:1313"
+    volumes:
+      - .:/src
+    command: server --bind 0.0.0.0 --buildDrafts --disableFastRender
+    environment:
+      - TZ=America/Sao_Paulo
