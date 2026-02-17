@@ -1,15 +1,18 @@
-### Informe os seguintes parametros para gerar a imagem
+- Informe os seguintes parametros para gerar a imagem
 
 Nome da Imagem:
 ```
-lzocateli/dbeaver
+dbeaver
 ```
 
 Tag version:
 ```
-24.0.0
+25.2.0
 ```
-
+Your Dockerfile repositories:
+```
+containers
+```
 Local para o dockerfile:
 ```
 containers/dbeaver
@@ -17,47 +20,42 @@ containers/dbeaver
 
 Imagem argumentos:
 ```
-  --build-arg Env_HttpProxy=proxy.xyz.com:80 --build-arg Env_NoProxy=xyz.com
+--build-arg Env_HttpProxy=proxy.xxx.com:80 --build-arg Env_NoProxy=xxx.com
 ```
 
-Baypass proxy: (insira 2 espaços a esquerda para não utilizar)
+Baypass proxy:
 ```
-  xyz\.com
-```
-
-
-### Documentação para uso da imagem
-
-Use o parametro `-it` no lugar `-d` para executar em modo iterativo
-
-- No Linux
-```bash
-sudo su -
-
-vardbeaver=/var/cloudbeaver/workspace
-voldbeaver="$($vardbeaver):/opt/cloudbeaver/workspace"
-mkdir -p $vardbeaver
-chmod -R 777 /var/cloudbeaver
-
-podman run -d \
-    -p 8978:8978 \
-    -v $voldbeaver \
-    --restart unless-stopped \
-    --name cloudbeaver \
-    lzocateli/dbeaver:24.0.0
+xxx\.com
 ```
 
 - No Windows com docker desktop
-```powershell
-vardbeaver="$($HOME)/cloudbeaver/workspace"
-voldbeaver="$($vardbeaver):/opt/cloudbeaver/workspace"
 
+Primeiro, crie as variáveis de ambiente no contexto do usuário e as pastas necessárias:
+```powershell
+# Definir as variáveis
+$vardbeaver = "$env:USERPROFILE\cloudbeaver\workspace"
+
+# Criar a pasta workspace se não existir
+if (!(Test-Path $vardbeaver)) {
+    New-Item -ItemType Directory -Path $vardbeaver -Force
+    Write-Host "Pasta criada: $vardbeaver"
+} else {
+    Write-Host "Pasta já existe: $vardbeaver"
+}
+
+# Definir as variáveis no contexto do usuário (persistente)
+[Environment]::SetEnvironmentVariable("DBEAVER_WORKSPACE", $vardbeaver, "User")
+Write-Host "Variável DBEAVER_WORKSPACE definida no contexto do usuário: $vardbeaver"
+```
+
+Em seguida, execute o container:
+```powershell
 docker run -d `
     -p 8978:8978 `
-    -v $voldbeaver `
+    -v "$env:DBEAVER_WORKSPACE:/opt/cloudbeaver/workspace" `
     --restart unless-stopped `
     --name cloudbeaver `
-    lzocateli/dbeaver:24.0.0
+   lzocateli/dbeaver:25.2.0
 ```
 
 Acesse: http://localhost:8978/
