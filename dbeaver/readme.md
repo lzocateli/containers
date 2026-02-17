@@ -2,7 +2,7 @@
 
 Nome da Imagem:
 ```
-dbeaver
+lzocateli/dbeaver
 ```
 
 Tag version:
@@ -63,4 +63,5 @@ Acesse: http://localhost:8978/
 ### Documentação oficial
 
 https://github.com/dbeaver/cloudbeaver/wiki/Run-Docker-Container
+
 
