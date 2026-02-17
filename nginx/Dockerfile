@@ -1,15 +1,19 @@
-ARG NGINX_VERSION=1.25.0-bullseye
+ARG NGINX_VERSION=1.27.2-bookworm-perl
 
 FROM nginx:$NGINX_VERSION AS buildbase
 
 RUN apt update -y \
-    && apt upgrade -y \
-    && apt install -y \
-    nginx-extras \
-    nano \
-    net-tools \
-    iputils-ping \
-    telnet
+    && apt upgrade -y
+
+RUN apt install -y wget nano net-tools apt-utils iputils-ping telnet
+
+# RUN mkdir -p /etc/apt/keyrings
+# RUN wget -qO - https://nginx.org/packages/keys/nginx_signing.key | tee /etc/apt/keyrings/nginx_signing.key
+
+# RUN echo "deb [signed-by=/etc/apt/keyrings/nginx_signing.key] https://nginx.org/packages/debian bookworm nginx" | tee /etc/apt/sources.list.d/nginx.list
+
+# RUN apt update -y
+# RUN apt install nginx-module-*
 
 COPY html /usr/share/nginx/html
 COPY ./nginx.conf /etc/nginx/nginx.conf
