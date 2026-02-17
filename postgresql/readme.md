@@ -2,17 +2,17 @@
 
 Nome da Imagem:
 ```
-lzocateli/mssql-server
+lzocateli/postgresql
 ```
 
 Tag version:
 ```
-2022-CU17-ubuntu-22.04
+17-bookworm
 ```
 
 Local para o dockerfile:
 ```
-containers/mssql-server
+containers/postgresql
 ```
 
 Imagem argumentos:
@@ -32,4 +32,3 @@ Executar com docker-compose:
 ```bash
 docker-compose up -d
 ```
-

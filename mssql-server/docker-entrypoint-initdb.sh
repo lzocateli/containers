@@ -1,4 +1,46 @@
 #!/usr/bin/env bash
+###############################################################################
+# docker-entrypoint-initdb.sh
+#
+# Descrição:
+#   Script de inicialização do banco de dados SQL Server.
+#   Executado em background pelo docker-entrypoint.sh na primeira vez que
+#   o container é iniciado. Aguarda o SQL Server ficar pronto e então:
+#     1. Cria o database definido em MSSQL_DATABASE (se informado)
+#     2. Aplica configurações otimizadas (compatibility level, collation,
+#        statistics, recovery, scoped configurations)
+#     3. Cria o login/usuário definido em MSSQL_USER/MSSQL_PASSWORD
+#     4. Concede role db_owner ao usuário no database
+#     5. Executa scripts .sh e .sql encontrados em /docker-entrypoint-initdb.d/
+#
+#   Um arquivo ~/init.lock é criado após a primeira execução para evitar
+#   re-inicialização em restarts do container.
+#
+# Dependências:
+#   - SQL Server 2022 (imagem base: mcr.microsoft.com/mssql/server:2022-latest)
+#   - sqlcmd (/opt/mssql-tools/bin/sqlcmd, já incluído na imagem)
+#
+# Variáveis de Ambiente:
+#   SA_PASSWORD            - Senha do superusuário SA (obrigatório)
+#   MSSQL_DATABASE         - Nome do database a ser criado (opcional)
+#   MSSQL_DATABASE_COLLATE - Collation do database
+#                            (padrão: SQL_Latin1_General_CP1_CI_AI)
+#   MSSQL_USER             - Nome do usuário da aplicação (opcional)
+#   MSSQL_PASSWORD         - Senha do usuário da aplicação (opcional)
+#
+# Uso:
+#   Este script é invocado automaticamente pelo docker-entrypoint.sh.
+#   Não deve ser executado manualmente.
+#
+#   Para adicionar scripts de inicialização customizados, monte um volume
+#   em /docker-entrypoint-initdb.d/ contendo arquivos .sh ou .sql:
+#
+#     volumes:
+#       - ./meus-scripts/:/docker-entrypoint-initdb.d/
+#
+#   Arquivos são executados em ordem alfabética na primeira inicialização.
+#
+###############################################################################
 
 
 
