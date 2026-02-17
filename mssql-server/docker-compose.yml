@@ -1,0 +1,30 @@
+version: "3.7"
+
+services:
+  sql:
+    image: lzocateli/mssql-server:2022-CU17-ubuntu-22.04
+    container_name: mssql
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Myadm@12390
+      - MSSQL_DATABASE=lzoca
+      - MSSQL_DATABASE_COLLATE=SQL_Latin1_General_CP1_CI_AI
+      - MSSQL_USER=myuser
+      - MSSQL_PASSWORD=Teste@1234
+    ports:
+      - 1433:1433
+    networks:
+      - lzo
+    volumes:
+      - /userapps/configs/db-scripts/:/docker-entrypoint-initdb.d/
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-U", "myuser", "-P", "Teste@1234", "-Q", "SELECT 1"]
+      start_period: 60s
+      interval: 60s
+      timeout: 10s
+      retries: 2
+
+networks:
+  lzo:
+    name: lzo
+    driver: bridge
