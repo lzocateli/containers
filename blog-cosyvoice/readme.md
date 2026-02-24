@@ -7,7 +7,7 @@ lzocateli/cosyvoice
 
 Tag version:
 ```
-2.1.0-cuda12.1-cudnn8-runtime
+2.3.1-cuda12.1-cudnn8-runtime
 ```
 
 Local para o dockerfile:
