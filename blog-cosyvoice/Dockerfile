@@ -42,5 +42,5 @@ RUN apt-get purge -y g++ && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 
 # CosyVoice não é um pacote pip (sem setup.py/pyproject.toml).
 # Basta adicionar ao PYTHONPATH para que os módulos sejam importáveis.
-ENV PYTHONPATH="/opt/CosyVoice${PYTHONPATH:+:${PYTHONPATH}}"
+ENV PYTHONPATH="/opt/CosyVoice/third_party/Matcha-TTS:/opt/CosyVoice${PYTHONPATH:+:${PYTHONPATH}}"
 
