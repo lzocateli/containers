@@ -9,7 +9,7 @@ lzocateli/nginx-geoipupdate
 
 Tag version:
 ```
-v6.1.0-amd64
+v7.1.1-amd64
 ```
 
 Local para o dockerfile:
@@ -59,5 +59,5 @@ podman run -d \
     --env-file /userapps/configs/geoip2/geoip2.env \
     -v /userapps/configs/geoip2/data:/usr/share/GeoIP \
     --name geoipupdate \
-    lzocateli/nginx-geoipupdate:v6.1.0-amd64
+    lzocateli/nginx-geoipupdate:v7.1.1-amd64
 ```
