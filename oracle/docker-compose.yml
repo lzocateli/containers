@@ -1,0 +1,29 @@
+version: "3.7"
+
+services:
+  db:
+    image: lzocateli/oracle:21-slim
+    container_name: oracle
+    environment:
+      - ORACLE_PASSWORD=Myadm@12390
+      - ORACLE_DATABASE=XEPDB1
+      - ORACLE_TABLESPACE=app_data
+      - ORACLE_USER=myuser
+      - ORACLE_USER_PASSWORD=Teste@1234
+    ports:
+      - 1521:1521
+    networks:
+      - lzo
+    volumes:
+      - /userapps/configs/db-scripts/:/docker-entrypoint-initdb.d/
+    healthcheck:
+      test: ["CMD", "sqlplus", "-s", "SYSTEM/Myadm@12390@localhost:1521/XEPDB1", "<<< 'SELECT 1 FROM DUAL;'"]
+      start_period: 120s
+      interval: 60s
+      timeout: 10s
+      retries: 3
+
+networks:
+  lzo:
+    name: lzo
+    driver: bridge
