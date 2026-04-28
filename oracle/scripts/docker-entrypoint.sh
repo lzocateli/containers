@@ -37,4 +37,4 @@ echo "$0: Starting Oracle Database XE"
 docker-entrypoint-initdb.sh &
 
 # Delegate to the original gvenzl/oracle-xe entrypoint
-exec /container-entrypoint.sh
+exec container-entrypoint.sh

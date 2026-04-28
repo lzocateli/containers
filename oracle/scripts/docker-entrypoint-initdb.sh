@@ -15,12 +15,12 @@
 #   re-inicialização em restarts do container.
 #
 # Dependências:
-#   - Oracle XE 21c (imagem base: gvenzl/oracle-xe:21-slim)
+#   - Oracle Free 23c (imagem base: gvenzl/oracle-free:23-slim)
 #   - sqlplus (já incluído na imagem)
 #
 # Variáveis de Ambiente:
 #   ORACLE_PASSWORD       - Senha do superusuário SYS/SYSTEM (obrigatório)
-#   ORACLE_DATABASE       - Nome do PDB (padrão: XEPDB1)
+#   ORACLE_DATABASE       - Nome do PDB (padrao: FREEPDB1)
 #   ORACLE_TABLESPACE     - Nome do tablespace a ser criado (opcional)
 #   ORACLE_TABLESPACE_SIZE - Tamanho inicial do tablespace (padrão: 100M)
 #   ORACLE_USER           - Nome do usuário/schema da aplicação (opcional)
@@ -40,7 +40,7 @@
 #
 ###############################################################################
 
-ORACLE_DATABASE="${ORACLE_DATABASE:-XEPDB1}"
+ORACLE_DATABASE="${ORACLE_DATABASE:-FREEPDB1}"
 ORACLE_TABLESPACE_SIZE="${ORACLE_TABLESPACE_SIZE:-100M}"
 
 # sqlplus connect string as SYSTEM on the PDB
