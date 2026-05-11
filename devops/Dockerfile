@@ -213,7 +213,9 @@ RUN printf '%s\n' \
 # Projetos consumidores podem montar hooks (ex.: video-pipeline monta um
 # `10-vp-init.sh` que roda `uv sync` no /work/.venv).
 COPY entrypoint.sh /usr/local/bin/devops-entrypoint
-RUN chmod +x /usr/local/bin/devops-entrypoint \
+RUN sed -i '1s/^\xEF\xBB\xBF//' /usr/local/bin/devops-entrypoint \
+ && sed -i 's/\r$//' /usr/local/bin/devops-entrypoint \
+ && chmod +x /usr/local/bin/devops-entrypoint \
  && mkdir -p /docker-entrypoint.d
 ENTRYPOINT ["/usr/local/bin/devops-entrypoint"]
 
