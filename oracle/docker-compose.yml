@@ -15,7 +15,8 @@ services:
     networks:
       - lzo
     volumes:
-      - /userapps/configs/db-scripts/:/docker-entrypoint-initdb.d/
+      - ${DATA_DIR}/oracle:/opt/oracle/oradata
+      - ./scripts:/docker-entrypoint-initdb.d/
     healthcheck:
       test: ["CMD", "sqlplus", "-s", "SYSTEM/Myadm@12390@localhost:1521/XEPDB1", "<<< 'SELECT 1 FROM DUAL;'"]
       start_period: 120s
