@@ -45,6 +45,9 @@ A imagem é flexível via build-args — você escolhe quais módulos pesados en
 | `:cpu-slim` | `BASE_IMAGE=ubuntu:22.04` `INSTALL_ML=false` `INSTALL_GOOGLE=false` | Só devops puro: Ansible/TF/Az/gh/ffmpeg/Marp/uv |
 | `:ops` | `BASE_IMAGE=ubuntu:22.04` `INSTALL_ML=false` `INSTALL_GOOGLE=false` | Sinônimo de `cpu-slim` quando o foco é IaC/automação |
 
+> `lzocateli/devops:ubuntu-22.04` no exemplo de build slim equivale a `cpu-slim` e **nao** inclui `gcloud`.
+> Para comandos `gcloud`, use `:cpu` ou `:cuda-12.4.1` (ou faca build com `INSTALL_GOOGLE=true`).
+
 ### Exemplos de build
 
 ```powershell
