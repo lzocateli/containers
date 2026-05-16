@@ -4,8 +4,9 @@
 #   BASE_IMAGE       imagem base (default: CUDA 12.4 + cuDNN sobre Ubuntu 22.04).
 #                    Para versão "slim" sem CUDA: BASE_IMAGE=ubuntu:22.04
 #   INSTALL_ML       instala PyTorch (cu124 ou cpu) + openai-whisper. Default: true
-#   INSTALL_GOOGLE   instala Google Cloud CLI (gcloud) + google-api-python-client + google-auth-* (YouTube/Drive). Default: true
+#   INSTALL_GOOGLE   instala google-api-python-client + google-auth-* (YouTube/Drive). Default: true
 #   GH_VERSION       versão do GitHub CLI (binário oficial). Default: 2.92.0
+#   SQLCMD_VERSION   versão do go-sqlcmd (binário oficial Microsoft). Default: 1.10.0
 #   Env_HttpProxy    proxy corporativo (host:porta). Opcional.
 #   Env_NoProxy      bypass proxy. Opcional.
 #
@@ -14,6 +15,7 @@
 #   - ffmpeg/ffprobe + Node.js 20 + Marp CLI (libs Chromium headless)
 #   - Terraform, Azure CLI, Ansible (+ ansible-dev-tools, passlib)
 #   - GitHub CLI (gh) — versão pinada via ARG GH_VERSION
+#   - sqlcmd (go-sqlcmd da Microsoft) — versão pinada via ARG SQLCMD_VERSION
 #   - typer, rich, httpx, python-dotenv
 #   - zsh + oh-my-posh + zsh-autosuggestions
 #   - SSH client, sshpass, jq, git
@@ -51,6 +53,7 @@ ARG BASE_IMAGE=nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04
 ARG INSTALL_ML=true
 ARG INSTALL_GOOGLE=true
 ARG GH_VERSION=2.92.0
+ARG SQLCMD_VERSION=1.10.0
 
 # ---- Proxy corporativo (opcional) -------------------------------------------
 ARG Env_HttpProxy=
@@ -78,7 +81,7 @@ RUN apt-get update -y && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
         ca-certificates curl wget gnupg gpg lsb-release software-properties-common \
         sudo sshpass openssh-client \
-        git jq aha less unzip zip \
+        git jq aha less unzip zip bzip2 \
         ffmpeg \
         python3.11 python3.11-venv python3-pip \
         fonts-dejavu fonts-liberation \
@@ -107,6 +110,26 @@ RUN ARCH=$(dpkg --print-architecture) \
  && tar -xz -f /tmp/gh.tar.gz -C /tmp \
  && mv "/tmp/gh_${GH_VERSION}_linux_${ARCH}/bin/gh" /usr/local/bin/gh \
  && rm -rf /tmp/gh.tar.gz "/tmp/gh_${GH_VERSION}_linux_${ARCH}"
+
+# ---- sqlcmd (go-sqlcmd) — binário oficial Microsoft -------------------------
+# https://github.com/microsoft/go-sqlcmd/releases
+# Não exige aceite de EULA (ao contrário do mssql-tools clássico) e é um
+# binário estático único. Configuração por padrão em /root/.sqlcmd/sqlconfig.
+# Os assets do upstream usam diretamente a nomenclatura `dpkg --print-architecture`
+# (amd64, arm64), então não é preciso traduzir.
+RUN ARCH=$(dpkg --print-architecture) \
+ && case "$ARCH" in \
+        amd64|arm64) : ;; \
+        *) echo "Arquitetura não suportada para sqlcmd: $ARCH" && exit 1 ;; \
+    esac \
+ && curl -fsSL "https://github.com/microsoft/go-sqlcmd/releases/download/v${SQLCMD_VERSION}/sqlcmd-linux-${ARCH}.tar.bz2" \
+        -o /tmp/sqlcmd.tar.bz2 \
+ && mkdir -p /tmp/sqlcmd \
+ && tar -xjf /tmp/sqlcmd.tar.bz2 -C /tmp/sqlcmd \
+ && mv /tmp/sqlcmd/sqlcmd /usr/local/bin/sqlcmd \
+ && chmod +x /usr/local/bin/sqlcmd \
+ && rm -rf /tmp/sqlcmd /tmp/sqlcmd.tar.bz2 \
+ && sqlcmd --version
 
 # ---- Node.js 20 + Marp CLI --------------------------------------------------
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
@@ -143,18 +166,11 @@ RUN if [ "$INSTALL_ML" = "true" ]; then \
         echo "[ML] pulado (INSTALL_ML=$INSTALL_ML)" ; \
     fi
 
-# ---- Google opcional: Cloud CLI (gcloud) + APIs Python ----------------------
+# ---- Google APIs opcionais (YouTube Data, Drive, etc.) ----------------------
 RUN if [ "$INSTALL_GOOGLE" = "true" ]; then \
-        echo "[Google] instalando Google Cloud CLI (gcloud) + libs Python" && \
-        curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg \
-            | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg && \
-        echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" \
-            > /etc/apt/sources.list.d/google-cloud-sdk.list && \
-        apt-get update -y && \
-        apt-get install -y --no-install-recommends google-cloud-cli && \
+        echo "[Google] instalando google-api-python-client + auth" && \
         uv pip install --python /opt/venv/bin/python \
-            google-api-python-client google-auth-oauthlib google-auth-httplib2 && \
-        rm -rf /var/lib/apt/lists/* ; \
+            google-api-python-client google-auth-oauthlib google-auth-httplib2 ; \
     else \
         echo "[Google] pulado (INSTALL_GOOGLE=$INSTALL_GOOGLE)" ; \
     fi
@@ -213,9 +229,7 @@ RUN printf '%s\n' \
 # Projetos consumidores podem montar hooks (ex.: video-pipeline monta um
 # `10-vp-init.sh` que roda `uv sync` no /work/.venv).
 COPY entrypoint.sh /usr/local/bin/devops-entrypoint
-RUN sed -i '1s/^\xEF\xBB\xBF//' /usr/local/bin/devops-entrypoint \
- && sed -i 's/\r$//' /usr/local/bin/devops-entrypoint \
- && chmod +x /usr/local/bin/devops-entrypoint \
+RUN chmod +x /usr/local/bin/devops-entrypoint \
  && mkdir -p /docker-entrypoint.d
 ENTRYPOINT ["/usr/local/bin/devops-entrypoint"]
 
