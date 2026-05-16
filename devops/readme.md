@@ -100,7 +100,7 @@ docker build `
   --build-arg GH_VERSION=2.92.0 `
   --build-arg BASE_IMAGE=ubuntu:22.04 `
   --build-arg INSTALL_ML=false `
-  --build-arg INSTALL_GOOGLE=false `
+  --build-arg INSTALL_GOOGLE=true `
   -t lzocateli/devops:ubuntu-22.04 `
   -f Dockerfile .
 
