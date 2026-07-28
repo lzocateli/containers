@@ -1,31 +1,18 @@
-FROM postgres:17-bookworm
-	
-USER root
+FROM pgvector/pgvector:0.8.5-pg18-bookworm
 
-VOLUME /docker-entrypoint-initdb.d
+LABEL org.opencontainers.image.title="lzocateli/postgresql" \
+	org.opencontainers.image.description="PostgreSQL 18 com pgvector para uso em contêineres." \
+	org.opencontainers.image.source="https://github.com/lzocateli/containers" \
+	org.opencontainers.image.documentation="https://github.com/lzocateli/containers/tree/main/postgresql" \
+	org.opencontainers.image.url="https://github.com/lzocateli/containers/tree/main/postgresql"
 
-ENV PG_DATABASE_ENCODING=UTF8
+ENV POSTGRES_INITDB_ARGS="--encoding=UTF8 --locale=C.UTF-8"
 
 EXPOSE 5432
 
-COPY ./docker-entrypoint.sh             /usr/local/bin/
-COPY ./docker-entrypoint-initdb.sh      /usr/local/bin/
+COPY postgresql-healthcheck.sh /usr/local/bin/postgresql-healthcheck
 
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh 
-RUN chmod +x /usr/local/bin/docker-entrypoint-initdb.sh
+RUN chmod +x /usr/local/bin/postgresql-healthcheck
 
-RUN mkdir -p -m 700 /var/lib/postgresql
-RUN mkdir -p -m 700 /var/lib/postgresql/data
-RUN mkdir -p -m 777 /var/log/postgresql
-RUN mkdir -p -m 777 /var/run/postgresql
-RUN chown -R postgres:postgres /var/lib/postgresql /var/log/postgresql /var/run/postgresql
-#RUN chown -R postgres /var/lib/postgresql /var/log/postgresql /var/run/postgresql
-
-
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
-
-RUN mkdir -p /home/postgres/
-
-RUN chown postgres /home/postgres/
-
-#USER postgres
+# O entrypoint oficial da imagem base inicializa o cluster e executa scripts
+# montados em /docker-entrypoint-initdb.d de forma síncrona no primeiro bootstrap.
