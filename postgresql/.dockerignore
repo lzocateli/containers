@@ -1,0 +1,6 @@
+.env
+.validation/
+.git
+.gitignore
+backups/
+data/

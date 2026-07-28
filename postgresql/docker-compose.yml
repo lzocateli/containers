@@ -1,29 +1,36 @@
-version: "3.7"
-
 services:
   db:
-    image: lzocateli/postgresql:17-bookworm
+    build:
+      context: .
+    image: lzocateli/postgresql:18.4-pgvector0.8.5-bookworm
     container_name: postgresql
     environment:
-      - POSTGRES_PASSWORD=Myadm@12390
-      - PG_DATABASE=lzoca
-      - PG_DATABASE_ENCODING=UTF8
-      - PG_USER=myuser
-      - PG_PASSWORD=Teste@1234
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_RUNTIME_USER: ${POSTGRES_RUNTIME_USER:-}
+      POSTGRES_RUNTIME_PASSWORD: ${POSTGRES_RUNTIME_PASSWORD:-}
+      POSTGRES_APP_SCHEMA: ${POSTGRES_APP_SCHEMA:-}
+      TZ: ${TZ:-UTC}
     ports:
-      - 5432:5432
+      - "${POSTGRES_PORT_BIND:-127.0.0.1:5432}:5432"
     networks:
-      - lzo
+      - postgresql
     volumes:
-      - /userapps/configs/db-scripts/:/docker-entrypoint-initdb.d/
+      - ${POSTGRES_DATA_DIR}:/var/lib/postgresql
+      - ./init/00-extensions.sql:/docker-entrypoint-initdb.d/00-extensions.sql:ro
+      - ./init/10-schemas.sql:/docker-entrypoint-initdb.d/10-schemas.sql:ro
+      - ./init/20-roles.sh:/docker-entrypoint-initdb.d/20-roles.sh:ro
+      - ./init/30-permissions.sql:/docker-entrypoint-initdb.d/30-permissions.sql:ro
+      - ./init/40-application.sql:/docker-entrypoint-initdb.d/40-application.sql:ro
+      - ${POSTGRES_BACKUP_DIR}:/backups
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "myuser", "-d", "lzoca"]
-      start_period: 60s
-      interval: 60s
-      timeout: 10s
-      retries: 2
+      test: ["CMD", "postgresql-healthcheck"]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 6
 
 networks:
-  lzo:
-    name: lzo
+  postgresql:
     driver: bridge
