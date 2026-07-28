@@ -15,7 +15,7 @@ services:
     ports:
       - "${POSTGRES_PORT_BIND:-127.0.0.1:5432}:5432"
     networks:
-      - postgresql
+      - lzo
     volumes:
       - ${POSTGRES_DATA_DIR}:/var/lib/postgresql
       - ./init/00-extensions.sql:/docker-entrypoint-initdb.d/00-extensions.sql:ro
@@ -32,5 +32,5 @@ services:
       retries: 6
 
 networks:
-  postgresql:
+  lzo:
     driver: bridge
