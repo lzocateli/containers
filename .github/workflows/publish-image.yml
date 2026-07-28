@@ -41,7 +41,7 @@ concurrency:
 jobs:
   validate:
     name: Validar entradas e arquivos
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Obter repositório
         uses: actions/checkout@v4
@@ -106,7 +106,7 @@ jobs:
   publish:
     name: Build e push
     needs: validate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Obter repositório
         uses: actions/checkout@v4
