@@ -5,6 +5,7 @@ applyTo: [".github/workflows/**/*.yml", ".github/workflows/**/*.yaml"]
 
 # GitHub Actions para imagens
 
+- Fixe runners por versão LTS explícita e estável, como `ubuntu-24.04`; não use aliases `*-latest` nem imagens em preview. Atualize a versão somente após validar os workflows na nova LTS.
 - Conceda apenas as permissões necessárias e use `contents: read` por padrão.
 - Use secrets `DOCKERHUB_USERNAME` e `DOCKERHUB_TOKEN`; nunca use senha da conta.
 - Passe entradas de usuário por `env` antes de usá-las em shell e valide caminhos, nomes e tags.
