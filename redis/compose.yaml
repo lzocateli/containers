@@ -10,7 +10,7 @@ services:
       - redis-internal
 
   redis-gui:
-    image: lzocateli/redis-gui:2026.4.3014
+    image: lzocateli/redis-gui:2026.4.3014-r1
     restart: unless-stopped
     depends_on:
       valkey:
