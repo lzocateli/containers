@@ -1,0 +1,29 @@
+services:
+  valkey:
+    image: lzocateli/redis:9.1.1
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ./data/valkey
+        target: /data
+    networks:
+      - redis-internal
+
+  redis-gui:
+    image: lzocateli/redis-gui:2026.4.3014
+    restart: unless-stopped
+    depends_on:
+      valkey:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:7843:7843"
+    volumes:
+      - type: bind
+        source: ./settings/redis-gui
+        target: /settings
+    networks:
+      - redis-internal
+
+networks:
+  redis-internal:
+    driver: bridge
