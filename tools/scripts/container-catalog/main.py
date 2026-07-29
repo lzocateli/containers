@@ -181,11 +181,29 @@ def release_entry(
         if image["context"] == context
         and image["dockerfile"] == dockerfile
         and image["imageName"] == image_name
-        and image["platforms"] == requested_platforms
     ]
     if len(matches) != 1:
-        fail("inputs de release não correspondem exatamente a uma entrada do catálogo")
-    return matches[0]
+        fail(
+            "context, Dockerfile e nome da imagem não correspondem exatamente "
+            "a uma entrada de tools/container-images.json"
+        )
+    allowed_platforms = cast(list[str], matches[0]["platforms"])
+    if not requested_platforms or any(not platform for platform in requested_platforms):
+        fail("ao menos uma plataforma deve ser informada")
+    if len(requested_platforms) != len(set(requested_platforms)):
+        fail(f"plataformas duplicadas para {image_name}: {platforms}")
+    unavailable_platforms = [
+        platform for platform in requested_platforms if platform not in allowed_platforms
+    ]
+    if unavailable_platforms:
+        fail(
+            f"plataformas não catalogadas para {image_name}: {','.join(unavailable_platforms)}; "
+            f"opções={','.join(allowed_platforms)}"
+        )
+    selected_platforms = [
+        platform for platform in allowed_platforms if platform in requested_platforms
+    ]
+    return {**matches[0], "platforms": selected_platforms}
 
 
 def compact_json(value: object) -> str:
@@ -222,13 +240,15 @@ def create_parser() -> argparse.ArgumentParser:
 
     release_parser = subparsers.add_parser(
         "release",
-        help="confere se inputs de publicação correspondem exatamente ao catálogo",
+        help="confere se os inputs e as plataformas de publicação são permitidos pelo catálogo",
         description="Valida os inputs de uma release e imprime a entrada JSON correspondente.",
     )
     release_parser.add_argument("--context", required=True, help="diretório de contexto relativo ao repositório")
     release_parser.add_argument("--dockerfile", required=True, help="nome do Dockerfile dentro do contexto")
     release_parser.add_argument("--image-name", required=True, help="nome da imagem sem o namespace do registry")
-    release_parser.add_argument("--platforms", required=True, help="plataformas em ordem exata, separadas por vírgula")
+    release_parser.add_argument(
+        "--platforms", required=True, help="uma ou mais plataformas catalogadas, separadas por vírgula"
+    )
     return parser
 
 
