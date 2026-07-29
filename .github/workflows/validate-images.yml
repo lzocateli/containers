@@ -36,7 +36,7 @@ jobs:
       count: ${{ steps.matrix.outputs.count }}
     steps:
       - name: Obter repositório
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
@@ -91,10 +91,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Obter repositório
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Bloquear secrets
-        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: fs
           scan-ref: .
@@ -106,7 +106,7 @@ jobs:
 
       - name: Relatar misconfigurações
         if: always()
-        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: fs
           scan-ref: .
@@ -118,7 +118,7 @@ jobs:
 
       - name: Publicar relatório do repositório
         if: always() && (hashFiles('trivy-secrets.sarif') != '' || hashFiles('trivy-misconfigurations.sarif') != '')
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: trivy-repository-${{ github.run_id }}
           path: |
@@ -134,7 +134,7 @@ jobs:
       contents: read
     steps:
       - name: Revisar mudanças de dependências
-        uses: actions/dependency-review-action@da24556b548a50705dd671f47852072ea4c105d9 # v4.7.1
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
         with:
           fail-on-severity: critical
           comment-summary-in-pr: never
@@ -153,7 +153,7 @@ jobs:
         image: ${{ fromJSON(needs.catalog.outputs.matrix).include }}
     steps:
       - name: Obter repositório
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Validar contrato do diretório
         shell: bash
@@ -182,10 +182,10 @@ jobs:
           fi
 
       - name: Configurar Docker Buildx
-        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
 
       - name: Validar Dockerfile com BuildKit
-        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           context: ${{ matrix.image.context }}
           file: ${{ matrix.image.context }}/${{ matrix.image.dockerfile }}
@@ -193,7 +193,7 @@ jobs:
 
       - name: Construir imagem para análise
         if: matrix.image.validation == 'build'
-        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           context: ${{ matrix.image.context }}
           file: ${{ matrix.image.context }}/${{ matrix.image.dockerfile }}
@@ -205,7 +205,7 @@ jobs:
 
       - name: Gerar relatório de vulnerabilidades
         if: matrix.image.validation == 'build'
-        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: local/${{ matrix.image.id }}:${{ github.sha }}
           format: sarif
@@ -215,7 +215,7 @@ jobs:
 
       - name: Bloquear vulnerabilidades críticas corrigíveis
         if: matrix.image.validation == 'build'
-        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: local/${{ matrix.image.id }}:${{ github.sha }}
           format: table
@@ -225,7 +225,7 @@ jobs:
 
       - name: Publicar relatório como artifact
         if: always() && matrix.image.validation == 'build' && hashFiles(format('trivy-{0}.sarif', matrix.image.id)) != ''
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: trivy-${{ matrix.image.id }}-${{ github.run_id }}
           path: trivy-${{ matrix.image.id }}.sarif
@@ -233,7 +233,7 @@ jobs:
 
       - name: Enviar resultado ao Code Scanning
         if: always() && matrix.image.validation == 'build' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && hashFiles(format('trivy-{0}.sarif', matrix.image.id)) != ''
-        uses: github/codeql-action/upload-sarif@f081e69141f6ea0aa740920b0c7012cd81a4fbe6 # v3.37.3
+        uses: github/codeql-action/upload-sarif@4187e74d05793876e9989daffde9c3e66b4acd07 # v3.37.3
         with:
           sarif_file: trivy-${{ matrix.image.id }}.sarif
           category: trivy-${{ matrix.image.id }}
