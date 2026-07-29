@@ -48,13 +48,15 @@ O gate bloqueia secrets no repositório e vulnerabilidades `CRITICAL` com corre�
 
 1. Garanta que a pasta contenha `Dockerfile`, `README.md`, `.gitignore` e `.dockerignore` completos.
 2. Abra **Actions > Publicar imagem de container > Run workflow**.
-3. Informe a pasta relativa, o nome da imagem sem `lzocateli/`, a tag imutável, o Dockerfile e as plataformas.
+3. Informe a pasta relativa, o nome da imagem sem `lzocateli/`, a tag imutável, o Dockerfile e uma ou mais plataformas declaradas para a imagem em `tools/container-images.json`.
 4. Mantenha a atualização do README habilitada para publicar a descrição completa no Docker Hub.
 5. O workflow confere os inputs no catálogo, constrói e escaneia cada plataforma antes de autenticar no Docker Hub.
 6. Após os gates, o build multi-plataforma publica SBOM e proveniência, valida o digest e os manifests remotos e só então sincroniza o README.
 7. Consulte os artifacts `security-*` para o relatório Trivy e o SBOM CycloneDX de cada plataforma.
 
-O workflow aceita `linux/amd64`, `linux/arm64` e `linux/arm/v7`, rejeita `latest`, `main`, `master`, `edge` e `nightly` e limita a descrição do Docker Hub a 25.000 bytes. Uma futura política de tags móveis exige alteração explícita do catálogo e uma tag imutável correspondente.
+O workflow aceita qualquer subconjunto não vazio das plataformas declaradas para a imagem, remove a influência da ordem informada e rejeita duplicatas ou arquiteturas não catalogadas. Para imagens com `linux/amd64` e `linux/arm64`, por exemplo, é possível publicar uma delas ou ambas. Publicar somente uma arquitetura usando uma tag que já existe substitui o manifest dessa tag e pode remover as demais arquiteturas anteriormente disponíveis.
+
+As plataformas reconhecidas pelo catálogo são `linux/amd64`, `linux/arm64` e `linux/arm/v7`. O workflow rejeita `latest`, `main`, `master`, `edge` e `nightly` e limita a descrição do Docker Hub a 25.000 bytes. Uma futura política de tags móveis exige alteração explícita do catálogo e uma tag imutável correspondente.
 
 ## Criar documentação de imagem
 
