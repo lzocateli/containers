@@ -1,230 +1,150 @@
 #!/usr/bin/env bash
-###############################################################################
-# docker-entrypoint-initdb.sh
-#
-# Descrição:
-#   Script de inicialização do banco de dados SQL Server.
-#   Executado em background pelo docker-entrypoint.sh na primeira vez que
-#   o container é iniciado. Aguarda o SQL Server ficar pronto e então:
-#     1. Cria o database definido em MSSQL_DATABASE (se informado)
-#     2. Aplica configurações otimizadas (compatibility level, collation,
-#        statistics, recovery, scoped configurations)
-#     3. Cria o login/usuário definido em MSSQL_USER/MSSQL_PASSWORD
-#     4. Concede role db_owner ao usuário no database
-#     5. Executa scripts .sh e .sql encontrados em /docker-entrypoint-initdb.d/
-#
-#   Um arquivo ~/init.lock é criado após a primeira execução para evitar
-#   re-inicialização em restarts do container.
-#
-# Dependências:
-#   - SQL Server 2022 (imagem base: mcr.microsoft.com/mssql/server:2022-latest)
-#   - sqlcmd (/opt/mssql-tools/bin/sqlcmd, já incluído na imagem)
-#
-# Variáveis de Ambiente:
-#   SA_PASSWORD            - Senha do superusuário SA (obrigatório)
-#   MSSQL_DATABASE         - Nome do database a ser criado (opcional)
-#   MSSQL_DATABASE_COLLATE - Collation do database
-#                            (padrão: SQL_Latin1_General_CP1_CI_AI)
-#   MSSQL_USER             - Nome do usuário da aplicação (opcional)
-#   MSSQL_PASSWORD         - Senha do usuário da aplicação (opcional)
-#
-# Uso:
-#   Este script é invocado automaticamente pelo docker-entrypoint.sh.
-#   Não deve ser executado manualmente.
-#
-#   Para adicionar scripts de inicialização customizados, monte um volume
-#   em /docker-entrypoint-initdb.d/ contendo arquivos .sh ou .sql:
-#
-#     volumes:
-#       - ./meus-scripts/:/docker-entrypoint-initdb.d/
-#
-#   Arquivos são executados em ordem alfabética na primeira inicialização.
-#
-###############################################################################
+set -Eeuo pipefail
 
+readonly SQLCMD=/opt/mssql-tools18/bin/sqlcmd
+readonly INIT_DIRECTORY=/docker-entrypoint-initdb.d
+readonly INIT_LOCK=/var/opt/mssql/.container-init-complete
 
+show_help() {
+  cat <<'EOF'
+Inicializa uma instancia SQL Server 2025 uma unica vez.
 
-if [ ! -f ~/init.lock ]; then
+Uso:
+  docker-entrypoint-initdb.sh
+  docker-entrypoint-initdb.sh --help
 
-    # wait for database to start...
-    for i in {40..0}; do
-      if /opt/mssql-tools/bin/sqlcmd -U SA -P $SA_PASSWORD -Q 'SELECT 1;' &> /dev/null; then
-        echo "$0: SQL Server started"
-        break
-      fi
-      echo "$0: SQL Server startup in progress..."
-      sleep 1
-    done
+Variaveis:
+  MSSQL_SA_PASSWORD       Senha obrigatoria do login sa.
+  MSSQL_DATABASE          Banco opcional a criar.
+  MSSQL_DATABASE_COLLATE  Collation do banco opcional.
+  MSSQL_USER              Login opcional da aplicacao.
+  MSSQL_PASSWORD          Senha obrigatoria quando MSSQL_USER for informado.
 
-    echo "$0: Initializing database"
+Arquivos .sql e .sh em /docker-entrypoint-initdb.d sao executados em ordem
+alfabetica. O marcador persistente so e criado quando todas as etapas terminam.
+EOF
+}
 
-    touch ~/tmp.sql
+case "${1:-}" in
+  -h|--help)
+    show_help
+    exit 0
+    ;;
+esac
 
-  #BEGIN DATABASE CREATION
-  if [ "$MSSQL_DATABASE" ]; then
+validate_identifier() {
+  local name=$1
+  local value=$2
 
-    cat > ~/tmp.sql <<-EOSQL
-    CREATE DATABASE [${MSSQL_DATABASE}] 
-    CONTAINMENT = NONE
-    ON  PRIMARY ( 
-          NAME = N'${MSSQL_DATABASE}', 
-          FILENAME = N'/var/opt/mssql/data/${MSSQL_DATABASE}.mdf' , 
-          SIZE = 8192KB , 
-          FILEGROWTH = 65536KB 
-    )
-    LOG ON ( 
-          NAME = N'${MSSQL_DATABASE}_log', 
-          FILENAME = N'/var/opt/mssql/data/${MSSQL_DATABASE}_log.ldf' , 
-          SIZE = 8192KB , 
-          FILEGROWTH = 65536KB 
-    )
-    COLLATE ${MSSQL_DATABASE_COLLATE}
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET COMPATIBILITY_LEVEL = 140
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET ANSI_NULL_DEFAULT OFF 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET ANSI_NULLS OFF 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET ANSI_PADDING OFF 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET ANSI_WARNINGS OFF 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET ARITHABORT OFF 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET AUTO_CLOSE OFF 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET AUTO_SHRINK OFF 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET AUTO_CREATE_STATISTICS ON(INCREMENTAL = OFF)
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET AUTO_UPDATE_STATISTICS ON 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET CURSOR_CLOSE_ON_COMMIT OFF 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET CURSOR_DEFAULT  GLOBAL 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET CONCAT_NULL_YIELDS_NULL OFF 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET NUMERIC_ROUNDABORT OFF 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET QUOTED_IDENTIFIER OFF 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET RECURSIVE_TRIGGERS OFF 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET  DISABLE_BROKER 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET DATE_CORRELATION_OPTIMIZATION OFF 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET PARAMETERIZATION SIMPLE 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET READ_COMMITTED_SNAPSHOT OFF 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET  READ_WRITE 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET RECOVERY FULL 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET  MULTI_USER 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET PAGE_VERIFY CHECKSUM  
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET TARGET_RECOVERY_TIME = 60 SECONDS 
-    GO
-    ALTER DATABASE [${MSSQL_DATABASE}] SET DELAYED_DURABILITY = DISABLED 
-    GO
-    USE [${MSSQL_DATABASE}]
-    GO
-    ALTER DATABASE SCOPED CONFIGURATION SET LEGACY_CARDINALITY_ESTIMATION = Off;
-    GO
-    ALTER DATABASE SCOPED CONFIGURATION FOR SECONDARY SET LEGACY_CARDINALITY_ESTIMATION = Primary;
-    GO
-    ALTER DATABASE SCOPED CONFIGURATION SET MAXDOP = 0;
-    GO
-    ALTER DATABASE SCOPED CONFIGURATION FOR SECONDARY SET MAXDOP = PRIMARY;
-    GO
-    ALTER DATABASE SCOPED CONFIGURATION SET PARAMETER_SNIFFING = On;
-    GO
-    ALTER DATABASE SCOPED CONFIGURATION FOR SECONDARY SET PARAMETER_SNIFFING = Primary;
-    GO
-    ALTER DATABASE SCOPED CONFIGURATION SET QUERY_OPTIMIZER_HOTFIXES = Off;
-    GO
-    ALTER DATABASE SCOPED CONFIGURATION FOR SECONDARY SET QUERY_OPTIMIZER_HOTFIXES = Primary;
-    GO
-    USE [${MSSQL_DATABASE}]
-    GO
-    IF NOT EXISTS (SELECT name FROM sys.filegroups WHERE is_default=1 AND name = N'PRIMARY') ALTER DATABASE [${MSSQL_DATABASE}] MODIFY FILEGROUP [PRIMARY] DEFAULT
-    GO
-
-	EOSQL
-
-    /opt/mssql-tools/bin/sqlcmd -U SA -P $SA_PASSWORD -i ~/tmp.sql
-
-    rm -f ~/tmp.sql
-
+  if [[ ! $value =~ ^[A-Za-z_][A-Za-z0-9_]{0,127}$ ]]; then
+    echo "$0: $name deve ser um identificador SQL simples com ate 128 caracteres" >&2
+    return 1
   fi
-  #END DATABASE CREATION
+}
 
-  #BEGIN USER CREATION
-  if [ "$MSSQL_USER" -a "$MSSQL_PASSWORD" ]; then
+run_sql() {
+  SQLCMDPASSWORD="$MSSQL_SA_PASSWORD" "$SQLCMD" \
+    -S localhost -U sa -C -b -V 16 "$@"
+}
 
-    DEFAULT_DB="master"
-
-    if [ "$MSSQL_DATABASE" ]; then
-
-      DEFAULT_DB=$MSSQL_DATABASE
-
-    fi
-
-    cat > ~/tmp.sql <<-EOSQL
-    USE [master]
-    GO
-    CREATE LOGIN [${MSSQL_USER}] WITH PASSWORD=N'${MSSQL_PASSWORD}', DEFAULT_DATABASE=[${DEFAULT_DB}], CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF    
-    GO
-	EOSQL
-
-    /opt/mssql-tools/bin/sqlcmd -U SA -P $SA_PASSWORD -i ~/tmp.sql
-
-    rm -f ~/tmp.sql
-
-    #BEGIN BIND USER TO DATABASE AS OWNER
-    if [ "$MSSQL_DATABASE" ]; then
-
-      	cat > ~/tmp.sql <<-EOSQL
-		USE [${MSSQL_DATABASE}]
-		GO
-		CREATE USER [${MSSQL_USER}] FOR LOGIN [${MSSQL_USER}]
-		GO
-		USE [${MSSQL_DATABASE}]
-		GO
-		ALTER ROLE [db_owner] ADD MEMBER [${MSSQL_USER}]
-		GO
-		EOSQL
-
-      	/opt/mssql-tools/bin/sqlcmd -U SA -P $SA_PASSWORD -i ~/tmp.sql
-
-      	rm -f ~/tmp.sql
-
-    fi
-    #END BIND USER TO DATABASE AS OWNER
-
-  fi
-  #END USER CREATION
-
-  #BEGIN INITIALIZE SQL SERVER WITH SCRIPTS
-  for f in /docker-entrypoint-initdb.d/*; do
-    case "$f" in
-      *.sh)     echo "$0: running $f"; . "$f" ;;
-      *.sql)    echo "$0: running $f"; /opt/mssql-tools/bin/sqlcmd -U SA -P $SA_PASSWORD -X -i  "$f"; echo ;;
-      *)        echo "$0: ignoring $f" ;;
-    esac
-    echo
-  done
-  #END INITIALIZE SQL SERVER WITH SCRIPTS
-
-  touch ~/init.lock
-
+if [[ -f $INIT_LOCK ]]; then
+  echo "$0: inicializacao ja concluida"
+  exit 0
 fi
 
-echo "$0: SQL Server Database ready"
+: "${MSSQL_SA_PASSWORD:?MSSQL_SA_PASSWORD e obrigatoria}"
+
+if [[ -n ${MSSQL_DATABASE:-} ]]; then
+  validate_identifier MSSQL_DATABASE "$MSSQL_DATABASE"
+fi
+
+if [[ -n ${MSSQL_USER:-} ]]; then
+  validate_identifier MSSQL_USER "$MSSQL_USER"
+  : "${MSSQL_PASSWORD:?MSSQL_PASSWORD e obrigatoria quando MSSQL_USER e informado}"
+elif [[ -n ${MSSQL_PASSWORD:-} ]]; then
+  echo "$0: MSSQL_USER e obrigatoria quando MSSQL_PASSWORD e informado" >&2
+  exit 1
+fi
+
+readonly database_collation=${MSSQL_DATABASE_COLLATE:-SQL_Latin1_General_CP1_CI_AI}
+validate_identifier MSSQL_DATABASE_COLLATE "$database_collation"
+
+for attempt in {1..60}; do
+  if run_sql -Q "SELECT 1" -o /dev/null 2>/dev/null; then
+    echo "$0: SQL Server pronto para inicializacao"
+    break
+  fi
+
+  if (( attempt == 60 )); then
+    echo "$0: SQL Server nao ficou pronto em 60 segundos" >&2
+    exit 1
+  fi
+
+  sleep 1
+done
+
+temporary_sql=$(mktemp)
+trap 'rm -f "$temporary_sql"' EXIT
+
+if [[ -n ${MSSQL_DATABASE:-} ]]; then
+  cat > "$temporary_sql" <<EOSQL
+IF DB_ID(N'${MSSQL_DATABASE}') IS NULL
+  CREATE DATABASE [${MSSQL_DATABASE}] COLLATE ${database_collation};
+GO
+ALTER DATABASE [${MSSQL_DATABASE}] SET COMPATIBILITY_LEVEL = 170;
+GO
+EOSQL
+  run_sql -i "$temporary_sql"
+fi
+
+if [[ -n ${MSSQL_USER:-} ]]; then
+  default_database=${MSSQL_DATABASE:-master}
+  escaped_password=${MSSQL_PASSWORD//\'/\'\'}
+
+  cat > "$temporary_sql" <<EOSQL
+USE [master];
+GO
+IF SUSER_ID(N'${MSSQL_USER}') IS NULL
+  CREATE LOGIN [${MSSQL_USER}]
+    WITH PASSWORD = N'${escaped_password}',
+       DEFAULT_DATABASE = [${default_database}],
+       CHECK_POLICY = ON;
+GO
+EOSQL
+
+  if [[ -n ${MSSQL_DATABASE:-} ]]; then
+    cat >> "$temporary_sql" <<EOSQL
+USE [${MSSQL_DATABASE}];
+GO
+IF DATABASE_PRINCIPAL_ID(N'${MSSQL_USER}') IS NULL
+  CREATE USER [${MSSQL_USER}] FOR LOGIN [${MSSQL_USER}];
+GO
+IF ISNULL(IS_ROLEMEMBER(N'db_owner', N'${MSSQL_USER}'), 0) = 0
+  ALTER ROLE [db_owner] ADD MEMBER [${MSSQL_USER}];
+GO
+EOSQL
+  fi
+
+  run_sql -i "$temporary_sql"
+fi
+
+shopt -s nullglob
+init_files=("$INIT_DIRECTORY"/*)
+for init_file in "${init_files[@]}"; do
+  case "$init_file" in
+    *.sql)
+      echo "$0: executando $init_file"
+      run_sql -X -i "$init_file"
+      ;;
+    *.sh)
+      echo "$0: executando $init_file"
+      bash "$init_file"
+      ;;
+    *)
+      echo "$0: ignorando $init_file"
+      ;;
+  esac
+done
+
+touch "$INIT_LOCK"
+echo "$0: inicializacao concluida"
