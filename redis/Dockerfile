@@ -1,1 +1,1 @@
-FROM redis:7.4.0-bookworm
+FROM redis:8.4.0-bookworm

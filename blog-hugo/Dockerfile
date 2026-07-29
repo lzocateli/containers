@@ -1,4 +1,4 @@
-FROM hugomods/hugo:exts-0.147.0
+FROM hugomods/hugo:exts-0.154.5
 
 USER root
 

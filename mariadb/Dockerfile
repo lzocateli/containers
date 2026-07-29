@@ -1,1 +1,1 @@
-FROM mariadb:11.2.4-jammy
+FROM mariadb:11.3.2-jammy

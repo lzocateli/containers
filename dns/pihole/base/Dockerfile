@@ -1,1 +1,1 @@
-FROM pihole/pihole:2024.07.0
+FROM pihole/pihole:2026.07.2
