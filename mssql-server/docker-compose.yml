@@ -1,30 +1,26 @@
-version: "3.7"
-
 services:
   sql:
-    image: lzocateli/mssql-server:2022-CU17-ubuntu-22.04
-    container_name: mssql
+    image: lzocateli/mssql-server:2025-CU7-ubuntu-24.04
+    platform: linux/amd64
+    restart: unless-stopped
     environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=Myadm@12390
-      - MSSQL_DATABASE=lzoca
-      - MSSQL_DATABASE_COLLATE=SQL_Latin1_General_CP1_CI_AI
-      - MSSQL_USER=myuser
-      - MSSQL_PASSWORD=Teste@1234
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: ${MSSQL_PID:-Developer}
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?defina MSSQL_SA_PASSWORD no arquivo .env}
+      MSSQL_DATABASE: ${MSSQL_DATABASE:-app}
+      MSSQL_DATABASE_COLLATE: ${MSSQL_DATABASE_COLLATE:-SQL_Latin1_General_CP1_CI_AI}
+      MSSQL_USER: ${MSSQL_USER:-app}
+      MSSQL_PASSWORD: ${MSSQL_PASSWORD:?defina MSSQL_PASSWORD no arquivo .env}
     ports:
-      - 1433:1433
-    networks:
-      - lzo
+      - "127.0.0.1:1433:1433"
     volumes:
-      - /userapps/configs/db-scripts/:/docker-entrypoint-initdb.d/
+      - mssql-data:/var/opt/mssql
     healthcheck:
-      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-U", "myuser", "-P", "Teste@1234", "-Q", "SELECT 1"]
+      test: ["CMD-SHELL", "test -f /var/opt/mssql/.container-init-complete && SQLCMDPASSWORD=\"$${MSSQL_SA_PASSWORD}\" sqlcmd -S localhost -U sa -C -Q 'SELECT 1' -b -o /dev/null"]
       start_period: 60s
-      interval: 60s
+      interval: 30s
       timeout: 10s
-      retries: 2
+      retries: 5
 
-networks:
-  lzo:
-    name: lzo
-    driver: bridge
+volumes:
+  mssql-data:

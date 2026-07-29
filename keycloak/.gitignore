@@ -1,0 +1,35 @@
+# Configuracao local e secrets
+.env
+.env.*
+!.env.example
+secrets/
+credentials/
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Dados persistentes, imports e exports
+data/
+imports/
+exports/
+backups/
+backup/
+*.bak
+*.dump
+*.sql.gz
+
+# Temas, providers e logs locais
+themes/
+providers/
+logs/
+*.log
+.cache/
+tmp/
+temp/
+
+# Editores e sistema operacional
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
