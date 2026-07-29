@@ -10,7 +10,8 @@ description: "Use para criar, alterar, otimizar, documentar, validar, versionar 
 1. Identifique a pasta da imagem e leia `Dockerfile`, `README.md`, `.gitignore`, `.dockerignore`, Compose e scripts próximos.
 2. Consulte as instruções em `.github/instructions/` aplicáveis aos arquivos alterados.
 3. Use `.github/templates/container-README.template.md` para documentação nova.
-4. Preserve o namespace `lzocateli` e o nome público do repositório `containers`.
+4. Confira ou adicione a entrada correspondente em `tools/container-images.json`.
+5. Preserve o namespace `lzocateli` e o nome público do repositório `containers`.
 
 ## Criar uma imagem
 
@@ -21,6 +22,7 @@ description: "Use para criar, alterar, otimizar, documentar, validar, versionar 
 5. Use multi-stage build quando ferramentas de compilação não forem necessárias em runtime.
 6. Adicione labels OCI e um health check somente quando houver uma prova útil de saúde.
 7. Documente tags, configuração, segurança, validação e operação.
+8. Registre contexto, Dockerfile, nome, plataformas e nível de validação no catálogo.
 
 ## Alterar uma imagem
 
@@ -48,7 +50,8 @@ description: "Use para criar, alterar, otimizar, documentar, validar, versionar 
 5. Execute smoke test e health check.
 6. Inspecione `Config.User`, `Entrypoint`, `Cmd`, labels, portas e volumes.
 7. Teste persistência e encerramento quando fizerem parte do contrato.
-8. Faça scan de vulnerabilidades e gere SBOM/proveniência na release.
+8. Faça scan Trivy e bloqueie vulnerabilidades `CRITICAL` corrigíveis.
+9. Gere e preserve relatórios, SBOM e proveniência na release.
 
 ## Versionar e publicar
 
@@ -56,8 +59,9 @@ description: "Use para criar, alterar, otimizar, documentar, validar, versionar 
 2. Não publique `latest` sem uma política explícita no README.
 3. Use `.github/workflows/publish-image.yml` para build e push no Docker Hub.
 4. Informe `context_path`, `image_name`, `image_tag`, Dockerfile e plataformas.
-5. Confirme o digest publicado e teste `docker pull` pela referência remota.
-6. Sincronize o README apenas após o push bem-sucedido.
+5. Confirme que os inputs correspondem ao catálogo e que o gate pré-push passou em todas as plataformas.
+6. Confirme o digest e os manifests publicados.
+7. Sincronize o README apenas após a verificação remota.
 
 ## Secrets do repositório
 

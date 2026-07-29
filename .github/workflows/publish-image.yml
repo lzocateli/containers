@@ -42,12 +42,20 @@ jobs:
   validate:
     name: Validar entradas e arquivos
     runs-on: ubuntu-24.04
+    outputs:
+      platform_matrix: ${{ steps.catalog.outputs.platform_matrix }}
     steps:
       - name: Obter repositório
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Configurar uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.9.26"
+          enable-cache: false
 
       - name: Configurar Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
 
       - name: Validar parâmetros
         shell: bash
@@ -66,6 +74,7 @@ jobs:
           [[ "$DOCKERFILE_NAME" =~ ^Dockerfile([.][A-Za-z0-9._-]+)?$ ]] || { echo "dockerfile inválido"; exit 1; }
           [[ "$IMAGE_NAME" =~ ^[a-z0-9]+([._-][a-z0-9]+)*$ ]] || { echo "image_name inválido"; exit 1; }
           [[ "$IMAGE_TAG" =~ ^[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$ ]] || { echo "image_tag inválida"; exit 1; }
+          [[ ! "$IMAGE_TAG" =~ ^(latest|main|master|edge|nightly)$ ]] || { echo "image_tag móvel proibida: $IMAGE_TAG"; exit 1; }
           [[ "$PLATFORMS" =~ ^linux/(amd64|arm64|arm/v7)(,linux/(amd64|arm64|arm/v7))*$ ]] || { echo "platforms aceita apenas linux/amd64, linux/arm64 e linux/arm/v7"; exit 1; }
           [[ -d "$CONTEXT_PATH" ]] || { echo "Pasta não encontrada: $CONTEXT_PATH"; exit 1; }
           [[ -f "$CONTEXT_PATH/$DOCKERFILE_NAME" ]] || { echo "Dockerfile não encontrado"; exit 1; }
@@ -86,8 +95,14 @@ jobs:
           grep -Eq '^[[:space:]]*\.env([*./]|$)' "$dockerignore" || { echo ".dockerignore deve bloquear .env"; exit 1; }
           grep -Eq '^[[:space:]]*\.git([*./]|$)' "$dockerignore" || { echo ".dockerignore deve bloquear .git"; exit 1; }
           git check-ignore --no-index --quiet "$CONTEXT_PATH/.env" || { echo ".gitignore reintroduz ou não bloqueia .env"; exit 1; }
-          ! grep -Eq '^[[:space:]]*!\.env([*./]|$)' "$dockerignore" || { echo ".dockerignore não pode reintroduzir .env"; exit 1; }
-          ! grep -Eq '^[[:space:]]*!\.git([*./]|$)' "$dockerignore" || { echo ".dockerignore não pode reintroduzir .git"; exit 1; }
+          if grep -Eq '^[[:space:]]*!\.env([*./]|$)' "$dockerignore"; then
+            echo ".dockerignore não pode reintroduzir .env" >&2
+            exit 1
+          fi
+          if grep -Eq '^[[:space:]]*!\.git([*./]|$)' "$dockerignore"; then
+            echo ".dockerignore não pode reintroduzir .git" >&2
+            exit 1
+          fi
 
           if [[ "$UPDATE_README" == "true" ]]; then
             [[ -f "$CONTEXT_PATH/README.md" ]] || { echo "README.md não encontrado para sincronização"; exit 1; }
@@ -96,36 +111,125 @@ jobs:
             [[ "$(wc -c < "$readme")" -le 25000 ]] || { echo "README.md excede 25.000 bytes"; exit 1; }
           fi
 
+      - name: Validar entrada no catálogo
+        id: catalog
+        shell: bash
+        env:
+          CONTEXT_PATH: ${{ inputs.context_path }}
+          DOCKERFILE_NAME: ${{ inputs.dockerfile }}
+          IMAGE_NAME: ${{ inputs.image_name }}
+          PLATFORMS: ${{ inputs.platforms }}
+        run: |
+          set -euo pipefail
+
+          uv run --project tools --frozen python tools/scripts/container-catalog/main.py validate
+          entry="$(uv run --project tools --frozen python tools/scripts/container-catalog/main.py release \
+            --context "$CONTEXT_PATH" \
+            --dockerfile "$DOCKERFILE_NAME" \
+            --image-name "$IMAGE_NAME" \
+            --platforms "$PLATFORMS")"
+          platform_matrix="$(jq -c '[.platforms[] | {platform: ., suffix: gsub("/"; "-")}]' <<<"$entry")"
+          echo "platform_matrix=$platform_matrix" >> "$GITHUB_OUTPUT"
+
       - name: Validar Dockerfile com BuildKit
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         with:
           context: ${{ inputs.context_path }}
           file: ${{ inputs.context_path }}/${{ inputs.dockerfile }}
           call: check
 
+  security:
+    name: Segurança ${{ matrix.target.platform }}
+    needs: validate
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJSON(needs.validate.outputs.platform_matrix) }}
+    steps:
+      - name: Obter repositório
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Configurar QEMU
+        uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.6.0
+
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
+
+      - name: Construir imagem sem publicar
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        with:
+          context: ${{ inputs.context_path }}
+          file: ${{ inputs.context_path }}/${{ inputs.dockerfile }}
+          platforms: ${{ matrix.target.platform }}
+          load: true
+          tags: local/${{ inputs.image_name }}:${{ github.run_id }}-${{ matrix.target.suffix }}
+          cache-from: type=gha,scope=${{ inputs.image_name }}-${{ matrix.target.suffix }}
+          cache-to: type=gha,mode=max,scope=${{ inputs.image_name }}-${{ matrix.target.suffix }}
+
+      - name: Gerar relatório Trivy
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        with:
+          image-ref: local/${{ inputs.image_name }}:${{ github.run_id }}-${{ matrix.target.suffix }}
+          format: json
+          output: trivy-${{ inputs.image_name }}-${{ matrix.target.suffix }}.json
+          severity: HIGH,CRITICAL
+          exit-code: "0"
+
+      - name: Gerar SBOM CycloneDX
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        with:
+          image-ref: local/${{ inputs.image_name }}:${{ github.run_id }}-${{ matrix.target.suffix }}
+          scan-type: image
+          format: cyclonedx
+          output: sbom-${{ inputs.image_name }}-${{ matrix.target.suffix }}.cdx.json
+          exit-code: "0"
+
+      - name: Bloquear vulnerabilidades críticas corrigíveis
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        with:
+          image-ref: local/${{ inputs.image_name }}:${{ github.run_id }}-${{ matrix.target.suffix }}
+          format: table
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+      - name: Publicar evidências de segurança
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: security-${{ inputs.image_name }}-${{ matrix.target.suffix }}-${{ github.run_id }}
+          path: |
+            trivy-${{ inputs.image_name }}-${{ matrix.target.suffix }}.json
+            sbom-${{ inputs.image_name }}-${{ matrix.target.suffix }}.cdx.json
+          if-no-files-found: error
+          retention-days: 90
+
   publish:
     name: Build e push
-    needs: validate
+    needs:
+      - validate
+      - security
     runs-on: ubuntu-24.04
     steps:
       - name: Obter repositório
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Configurar QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.6.0
 
       - name: Configurar Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
 
       - name: Autenticar no Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Gerar metadados OCI
         id: metadata
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f # v5.8.0
         with:
           images: docker.io/lzocateli/${{ inputs.image_name }}
           tags: |
@@ -134,7 +238,8 @@ jobs:
             org.opencontainers.image.documentation=https://github.com/${{ github.repository }}/tree/${{ github.sha }}/${{ inputs.context_path }}
 
       - name: Construir e publicar
-        uses: docker/build-push-action@v6
+        id: build
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         with:
           context: ${{ inputs.context_path }}
           file: ${{ inputs.context_path }}/${{ inputs.dockerfile }}
@@ -142,10 +247,42 @@ jobs:
           push: true
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
-          cache-from: type=gha,scope=${{ inputs.image_name }}
+          cache-from: |
+            type=gha,scope=${{ inputs.image_name }}
+            type=gha,scope=${{ inputs.image_name }}-linux-amd64
+            type=gha,scope=${{ inputs.image_name }}-linux-arm64
+            type=gha,scope=${{ inputs.image_name }}-linux-arm-v7
           cache-to: type=gha,mode=max,scope=${{ inputs.image_name }}
           provenance: mode=max
           sbom: true
+
+      - name: Verificar digest e plataformas publicados
+        shell: bash
+        env:
+          IMAGE_REF: docker.io/lzocateli/${{ inputs.image_name }}
+          IMAGE_TAG: ${{ inputs.image_tag }}
+          IMAGE_DIGEST: ${{ steps.build.outputs.digest }}
+          PLATFORMS: ${{ inputs.platforms }}
+        run: |
+          set -euo pipefail
+
+          test -n "$IMAGE_DIGEST"
+          inspection="$(docker buildx imagetools inspect "$IMAGE_REF@$IMAGE_DIGEST")"
+          while IFS= read -r platform; do
+            grep -Fq "Platform:  $platform" <<<"$inspection" || {
+              echo "Plataforma ausente no manifest publicado: $platform" >&2
+              exit 1
+            }
+          done < <(tr ',' '\n' <<<"$PLATFORMS")
+
+          {
+            echo "## Imagem publicada"
+            echo
+            echo "- Imagem: \`$IMAGE_REF:$IMAGE_TAG\`"
+            echo "- Digest: \`$IMAGE_DIGEST\`"
+            echo "- Plataformas: \`$PLATFORMS\`"
+            echo "- SBOM e proveniência: anexados ao manifest"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Atualizar descrição no Docker Hub
         if: ${{ inputs.update_dockerhub_readme }}

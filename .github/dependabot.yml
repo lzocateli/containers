@@ -1,0 +1,70 @@
+version: 2
+
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "05:00"
+      timezone: America/Sao_Paulo
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+
+  - package-ecosystem: docker
+    directories:
+      - /angular-cli
+      - /azure-cli
+      - /blog-comentario
+      - /blog-cosyvoice
+      - /blog-hugo
+      - /blog-listmonk
+      - /certbot
+      - /cockpit
+      - /cups
+      - /dbeaver
+      - /devops
+      - /dns/cloudflared/base
+      - /dns/pihole/base
+      - /dns/unbound/base
+      - /dotnet-aspnet
+      - /dotnet-sdk
+      - /dotnet-sdk-devcontainer
+      - /grafana
+      - /heroku
+      - /keycloak
+      - /mariadb
+      - /mssql-server
+      - /nginx
+      - /nginx-geoip2
+      - /node
+      - /oracle
+      - /portainer/agent
+      - /portainer/linux
+      - /portainer/nginx-proxy
+      - /postgres
+      - /python
+      - /rclone-onedrive
+      - /redis
+      - /redis/gui
+      - /stirling-pdf
+      - /terraform
+      - /wordpress
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/Sao_Paulo
+    groups:
+      container-bases:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "build"
+      include: scope
