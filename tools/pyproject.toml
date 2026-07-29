@@ -1,0 +1,10 @@
+[project]
+name = "containers-repository-tools"
+version = "0.1.0"
+description = "Ferramentas de automação do repositório containers."
+requires-python = ">=3.12"
+dependencies = []
+
+[tool.uv]
+package = false
+required-version = "==0.9.26"

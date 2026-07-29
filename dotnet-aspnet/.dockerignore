@@ -1,0 +1,43 @@
+# Controle de versão e automação
+.git
+.gitignore
+.github
+
+# Configuração local, secrets e credenciais
+.env
+.env.*
+secrets/
+credentials/
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Dados persistentes, backups, logs e temporários
+data/
+backups/
+backup/
+logs/
+*.bak
+*.dump
+*.log
+*.sql.gz
+.cache/
+tmp/
+temp/
+
+# Artefatos locais
+coverage/
+node_modules/
+bin/
+obj/
+
+# Arquivos que não participam do build
+README.md
+readme.md
+compose*.yml
+compose*.yaml
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

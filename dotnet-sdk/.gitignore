@@ -1,0 +1,35 @@
+# Configuração local, secrets e credenciais
+.env
+.env.*
+!.env.example
+secrets/
+credentials/
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Dados persistentes, backups, logs e temporários
+data/
+backups/
+backup/
+logs/
+*.bak
+*.dump
+*.log
+*.sql.gz
+.cache/
+tmp/
+temp/
+
+# Artefatos locais
+coverage/
+node_modules/
+bin/
+obj/
+
+# Editores e sistema operacional
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

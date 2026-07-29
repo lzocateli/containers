@@ -1,0 +1,6 @@
+# Superfícies de automação e supply chain exigem revisão do mantenedor.
+/.github/workflows/ @lzocateli
+/.github/dependabot.yml @lzocateli
+/tools/container-images.json @lzocateli
+/tools/ @lzocateli
+/**/Dockerfile* @lzocateli
