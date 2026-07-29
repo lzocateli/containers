@@ -270,13 +270,21 @@ jobs:
           set -euo pipefail
 
           test -n "$IMAGE_DIGEST"
-          inspection="$(docker buildx imagetools inspect "$IMAGE_REF@$IMAGE_DIGEST")"
-          while IFS= read -r platform; do
-            grep -Fq "Platform:  $platform" <<<"$inspection" || {
-              echo "Plataforma ausente no manifest publicado: $platform" >&2
-              exit 1
-            }
-          done < <(tr ',' '\n' <<<"$PLATFORMS")
+          manifest="$(docker buildx imagetools inspect --raw "$IMAGE_REF@$IMAGE_DIGEST")"
+          expected_platforms="$(tr ',' '\n' <<<"$PLATFORMS" | sort | paste -sd, -)"
+          published_platforms="$(jq -r '
+            [
+              .manifests[].platform
+              | select(.os != "unknown" and .architecture != "unknown")
+              | "\(.os)/\(.architecture)\(if .variant then "/" + .variant else "" end)"
+            ]
+            | sort
+            | join(",")
+          ' <<<"$manifest")"
+          if [[ "$published_platforms" != "$expected_platforms" ]]; then
+            echo "Plataformas do manifest divergem; esperado=$expected_platforms; publicado=$published_platforms" >&2
+            exit 1
+          fi
 
           {
             echo "## Imagem publicada"
