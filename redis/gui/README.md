@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 # P3X Redis UI
 
 ![Docker Hub](https://img.shields.io/badge/image-lzocateli%2Fredis--gui-2496ED?logo=docker&logoColor=white)
-![Version](https://img.shields.io/badge/version-2026.4.3014-2E7D32)
+![Version](https://img.shields.io/badge/version-2026.4.3014--r1-2E7D32)
 ![Base](https://img.shields.io/badge/base-patrikx3%2Fp3x--redis--ui%3A2026.4.3014-555555?logo=docker&logoColor=white)
 ![Platforms](https://img.shields.io/badge/platforms-linux%2Famd64-607D8B)
 ![Repository code license](https://img.shields.io/badge/repository_code-MIT-1565C0)
@@ -18,7 +18,7 @@ Interface web P3X Redis UI para administrar Valkey e outros servidores compatív
 
 | Item | Valor |
 | --- | --- |
-| Imagem | `lzocateli/redis-gui:2026.4.3014` |
+| Imagem | `lzocateli/redis-gui:2026.4.3014-r1` |
 | Imagem base | `patrikx3/p3x-redis-ui:2026.4.3014`, fixada por digest no Dockerfile |
 | Plataformas | `linux/amd64` |
 | Usuário padrão | `10001:0` |
@@ -50,7 +50,7 @@ docker run --name redis-gui \
   --detach \
   --publish 127.0.0.1:7843:7843 \
   --mount type=bind,src="$(pwd)/settings/redis-gui",dst=/settings \
-  lzocateli/redis-gui:2026.4.3014
+  lzocateli/redis-gui:2026.4.3014-r1
 ```
 
 Acesse `http://127.0.0.1:7843`. Com Podman, prepare a propriedade com `podman unshare chown 10001:0 settings/redis-gui` e use `--volume "$(pwd)/settings/redis-gui:/settings:Z"` em hosts com SELinux.
@@ -108,14 +108,15 @@ O entrypoint upstream inicia `p3x-redis` como UID `10001`. O health check consul
 ## Build local
 
 ```bash
-docker build --pull --tag lzocateli/redis-gui:2026.4.3014 redis/gui
+docker build --pull --tag lzocateli/redis-gui:2026.4.3014-r1 redis/gui
 ```
 
 ## Tags e compatibilidade
 
 | Tag | Mutabilidade | Compatibilidade | Uso recomendado |
 | --- | --- | --- | --- |
-| `2026.4.3014` | Imutável | P3X Redis UI 2026.4.3014 | Produção atrás de proxy protegido |
+| `2026.4.3014-r1` | Imutável | P3X Redis UI 2026.4.3014 + patch npm 11.18.0 (tar 7.5.19) | Produção atrás de proxy protegido |
+| `2026.4.3014` | Imutável | P3X Redis UI 2026.4.3014 | Mantida para compatibilidade histórica |
 
 Esta versão substitui RedisInsight 2.54 por P3X Redis UI. A mudança é incompatível quanto à aplicação, porta, persistência e formato das configurações. RedisInsight usa SSPLv1; P3X Redis UI usa MIT, compatível com a política deste repositório. Recrie as conexões manualmente e não reutilize o diretório `/data` antigo.
 
@@ -129,7 +130,7 @@ Use **Actions > Publicar imagem de container > Run workflow** com:
 
 - `context_path`: `redis/gui`;
 - `image_name`: `redis-gui`;
-- `image_tag`: `2026.4.3014`;
+- `image_tag`: `2026.4.3014-r1`;
 - `dockerfile`: `Dockerfile`;
 - `platforms`: `linux/amd64`.
 
@@ -163,4 +164,5 @@ O badge MIT descreve somente o conteúdo original deste repositório. O código 
 
 ## Histórico de alterações
 
+- `2026.4.3014-r1`: mantém P3X Redis UI 2026.4.3014 e aplica patch de segurança npm 11.18.0 (tar 7.5.19) para mitigar o CVE-2026-59873.
 - `2026.4.3014`: substitui RedisInsight por P3X Redis UI, muda a porta para 7843, persiste configuração em `/settings` e executa como UID `10001`.
