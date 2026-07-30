@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
 ![Repository code license](https://img.shields.io/badge/repository_code-MIT-1565C0)
 ![Build](https://img.shields.io/badge/build-validado-success)
 
-Imagem baseada em Node.js 24 LTS (Debian Bookworm), com `npm`, `npx` e `corepack` habilitado. O foco e suportar build e desenvolvimento de projetos Angular 22 com runtime LTS estavel.
+Imagem baseada em Node.js 24 LTS (Debian Bookworm), com `npm`, `npx` e `corepack` habilitado. O foco e suportar build e desenvolvimento de projetos Angular 22 com runtime LTS estavel, com hardening para reduzir CVEs criticas reportadas em scans de seguranca.
 
 ## Referencia da imagem
 
@@ -34,9 +34,10 @@ Imagem baseada em Node.js 24 LTS (Debian Bookworm), com `npm`, `npx` e `corepack
 ### Incluido
 
 - Node.js 24 LTS.
-- npm e npx distribuidos com o Node oficial.
+- npm e npx distribuidos com o Node oficial (npm atualizado para 12.0.2).
 - Corepack habilitado para pnpm/yarn quando exigido pelo projeto.
 - Usuario nao root (`node`) por padrao.
+- Remocao de pacotes Debian desnecessarios de toolchain (ImageMagick/MariaDB dev) para reduzir superficie de ataque.
 
 ### Nao incluido
 
@@ -119,6 +120,7 @@ O entrypoint da imagem base Node e preservado. O processo padrao executa `node -
 - Sem exposicao de portas por padrao.
 - Nao persistir tokens npm no repositorio ou na imagem.
 - Prefira lockfiles versionados para reproducibilidade.
+- Atualizacao de `libgnutls30` e npm para mitigar vulnerabilidades criticas com correcao disponivel.
 
 ## Build local
 
@@ -150,6 +152,8 @@ Antes da publicacao, confirme:
 - `docker buildx build --check` sem erros;
 - build para `linux/amd64`;
 - `node --version`, `npm --version` e `npx -y @angular/cli@22 version` executando com sucesso;
+- validacao de `npm ls -g tar` com versao `7.5.19` ou superior;
+- validacao de ausenca de pacotes legados via `dpkg -l` (imagemagick/libmariadb/linux-libc-dev) no container final;
 - scan de vulnerabilidades, SBOM e proveniencia no workflow oficial.
 
 ## Publicacao
@@ -188,5 +192,5 @@ O badge MIT descreve somente o conteudo original deste repositorio. Componentes 
 
 ## Historico de alteracoes
 
-- `24.15.0-bookworm`: padroniza Dockerfile e README, adota Node.js LTS, habilita corepack e define contrato para uso com Angular 22.
+- `24.15.0-bookworm`: adiciona hardening de seguranca (upgrade de `libgnutls30`, npm 12.0.2 e remocao de pacotes Debian desnecessarios) mantendo compatibilidade com Angular 22.
 
