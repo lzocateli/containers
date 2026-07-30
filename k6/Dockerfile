@@ -1,9 +1,10 @@
 # syntax=docker/dockerfile:1
 ARG NODE_BASE_IMAGE=lzocateli/node:24.15.0-bookworm
 ARG NODE_VERSION=24.15.0
-ARG K6_VERSION=0.57.0
+ARG K6_VERSION=2.1.0
+ARG K6_DIGEST=sha256:65c920dc067d5e2e00befbf982af6ad6ad0117034e8b1c65817c7975c52d4669
 
-FROM grafana/k6:${K6_VERSION} AS k6-binary
+FROM grafana/k6:${K6_VERSION}@${K6_DIGEST} AS k6-binary
 
 FROM ${NODE_BASE_IMAGE} AS runtime
 

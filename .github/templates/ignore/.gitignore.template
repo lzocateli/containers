@@ -17,6 +17,16 @@ backup/
 *.dump
 *.sql.gz
 
+# Arquivos compactados e bundles locais
+*.tar
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tgz
+*.zip
+*.7z
+*.rar
+
 # Logs, temporários e caches
 logs/
 *.log
