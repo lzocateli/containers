@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: 2024 Lincoln Zocateli
 SPDX-License-Identifier: MIT
 -->
 
-# Node.js LTS para Angular 22
+# Node.js 24 LTS hardened
 
 ![Docker Hub](https://img.shields.io/badge/image-lzocateli%2Fnode-2496ED?logo=docker&logoColor=white)
 ![Version](https://img.shields.io/badge/version-24.15.0--bookworm-2E7D32)
@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
 ![Repository code license](https://img.shields.io/badge/repository_code-MIT-1565C0)
 ![Build](https://img.shields.io/badge/build-validado-success)
 
-Imagem baseada em Node.js 24 LTS (Debian Bookworm), com `npm`, `npx` e `corepack` habilitado. O foco e suportar build e desenvolvimento de projetos Angular 22 com runtime LTS estavel, com hardening para reduzir CVEs criticas reportadas em scans de seguranca.
+Imagem baseada em Node.js 24 LTS (Debian Bookworm), com `npm`, `npx` e `corepack` habilitado. O foco e suportar pipelines e desenvolvimento JavaScript/TypeScript com runtime LTS estavel, com hardening para reduzir CVEs criticas reportadas em scans de seguranca.
 
 ## Referencia da imagem
 
@@ -45,17 +45,9 @@ Imagem baseada em Node.js 24 LTS (Debian Bookworm), com `npm`, `npx` e `corepack
 - Codigo de aplicacao, dependencias de projeto e cache de pacotes.
 - Ferramentas de navegador (Chrome/Playwright) para E2E.
 
-## Compatibilidade com Angular 22
+## Compatibilidade
 
-Esta imagem usa Node.js LTS da linha 24, apropriada para toolchains do Angular 22.
-
-Para validar no pipeline:
-
-```bash
-node --version
-npm --version
-npx -y @angular/cli@22 version
-```
+Esta imagem e base generica para workloads Node.js e TypeScript. Para uso com Angular CLI, prefira a imagem dedicada `lzocateli/angular-cli`, que herda desta base e adiciona somente os componentes especificos de CLI.
 
 ## Inicio rapido
 
@@ -64,14 +56,14 @@ docker pull lzocateli/node:24.15.0-bookworm
 docker run --rm lzocateli/node:24.15.0-bookworm node --version
 ```
 
-Exemplo com projeto Angular local:
+Exemplo com projeto Node local:
 
 ```bash
 docker run --rm \
   --workdir /workspace \
   --volume "$(pwd):/workspace" \
   lzocateli/node:24.15.0-bookworm \
-  sh -lc "npm ci && npx ng version"
+  sh -lc "npm ci && npm run -s build || npm test"
 ```
 
 ## Docker Compose
@@ -138,7 +130,7 @@ docker run --rm lzocateli/node:24.15.0-bookworm sh -lc "npx -y @angular/cli@22 v
 
 | Tag | Mutabilidade | Compatibilidade | Uso recomendado |
 | --- | --- | --- | --- |
-| `24.15.0-bookworm` | Imutavel | Node.js 24 LTS e toolchain Angular 22 | Producao e CI |
+| `24.15.0-bookworm` | Imutavel | Node.js 24 LTS hardened | Producao e CI |
 | `24-bookworm` | Movel | Ultimo patch da linha 24 LTS | Homologacao controlada |
 
 Prefira tags imutaveis em pipelines e releases.
@@ -151,7 +143,7 @@ Antes da publicacao, confirme:
 - exclusao de `.env`, secrets e `.git` do contexto Docker;
 - `docker buildx build --check` sem erros;
 - build para `linux/amd64`;
-- `node --version`, `npm --version` e `npx -y @angular/cli@22 version` executando com sucesso;
+- `node --version` e `npm --version` executando com sucesso;
 - validacao de `npm ls -g tar` com versao `7.5.19` ou superior;
 - validacao de ausenca de pacotes legados via `dpkg -l` (imagemagick/libmariadb/linux-libc-dev) no container final;
 - scan de vulnerabilidades, SBOM e proveniencia no workflow oficial.
@@ -171,7 +163,7 @@ Use **Actions > Publicar imagem de container > Run workflow** com:
 | Sintoma | Causa provavel | Verificacao | Correcao |
 | --- | --- | --- | --- |
 | `npm ERR! EACCES` | Permissao de escrita no bind mount | `id` e dono dos arquivos no host | Ajustar permissao do diretorio no host para usuario do container. |
-| `npx ng` nao encontrado | Dependencia local ausente | `npm ls @angular/cli` | Instalar `@angular/cli` no projeto ou usar `npx -y @angular/cli@22`. |
+| `npx` nao encontra pacote | Dependencia local ausente ou registry privado sem auth | `npm config list` e `npm whoami` | Configurar auth no runtime (`.npmrc`/token) e reinstalar dependencias. |
 | `npm ci` falha por lockfile | lockfile fora de sincronia | comparar `package.json` e lockfile | Regenerar lockfile no mesmo major do npm usado no CI. |
 
 ## Limitacoes conhecidas
@@ -192,5 +184,5 @@ O badge MIT descreve somente o conteudo original deste repositorio. Componentes 
 
 ## Historico de alteracoes
 
-- `24.15.0-bookworm`: adiciona hardening de seguranca (upgrade de `libgnutls30`, npm 12.0.2 e remocao de pacotes Debian desnecessarios) mantendo compatibilidade com Angular 22.
+- `24.15.0-bookworm`: adiciona hardening de seguranca (upgrade de `libgnutls30`, npm 12.0.2 e remocao de pacotes Debian desnecessarios) para uso generico como base Node LTS.
 
