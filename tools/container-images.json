@@ -21,6 +21,7 @@
     { "id": "dotnet-sdk-devcontainer", "imageName": "dotnet-sdk-devcontainer", "context": "dotnet-sdk-devcontainer", "dockerfile": "Dockerfile", "platforms": ["linux/amd64"], "scanPlatform": "linux/amd64", "validation": "build" },
     { "id": "grafana", "imageName": "grafana", "context": "grafana", "dockerfile": "Dockerfile", "platforms": ["linux/amd64"], "scanPlatform": "linux/amd64", "validation": "check", "reason": "Espelho de imagem upstream sem customização relevante." },
     { "id": "heroku", "imageName": "heroku", "context": "heroku", "dockerfile": "Dockerfile", "platforms": ["linux/amd64"], "scanPlatform": "linux/amd64", "validation": "build" },
+    { "id": "k6", "imageName": "k6", "context": "k6", "dockerfile": "Dockerfile", "platforms": ["linux/amd64"], "scanPlatform": "linux/amd64", "validation": "build" },
     { "id": "keycloak", "imageName": "keycloak", "context": "keycloak", "dockerfile": "Dockerfile", "platforms": ["linux/amd64"], "scanPlatform": "linux/amd64", "validation": "build" },
     { "id": "mariadb", "imageName": "mariadb", "context": "mariadb", "dockerfile": "Dockerfile", "platforms": ["linux/amd64"], "scanPlatform": "linux/amd64", "validation": "check", "reason": "Espelho de imagem upstream sem customização relevante." },
     { "id": "mssql-server", "imageName": "mssql-server", "context": "mssql-server", "dockerfile": "Dockerfile", "platforms": ["linux/amd64"], "scanPlatform": "linux/amd64", "validation": "check", "reason": "Build e smoke test exigem recursos e licença específicos." },
