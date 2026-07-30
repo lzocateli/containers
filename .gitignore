@@ -82,6 +82,18 @@ web_modules/
 # Output of 'npm pack'
 *.tgz
 
+# Arquivos compactados e bundles locais
+*.tar
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.zip
+*.7z
+*.rar
+
+# Evidencias locais de scan de seguranca
+artifacts/security-local/
+
 # Yarn Integrity file
 .yarn-integrity
 

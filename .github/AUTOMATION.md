@@ -9,7 +9,9 @@ Esta pasta centraliza padrões de criação, alteração, documentação, valida
 | `copilot-instructions.md` | Regras gerais do repositório. |
 | `instructions/` | Regras aplicadas a Dockerfiles, READMEs e workflows. |
 | `skills/container-image-maintenance/` | Playbook completo de manutenção e release. |
+| `skills/container-vulnerability-remediation/` | Playbook de scan local com Trivy e correção de vulnerabilidades de imagens. |
 | `agents/container-image-reviewer.agent.md` | Revisor somente leitura especializado. |
+| `agents/container-vulnerability-remediator.agent.md` | Agente de remediação de vulnerabilidades com execução local de scan. |
 | `prompts/` | Atalhos para criar, revisar e preparar releases. |
 | `templates/container-README.template.md` | Estrutura canônica de documentação por imagem. |
 | `templates/ignore/` | Modelos obrigatórios de `.gitignore` e `.dockerignore` por imagem. |
@@ -23,6 +25,45 @@ A ferramenta `tools/scripts/container-catalog/main.py` valida o catálogo de for
 ```bash
 uv run --project tools python tools/scripts/container-catalog/main.py --help
 ```
+
+Para reproduzir localmente o gate de vulnerabilidades usado nos workflows, use:
+
+```powershell
+tools/scripts/scan-container-vulnerabilities.ps1 --help
+tools/scripts/scan-container-vulnerabilities.ps1 -ContextPath <pasta-da-imagem>
+tools/scripts/scan-container-vulnerabilities-by-id.ps1 --help
+tools/scripts/scan-container-vulnerabilities-by-id.ps1 -ImageId <id-do-catalogo>
+```
+
+Para reduzir tempo e download repetido do banco de vulnerabilidades, use cache local do Trivy:
+
+```powershell
+tools/scripts/scan-container-vulnerabilities.ps1 -ContextPath <pasta-da-imagem> -CacheDir artifacts/security-local/trivy-cache
+tools/scripts/scan-container-vulnerabilities-by-id.ps1 -ImageId <id-do-catalogo> -CacheDir artifacts/security-local/trivy-cache
+```
+
+Política de atualização do cache (`-DbCachePolicy`):
+
+- `auto` (padrão): reutiliza o cache e permite que o Trivy atualize o banco quando necessário.
+- `reuse`: usa somente o banco já presente no cache local (`--skip-db-update`), sem chamadas de atualização remota.
+- `refresh`: força atualização do banco no cache local antes do scan e depois reutiliza esse conteúdo atualizado.
+
+Ao final de cada execução, o script imprime o status do metadata do cache (`db/metadata.json`) com campos como `UpdatedAt`, `NextUpdate` e `DownloadedAt` quando disponíveis, para deixar explícito quando o banco foi atualizado.
+
+Exemplos:
+
+```powershell
+# comportamento padrão (equilíbrio entre atualização e performance)
+tools/scripts/scan-container-vulnerabilities-by-id.ps1 -ImageId k6 -DbCachePolicy auto
+
+# triagem rápida/offline usando apenas cache já baixado
+tools/scripts/scan-container-vulnerabilities-by-id.ps1 -ImageId k6 -DbCachePolicy reuse
+
+# atualização explícita do banco antes da validação final
+tools/scripts/scan-container-vulnerabilities-by-id.ps1 -ImageId k6 -DbCachePolicy refresh
+```
+
+O script por id resolve automaticamente contexto, Dockerfile e plataforma via `tools/container-images.json`. Quando a base da imagem tambem pertence ao projeto (namespace `lzocateli` e entrada no catalogo), ele escaneia primeiro a base e depois a imagem filha.
 
 ## Configuração inicial no GitHub
 
