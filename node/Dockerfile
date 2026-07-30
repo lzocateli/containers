@@ -8,7 +8,7 @@ ARG NODE_VERSION
 ARG NPM_VERSION
 
 LABEL org.opencontainers.image.title="lzocateli/node" \
-	org.opencontainers.image.description="Node.js LTS para pipelines e desenvolvimento com suporte ao ecossistema Angular 22." \
+	org.opencontainers.image.description="Node.js 24 LTS hardened para pipelines e desenvolvimento JavaScript/TypeScript." \
 	org.opencontainers.image.source="https://github.com/lzocateli/containers" \
 	org.opencontainers.image.documentation="https://github.com/lzocateli/containers/tree/main/node" \
 	org.opencontainers.image.url="https://github.com/lzocateli/containers/tree/main/node" \
