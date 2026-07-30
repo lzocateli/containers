@@ -6,21 +6,21 @@ SPDX-License-Identifier: MIT
 # k6 sobre Node.js 24 LTS hardened
 
 ![Docker Hub](https://img.shields.io/badge/image-lzocateli%2Fk6-2496ED?logo=docker&logoColor=white)
-![Version](https://img.shields.io/badge/version-0.57.0--node24.15.0--bookworm-2E7D32)
+![Version](https://img.shields.io/badge/version-2.1.0--node24.15.0--bookworm-2E7D32)
 ![Base](https://img.shields.io/badge/base-lzocateli%2Fnode%3A24.15.0--bookworm-555555?logo=docker&logoColor=white)
 ![Platforms](https://img.shields.io/badge/platforms-linux%2Famd64-607D8B)
 ![Repository code license](https://img.shields.io/badge/repository_code-MIT-1565C0)
 ![Build](https://img.shields.io/badge/build-validado-success)
 
-Imagem para execução isolada do k6, baseada em `lzocateli/node:24.15.0-bookworm`, com binário oficial do k6 copiado da imagem upstream `grafana/k6`.
+Imagem para execução isolada do k6, baseada em `lzocateli/node:24.15.0-bookworm`, com binário oficial do k6 copiado da imagem upstream `grafana/k6` fixada por digest imutável.
 
 ## Referência da imagem
 
 | Item | Valor |
 | --- | --- |
-| Imagem | `lzocateli/k6:0.57.0-node24.15.0-bookworm` |
+| Imagem | `lzocateli/k6:2.1.0-node24.15.0-bookworm` |
 | Imagem base | `lzocateli/node:24.15.0-bookworm` |
-| Binário k6 | `grafana/k6:0.57.0` |
+| Binário k6 | `grafana/k6:2.1.0@sha256:65c920dc067d5e2e00befbf982af6ad6ad0117034e8b1c65817c7975c52d4669` |
 | Plataformas | `linux/amd64` |
 | Usuário padrão | `node` |
 | Entry point | `k6` |
@@ -33,7 +33,7 @@ Imagem para execução isolada do k6, baseada em `lzocateli/node:24.15.0-bookwor
 
 ### Incluído
 
-- Binário `k6` versão 0.57.0.
+- Binário `k6` versão 2.1.0.
 - Runtime Node.js 24 LTS hardened herdado da imagem base.
 - Execução padrão em usuário não root.
 
@@ -46,8 +46,8 @@ Imagem para execução isolada do k6, baseada em `lzocateli/node:24.15.0-bookwor
 ## Início rápido
 
 ```bash
-docker pull lzocateli/k6:0.57.0-node24.15.0-bookworm
-docker run --rm lzocateli/k6:0.57.0-node24.15.0-bookworm version
+docker pull lzocateli/k6:2.1.0-node24.15.0-bookworm
+docker run --rm lzocateli/k6:2.1.0-node24.15.0-bookworm version
 ```
 
 Exemplo com script local:
@@ -56,7 +56,7 @@ Exemplo com script local:
 docker run --rm \
   --workdir /workspace \
   --volume "$(pwd):/workspace" \
-  lzocateli/k6:0.57.0-node24.15.0-bookworm \
+  lzocateli/k6:2.1.0-node24.15.0-bookworm \
   run script.js
 ```
 
@@ -65,7 +65,7 @@ docker run --rm \
 ```yaml
 services:
   k6:
-    image: lzocateli/k6:0.57.0-node24.15.0-bookworm
+    image: lzocateli/k6:2.1.0-node24.15.0-bookworm
     working_dir: /workspace
     user: "node"
     volumes:
@@ -118,14 +118,14 @@ docker build --pull --tag lzocateli/node:24.15.0-bookworm node
 Depois gere a imagem k6:
 
 ```bash
-docker build --pull --tag lzocateli/k6:0.57.0-node24.15.0-bookworm k6
+docker build --pull --tag lzocateli/k6:2.1.0-node24.15.0-bookworm k6
 ```
 
 ## Tags e compatibilidade
 
 | Tag | Mutabilidade | Compatibilidade | Uso recomendado |
 | --- | --- | --- | --- |
-| `0.57.0-node24.15.0-bookworm` | Imutável | k6 0.57.0 + Node 24.15.0 LTS | Produção e CI |
+| `2.1.0-node24.15.0-bookworm` | Imutável | k6 2.1.0 + Node 24.15.0 LTS | Produção e CI |
 
 ## Validação
 
@@ -144,7 +144,7 @@ Use **Actions > Publicar imagem de container > Run workflow** com:
 
 - `context_path`: `k6`;
 - `image_name`: `k6`;
-- `image_tag`: `0.57.0-node24.15.0-bookworm`;
+- `image_tag`: `2.1.0-node24.15.0-bookworm`;
 - `dockerfile`: `Dockerfile`;
 - `platforms`: `linux/amd64`.
 
@@ -172,11 +172,11 @@ Use **Actions > Publicar imagem de container > Run workflow** com:
 | Componente | Versão | Licença | Fonte |
 | --- | --- | --- | --- |
 | Conteúdo original deste repositório | Atual | MIT | `https://github.com/lzocateli/containers` |
-| k6 | 0.57.0 | AGPL-3.0 | `https://github.com/grafana/k6` |
+| k6 | 2.1.0 | AGPL-3.0 | `https://github.com/grafana/k6` |
 | Imagem base `lzocateli/node` | 24.15.0-bookworm | MIT (conteúdo empacotado pelo projeto) | `https://github.com/lzocateli/containers/tree/main/node` |
 
 O badge MIT descreve somente o conteúdo original deste repositório. Componentes de terceiros permanecem sujeitos aos seus termos e avisos de licença. Consulte a política de licenciamento: https://github.com/lzocateli/containers/blob/main/LICENSING.md.
 
 ## Histórico de alterações
 
-- `0.57.0-node24.15.0-bookworm`: criação da imagem k6 isolada, baseada em `lzocateli/node` hardened.
+- `2.1.0-node24.15.0-bookworm`: atualização para k6 2.1.0 com pin por digest imutável para evitar deriva de tag e reaparição de CVEs críticos do binário Go no CI.

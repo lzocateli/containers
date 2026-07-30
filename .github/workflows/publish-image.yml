@@ -145,6 +145,8 @@ jobs:
     name: Segurança ${{ matrix.target.platform }}
     needs: validate
     runs-on: ubuntu-24.04
+    env:
+      TRIVY_DISABLE_VEX_NOTICE: true
     strategy:
       fail-fast: false
       matrix:
