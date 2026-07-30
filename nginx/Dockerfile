@@ -46,6 +46,10 @@ RUN mkdir -p /etc/nginx/modules-enabled
 
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libmaxminddb0 \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends --only-upgrade \
+        libgnutls30 \
+        libssl3 \
+        openssl \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=module-builder /tmp/nginx-${NGINX_VERSION}/objs/ngx_http_headers_more_filter_module.so /etc/nginx/modules/ngx_http_headers_more_filter_module.so
