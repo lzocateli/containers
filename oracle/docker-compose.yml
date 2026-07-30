@@ -1,24 +1,25 @@
-version: "3.7"
-
 services:
   db:
-    image: lzocateli/oracle:21-slim
+    image: lzocateli/oracle:23-slim
     container_name: oracle
+    restart: unless-stopped
     environment:
-      - ORACLE_PASSWORD=Myadm@12390
-      - ORACLE_DATABASE=XEPDB1
-      - ORACLE_TABLESPACE=app_data
-      - ORACLE_USER=myuser
-      - ORACLE_USER_PASSWORD=Teste@1234
+      - ORACLE_PASSWORD=${ORACLE_PASSWORD}
+      # Nao defina FREEPDB1 aqui: ele ja existe na imagem base.
+      - ORACLE_DATABASE=${ORACLE_DATABASE:-}
+      - ORACLE_USER=${ORACLE_USER:-app}
+      - ORACLE_USER_PASSWORD=${ORACLE_USER_PASSWORD}
+      - ORACLE_TABLESPACE=${ORACLE_TABLESPACE:-USERS}
     ports:
-      - 1521:1521
+      - "127.0.0.1:1521:1521"
     networks:
       - lzo
     volumes:
-      - ${DATA_DIR}/oracle:/opt/oracle/oradata
-      - ./scripts:/docker-entrypoint-initdb.d/
+      - ${DATA_DIR:-./data}/oracle:/opt/oracle/oradata
+      - ./scripts:/container-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD", "sqlplus", "-s", "SYSTEM/Myadm@12390@localhost:1521/XEPDB1", "<<< 'SELECT 1 FROM DUAL;'"]
+      # O script healthcheck.sh ja existe na imagem base gvenzl/oracle-free.
+      test: ["CMD", "healthcheck.sh"]
       start_period: 120s
       interval: 60s
       timeout: 10s
