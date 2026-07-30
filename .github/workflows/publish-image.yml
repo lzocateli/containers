@@ -295,6 +295,77 @@ jobs:
             echo "- SBOM e proveniência: anexados ao manifest"
           } >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Confirmar tag no Docker Hub (API)
+        shell: bash
+        env:
+          IMAGE_NAME: ${{ inputs.image_name }}
+          IMAGE_TAG: ${{ inputs.image_tag }}
+          IMAGE_DIGEST: ${{ steps.build.outputs.digest }}
+          PLATFORMS: ${{ needs.validate.outputs.platforms }}
+        run: |
+          set -euo pipefail
+
+          api_url="https://hub.docker.com/v2/repositories/lzocateli/${IMAGE_NAME}/tags/${IMAGE_TAG}"
+          response=""
+
+          # Docker Hub pode demorar alguns segundos para refletir a tag recém-publicada.
+          for attempt in $(seq 1 8); do
+            if response="$(curl --fail --silent --show-error "$api_url")"; then
+              break
+            fi
+
+            if [[ "$attempt" -eq 8 ]]; then
+              echo "Tag não encontrada no Docker Hub após ${attempt} tentativas: lzocateli/${IMAGE_NAME}:${IMAGE_TAG}" >&2
+              exit 1
+            fi
+
+            echo "Tentativa ${attempt} sem confirmação da tag no Docker Hub; aguardando 5s..." >&2
+            sleep 5
+          done
+
+          expected_platforms="$(tr ',' '\n' <<<"$PLATFORMS" | sort | paste -sd, -)"
+          api_platforms="$(jq -r '
+            [
+              .images[]?
+              | select(.os != "unknown" and .architecture != "unknown")
+              | "\(.os)/\(.architecture)\(if .variant then "/" + .variant else "" end)"
+            ]
+            | sort
+            | join(",")
+          ' <<<"$response")"
+
+          if [[ -z "$api_platforms" ]]; then
+            echo "API do Docker Hub não retornou plataformas válidas para lzocateli/${IMAGE_NAME}:${IMAGE_TAG}" >&2
+            exit 1
+          fi
+
+          if [[ "$api_platforms" != "$expected_platforms" ]]; then
+            echo "Plataformas na API do Docker Hub divergem; esperado=$expected_platforms; api=$api_platforms" >&2
+            exit 1
+          fi
+
+          api_digests="$(jq -r '
+            [
+              .images[]?
+              | select(.os != "unknown" and .architecture != "unknown")
+              | .digest
+            ]
+            | unique
+            | join(",")
+          ' <<<"$response")"
+          api_last_updated="$(jq -r '.last_updated // "desconhecido"' <<<"$response")"
+
+          {
+            echo
+            echo "## Confirmação no Docker Hub API"
+            echo
+            echo "- Imagem: \`lzocateli/${IMAGE_NAME}:${IMAGE_TAG}\`"
+            echo "- Digest do build (manifest): \`$IMAGE_DIGEST\`"
+            echo "- Digests remotos (plataformas): \`$api_digests\`"
+            echo "- Plataformas na API: \`$api_platforms\`"
+            echo "- Última atualização na API: \`$api_last_updated\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Atualizar descrição no Docker Hub
         if: ${{ inputs.update_dockerhub_readme }}
         shell: bash

@@ -1,0 +1,44 @@
+services:
+  nginx:
+    image: lzocateli/nginx:1.28.0-bookworm
+    container_name: nginx
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS --max-time 2 http://127.0.0.1:8081/nginx-healthz > /dev/null || exit 1"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    stop_grace_period: 10s
+    ports:
+      - ${NGINX_HTTP_BIND:-127.0.0.1:8080:80}
+      - ${NGINX_HTTPS_BIND:-443:443}
+    volumes:
+      - type: bind
+        source: ${NGINX_MAIN_CONFIG_FILE}
+        target: /etc/nginx/nginx.conf
+        read_only: true
+      - type: bind
+        source: ${NGINX_CONFD_DIR}
+        target: /etc/nginx/conf.d
+        read_only: true
+      - type: bind
+        source: ${NGINX_GEOIP_DIR}
+        target: /usr/share/GeoIP
+        read_only: true
+      - type: bind
+        source: ${NGINX_SSL_DIR}
+        target: /etc/nginx/ssl
+        read_only: true
+      - type: bind
+        source: ${NGINX_LOG_DIR}
+        target: /var/log/nginx
+    networks:
+      lzo:
+        aliases:
+          - nginx
+
+networks:
+  lzo:
+    external: true
+    name: ${NGINX_NETWORK_NAME:-lzo}

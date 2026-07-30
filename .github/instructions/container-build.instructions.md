@@ -20,7 +20,9 @@ applyTo: "**/Dockerfile*"
 - Prefira `ENTRYPOINT` e `CMD` em formato JSON. Garanta propagação de sinais e encerramento limpo do PID 1.
 - Declare somente portas e volumes que fazem parte do contrato público.
 - Adicione `HEALTHCHECK` apenas quando houver uma verificação útil e barata; não use processos temporários de bootstrap como sinal de saúde.
-- Inclua labels OCI `title`, `description`, `source`, `documentation`, `url` e `version` quando a versão estiver disponível no build. Use `licenses` somente com uma expressão SPDX validada para o artefato distribuído; não use `MIT` apenas porque o conteúdo original do repositório é MIT.
+- Inclua obrigatoriamente em todo Dockerfile publicável os labels OCI `title`, `description`, `source`, `documentation` e `url`.
+- Inclua também o label OCI `version` sempre que a versão da imagem estiver disponível no contexto do Dockerfile.
+- Use `licenses` somente com uma expressão SPDX validada para o artefato distribuído; não use `MIT` apenas porque o conteúdo original do repositório é MIT.
 - Não instale compiladores, shells administrativos ou clientes desnecessários na imagem final.
 - Minimize camadas sem condensar comandos que tenham ciclos de cache distintos.
 - Preserve suporte às plataformas declaradas; não fixe sufixo de arquitetura na imagem base sem justificar no README.

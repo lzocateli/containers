@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
+set -Eeuo pipefail
+
 ###############################################################################
 # docker-entrypoint-initdb.sh
 #
 # Descrição:
-#   Script de inicialização do banco de dados Oracle XE.
-#   Executado em background pelo docker-entrypoint.sh na primeira vez que
-#   o container é iniciado. Aguarda o Oracle ficar pronto e então:
+#   Script de inicialização do banco de dados Oracle Free.
+#   Executado pelo entrypoint upstream (gvenzl/oracle-free) na primeira vez
+#   que o container é inicializado. Aguarda o Oracle ficar pronto e então:
 #     1. Cria o tablespace definido em ORACLE_TABLESPACE (se informado)
 #     2. Cria o usuário/schema definido em ORACLE_USER/ORACLE_USER_PASSWORD
 #     3. Concede permissões (CREATE SESSION, TABLE, SEQUENCE, VIEW, PROCEDURE)
-#     4. Executa scripts .sh e .sql encontrados em /docker-entrypoint-initdb.d/
 #
 #   Um arquivo ~/init.lock é criado após a primeira execução para evitar
 #   re-inicialização em restarts do container.
@@ -20,31 +21,58 @@
 #
 # Variáveis de Ambiente:
 #   ORACLE_PASSWORD       - Senha do superusuário SYS/SYSTEM (obrigatório)
-#   ORACLE_DATABASE       - Nome do PDB (padrao: FREEPDB1)
+#   ORACLE_DATABASE       - Nome de PDB adicional (opcional)
+#   ORACLE_INIT_PDB       - PDB alvo para script (padrao: FREEPDB1)
 #   ORACLE_TABLESPACE     - Nome do tablespace a ser criado (opcional)
 #   ORACLE_TABLESPACE_SIZE - Tamanho inicial do tablespace (padrão: 100M)
 #   ORACLE_USER           - Nome do usuário/schema da aplicação (opcional)
 #   ORACLE_USER_PASSWORD  - Senha do usuário da aplicação (opcional)
 #
 # Uso:
-#   Este script é invocado automaticamente pelo docker-entrypoint.sh.
+#   Este script é invocado automaticamente pelo container-entrypoint.sh
+#   da imagem base.
 #   Não deve ser executado manualmente.
 #
 #   Para adicionar scripts de inicialização customizados, monte um volume
-#   em /docker-entrypoint-initdb.d/ contendo arquivos .sh ou .sql:
+#   em /container-entrypoint-initdb.d/ contendo arquivos .sh ou .sql:
 #
 #     volumes:
-#       - ./meus-scripts/:/docker-entrypoint-initdb.d/
+#       - ./meus-scripts/:/container-entrypoint-initdb.d/
 #
 #   Arquivos são executados em ordem alfabética na primeira inicialização.
 #
 ###############################################################################
 
-ORACLE_DATABASE="${ORACLE_DATABASE:-FREEPDB1}"
+ORACLE_DATABASE="${ORACLE_DATABASE:-}"
+ORACLE_INIT_PDB="${ORACLE_INIT_PDB:-${ORACLE_DATABASE:-FREEPDB1}}"
 ORACLE_TABLESPACE_SIZE="${ORACLE_TABLESPACE_SIZE:-100M}"
 
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  cat <<'EOF'
+Uso: docker-entrypoint-initdb.sh
+
+Script de inicializacao para imagem gvenzl/oracle-free:23-slim.
+Executado automaticamente pelo entrypoint da imagem base no primeiro bootstrap.
+
+Variaveis:
+  ORACLE_PASSWORD          Obrigatoria. Senha do SYSTEM.
+  ORACLE_DATABASE          Opcional. PDB adicional (sem padrao).
+  ORACLE_INIT_PDB          Opcional. PDB alvo do script. Padrao: FREEPDB1.
+  ORACLE_TABLESPACE        Opcional. Tablespace a criar.
+  ORACLE_TABLESPACE_SIZE   Opcional. Padrao: 100M.
+  ORACLE_USER              Opcional. Usuario da aplicacao.
+  ORACLE_USER_PASSWORD     Opcional. Senha do usuario da aplicacao.
+EOF
+  exit 0
+fi
+
+if [[ -z "${ORACLE_PASSWORD:-}" ]]; then
+  echo "$0: ORACLE_PASSWORD nao definido" >&2
+  exit 1
+fi
+
 # sqlplus connect string as SYSTEM on the PDB
-SQLPLUS="sqlplus -s SYSTEM/${ORACLE_PASSWORD}@localhost:1521/${ORACLE_DATABASE}"
+SQLPLUS="sqlplus -s SYSTEM/${ORACLE_PASSWORD}@localhost:1521/${ORACLE_INIT_PDB}"
 
 
 if [ ! -f ~/init.lock ]; then
@@ -123,17 +151,6 @@ EOSQL
 
   fi
   #END USER CREATION
-
-  #BEGIN INITIALIZE ORACLE WITH SCRIPTS
-  for f in /docker-entrypoint-initdb.d/*; do
-    case "$f" in
-      *.sh)     echo "$0: running $f"; . "$f" ;;
-      *.sql)    echo "$0: running $f"; echo "@@$f" | ${SQLPLUS}; echo ;;
-      *)        echo "$0: ignoring $f" ;;
-    esac
-    echo
-  done
-  #END INITIALIZE ORACLE WITH SCRIPTS
 
   touch ~/init.lock
 

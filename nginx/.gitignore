@@ -1,0 +1,45 @@
+# Configuracao local e secrets
+.env
+.env.*
+!.env.example
+secrets/
+credentials/
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Dados persistentes e backups
+data/
+backups/
+backup/
+*.bak
+*.dump
+*.sql.gz
+
+# Logs, temporarios e caches
+logs/
+*.log
+.cache/
+tmp/
+temp/
+
+# Artefatos comuns de build e testes
+coverage/
+node_modules/
+bin/
+obj/
+__pycache__/
+*.py[cod]
+
+# Editores e sistema operacional
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Artefatos especificos da imagem NGINX
+*.pid
+*.swp
+*.tmp
+nginx-test-output/
