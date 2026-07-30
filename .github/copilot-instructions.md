@@ -31,6 +31,7 @@
 
 - Registre toda imagem publicável em `tools/container-images.json`; o catálogo deve cobrir exatamente todos os `Dockerfile*` reais.
 - Valide sintaxe e boas práticas do Dockerfile com BuildKit.
+- Garanta que todo Dockerfile publicável inclua labels OCI `org.opencontainers.image.title`, `org.opencontainers.image.description`, `org.opencontainers.image.source`, `org.opencontainers.image.documentation` e `org.opencontainers.image.url`; inclua `org.opencontainers.image.version` quando a versão estiver disponível no contexto do build.
 - Confirme que `.gitignore` e `.dockerignore` existem e bloqueiam, no mínimo, `.env`; o `.dockerignore` também deve bloquear `.git`.
 - Construa a plataforma de destino sem usar credenciais no contexto.
 - Execute um smoke test compatível com a imagem.
