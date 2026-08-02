@@ -1,0 +1,13 @@
+{
+  "terminal.integrated.profiles.windows": {
+    "Copilot PowerShell (WindowsProfile)": {
+      "source": "PowerShell",
+      "args": [
+        "-NoExit",
+        "-Command",
+        ". 'C:\\Users\\lzob8c1\\OneDrive - SeuNome\\Documentos\\WindowsPowerShell\\Microsoft.PowerShell_profile.ps1'"
+      ]
+    }
+  },
+  "terminal.integrated.defaultProfile.windows": "Copilot PowerShell (WindowsProfile)"
+}
