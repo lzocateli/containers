@@ -30,7 +30,7 @@ Preparar o repositorio para visibilidade publica e incluir automacao via gh para
 - [x] 3.1. Criar script PowerShell de automacao em tools/scripts com parametros de owner/repo/branch/actor autorizado.
   - `tools/scripts/setup-github-governance.ps1` adicionado (commit 81a221e, corrigido em 8319fe4).
   - Parametros: `-RepoOwner`, `-RepoName`, `-BranchName`, `-AuthorizedActor`, `-EnvironmentName`, `-RequireLinearHistory`, `-DryRun`.
-- [x] 3.2. Aplicar branch protection com: bloqueio de merge sem PR, review obrigatorio, CODEOWNERS obrigatorio e bypass administrativo desabilitado.
+- [x] 3.2. Aplicar branch protection com PR, checks obrigatorios e bypass administrativo desabilitado.
   - Aplicado em `lzocateli/containers` main em 2026-08-02.
   - `require_code_owner_reviews: true`, `dismiss_stale_reviews: true`, `required_approving_review_count: 1`, `require_last_push_approval: true`, `enforce_admins: true`, `required_linear_history: true`, `allow_force_pushes: false`, `allow_deletions: false`, `required_conversation_resolution: true`.
   - Restricoes `bypass_pull_request_allowances` e `dismissal_restrictions` nao incluidas: exclusivas de repositorios de organizacao (HTTP 422 em conta pessoal).
@@ -43,6 +43,13 @@ Preparar o repositorio para visibilidade publica e incluir automacao via gh para
   - `restrict-pull-request-authors.yml` fecha PRs externos sem obter ou executar codigo do autor.
   - Issues permanecem habilitadas para qualquer usuario.
   - Politica remota aplicada em 2026-08-02: `required_approving_review_count: 0`, `require_code_owner_reviews: false`, `require_last_push_approval: false`, `enforce_admins: true`, `has_issues: true`.
+- [x] 3.6. Evoluir para o modelo comunitario de contribuicao aberta.
+  - PRs de forks e contribuidores externos passam a ser aceitos e validados sem secrets de publicacao.
+  - O check estavel `Validacao obrigatoria` agrega catalogo, secrets, dependencias e imagens e torna-se obrigatorio para merge.
+  - Issues, Discussions, alertas e correcoes de dependencias vulneraveis, Secret Scanning, Push Protection, reporte privado, squash/rebase e exclusao de branch apos merge passam a ser configurados pelo script.
+  - Templates estruturados de Issue e PR orientam triagem, seguranca e evidencias de validacao.
+  - A etapa 3.5 permanece como registro historico da politica intermediaria, agora substituida por esta decisao.
+  - Politica remota aplicada e verificada em 2026-08-02: `Validação obrigatória` com `strict: true`, Issues e Discussions habilitadas, merge commit desabilitado, squash/rebase habilitados, exclusao de branch apos merge, Dependabot Security Updates, Secret Scanning, Push Protection e reporte privado habilitados.
 
 ### Fase 4 - Restricao de Actions para unico usuario [concluida]
 - [x] 4.1. Implementar protecao fail-fast com validacao de actor autorizado nos workflows.
@@ -55,8 +62,8 @@ Preparar o repositorio para visibilidade publica e incluir automacao via gh para
   - Documentado em `.github/AUTOMATION.md`: GitHub nao oferece bloqueio nativo per-user do botao `workflow_dispatch`; bloqueio aplicado na execucao (gate de actor + environment).
 
 ### Fase 5 - Validacao final de prontidao publica [pendente - requer acao manual]
-- [ ] 5.1. Testar PR externo para main (deve ser comentado e fechado automaticamente).
-- [ ] 5.2. Testar PR de colaborador para main (deve permitir merge sem aprovacao conforme checks).
+- [ ] 5.1. Testar PR externo para main (deve executar CI sem acesso a secrets).
+- [ ] 5.2. Testar merge com check pendente ou falho (deve permanecer bloqueado).
 - [ ] 5.3. Testar workflow_dispatch com usuario nao autorizado (deve falhar no gate).
 - [ ] 5.4. Testar workflow_dispatch com usuario autorizado e aprovacao de environment (deve prosseguir).
 
@@ -74,7 +81,8 @@ Preparar o repositorio para visibilidade publica e incluir automacao via gh para
 - [x] CONTRIBUTING.md - adicionado.
 - [x] SECURITY.md - adicionado.
 - [x] tools/scripts/setup-github-governance.ps1 - script de governanca criado e aplicado.
-- [x] .github/workflows/restrict-pull-request-authors.yml - fecha PRs de usuarios externos sem executar codigo do autor.
+- [x] .github/PULL_REQUEST_TEMPLATE.md e .github/ISSUE_TEMPLATE - orientam contribuicoes e triagem publica.
+- [x] .github/workflows/restrict-pull-request-authors.yml - removido ao adotar contribuicao aberta.
 
 ## Verification
 - [x] 1. Validar sintaxe e ajuda do script: `--help` executado com saida 0.
@@ -82,13 +90,15 @@ Preparar o repositorio para visibilidade publica e incluir automacao via gh para
 - [x] 3. Regras verificadas por `gh api repos/.../branches/main/protection`:
   - `required_approving_review_count: 0`, `require_code_owner_reviews: false`, `require_last_push_approval: false`, `enforce_admins.enabled: true`, `required_linear_history.enabled: true`, `allow_force_pushes.enabled: false`.
 - [x] 4. Issues verificadas por `gh api repos/...`: `has_issues: true`, com repositorio publico.
-- [ ] 5. Testes manuais de autoria de PR e workflow_dispatch pendentes (Fase 5).
-- [~] 6. Varredura manual de segredos realizada via inspecao de git history. Varredura automatizada recomendada.
+- [x] 5. Modelo comunitario verificado por API: check agregado obrigatorio, Discussions, seguranca nativa, squash/rebase e limpeza de branches habilitados.
+- [ ] 6. Testes manuais de PR externo e workflow_dispatch pendentes (Fase 5).
+- [~] 7. Varredura manual de segredos realizada via inspecao de git history. Varredura automatizada recomendada.
 
 ## Decisions
 - Escopo do script: reutilizavel para multiplos repositorios.
 - Pull request para main: obrigatorio, sem aprovacao obrigatoria e sem bypass administrativo.
-- Autoria de PR: somente `OWNER`, `MEMBER` ou `COLLABORATOR`; PR externo e fechado por workflow porque o GitHub nao oferece restricao nativa compatível com Issues publicas.
+- Autoria de PR: aberta a qualquer usuario por fork; merge condicionado a checks obrigatorios e conversas resolvidas.
+- Execucao de PR externo: permissoes somente leitura, sem secrets de publicacao e sem execucao via `pull_request_target`.
 - Controle de Actions: abordagem combinada (fail-fast por actor + environment protegido com reviewer obrigatorio).
 - Limitacao aceita: GitHub nao oferece bloqueio nativo per-user do botao de disparo; bloqueio ocorre na execucao.
 - Restricoes de organizacao: `bypass_pull_request_allowances` e `dismissal_restrictions` omitidos (suportados apenas em repos de organizacao).

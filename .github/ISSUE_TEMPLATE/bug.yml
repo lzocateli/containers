@@ -1,0 +1,37 @@
+name: Relatar problema
+description: Informe um defeito reproduzível em uma imagem ou automação.
+title: "[bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: Não inclua secrets, credenciais, dumps ou dados sensíveis.
+  - type: input
+    id: image
+    attributes:
+      label: Imagem e tag
+      placeholder: lzocateli/postgresql:18.4-pgvector0.8.5-bookworm
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema
+      description: Descreva o comportamento observado e o esperado.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reprodução mínima
+      description: Informe comandos e configuração sanitizada.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Ambiente
+      description: Informe sistema operacional, arquitetura e engine de container.
+    validations:
+      required: true
