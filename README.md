@@ -12,3 +12,9 @@ Coleção de Dockerfiles, scripts e exemplos operacionais para imagens publicada
 O conteúdo original deste repositório é disponibilizado sob a [licença MIT](LICENSE). Ao redistribuí-lo, preserve o aviso de copyright e o texto da licença.
 
 As imagens produzidas incluem componentes de terceiros que permanecem sujeitos às licenças e atribuições de suas respectivas fontes. A licença MIT do repositório não relicencia esses componentes. Consulte [LICENSING.md](LICENSING.md) e a seção **Licenças e fontes** do README de cada imagem.
+
+## Governança do repositório
+
+- Segurança: [SECURITY.md](SECURITY.md)
+- Contribuição: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Conduta: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
