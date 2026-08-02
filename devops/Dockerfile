@@ -1,49 +1,6 @@
-﻿# Imagem multifuncional "devops" — flexível.
-#
-# Build flags:
-#   BASE_IMAGE       imagem base (default: CUDA 12.4 + cuDNN sobre Ubuntu 22.04).
-#                    Para versão "slim" sem CUDA: BASE_IMAGE=ubuntu:22.04
-#   INSTALL_ML       instala PyTorch (cu124 ou cpu) + openai-whisper. Default: true
-#   INSTALL_GOOGLE   instala google-api-python-client + google-auth-* (YouTube/Drive). Default: true
-#   GH_VERSION       versão do GitHub CLI (binário oficial). Default: 2.92.0
-#   SQLCMD_VERSION   versão do go-sqlcmd (binário oficial Microsoft). Default: 1.10.0
-#   Env_HttpProxy    proxy corporativo (host:porta). Opcional.
-#   Env_NoProxy      bypass proxy. Opcional.
-#
-# Sempre incluído (independente das flags):
-#   - Python 3.11 + uv (venv pré-aquecido em /opt/venv)
-#   - ffmpeg/ffprobe + Node.js 20 + Marp CLI (libs Chromium headless)
-#   - Terraform, Azure CLI, Ansible (+ ansible-dev-tools, passlib)
-#   - GitHub CLI (gh) — versão pinada via ARG GH_VERSION
-#   - sqlcmd (go-sqlcmd da Microsoft) — versão pinada via ARG SQLCMD_VERSION
-#   - typer, rich, httpx, python-dotenv
-#   - zsh + oh-my-posh + zsh-autosuggestions
-#   - SSH client, sshpass, jq, git
-#
-# Exemplos:
-#
-#  # Imagem completa com GPU (default)
-#   docker build -t infra/devops:cuda-12.4.1 -f Dockerfile .
-#
-#  # Imagem slim (sem CUDA, sem ML, sem Google)
-#   docker build \
-#       --build-arg BASE_IMAGE=ubuntu:22.04 \
-#       --build-arg INSTALL_ML=false \
-#       --build-arg INSTALL_GOOGLE=false \
-#       -t infra/devops:slim -f Dockerfile .
-#
-#  # Imagem só com Ansible/Terraform/Az CLI/gh (sem ffmpeg/marp/whisper)
-#   docker build \
-#       --build-arg BASE_IMAGE=ubuntu:22.04 \
-#       --build-arg INSTALL_ML=false \
-#       --build-arg INSTALL_GOOGLE=false \
-#       -t infra/devops:ops -f Dockerfile .
-#
-#  # CPU + Whisper (sem CUDA, mas com PyTorch CPU)
-#   docker build \
-#       --build-arg BASE_IMAGE=ubuntu:22.04 \
-#       --build-arg INSTALL_ML=true \
-#       -t infra/devops:cpu-ml -f Dockerfile .
+﻿# Imagem multifuncional para automação, IaC e fluxo de conteúdo.
+# Parâmetros de build, exemplos de uso e contrato da imagem:
+# veja README.md desta pasta.
 
 ARG BASE_IMAGE=nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04
 FROM ${BASE_IMAGE}
@@ -54,6 +11,7 @@ ARG INSTALL_ML=true
 ARG INSTALL_GOOGLE=true
 ARG GH_VERSION=2.92.0
 ARG SQLCMD_VERSION=1.10.0
+ARG IMAGE_VERSION=dev
 
 # ---- Proxy corporativo (opcional) -------------------------------------------
 ARG Env_HttpProxy=
@@ -71,6 +29,13 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PATH="/opt/venv/bin:/root/.local/bin:${PATH}" \
     UV_LINK_MODE=copy \
     UV_PROJECT_ENVIRONMENT=/opt/venv
+
+LABEL org.opencontainers.image.title="devops" \
+    org.opencontainers.image.description="Imagem multifuncional com Python, Azure CLI, Terraform, Ansible, GitHub CLI, Node.js/Marp e ferramentas opcionais de ML" \
+    org.opencontainers.image.source="https://github.com/lzocateli/containers" \
+    org.opencontainers.image.documentation="https://github.com/lzocateli/containers/tree/main/devops" \
+    org.opencontainers.image.url="https://github.com/lzocateli/containers/tree/main/devops" \
+    org.opencontainers.image.version="${IMAGE_VERSION}"
 
 # Nota: variáveis NVIDIA_VISIBLE_DEVICES e NVIDIA_DRIVER_CAPABILITIES são
 # definidas pela própria imagem base nvidia/cuda:* quando aplicável. Em bases
