@@ -81,7 +81,7 @@ O repositório não habilita auto-merge do Dependabot. Toda atualização de bas
 
 O workflow `validate-images.yml` usa o diff do pull request e o catálogo para selecionar somente as imagens alteradas. O catálogo é validado contra todos os `Dockerfile*`; caminhos não catalogados, duplicados ou inseguros falham antes do build.
 
-Para cada imagem selecionada, o workflow valida ignores, `README.md` e Dockerfile com BuildKit. Entradas com `validation: build` são construídas na plataforma `scanPlatform` e analisadas pelo Trivy. Entradas `validation: check` executam somente validação estática e devem registrar a justificativa no catálogo.
+Para cada imagem selecionada, o workflow valida ignores, `README.md` e Dockerfile com BuildKit. Entradas com `validation: build` são construídas na plataforma `scanPlatform` e analisadas pelo Trivy. Quando a entrada declara `smokeTest`, o valor deve ser o caminho relativo de um script Bash dentro do contexto; o catálogo valida esse caminho e o workflow executa o script com `--image` antes do scan. Entradas `validation: check` executam somente validação estática e devem registrar a justificativa no catálogo.
 
 O gate bloqueia secrets no repositório e vulnerabilidades `CRITICAL` com correção disponível nas imagens construídas. Misconfigurações legadas, vulnerabilidades `HIGH` e críticas sem correção continuam visíveis nos relatórios. Pull requests internos enviam o SARIF das imagens ao Code Scanning; todos os PRs preservam os relatórios do repositório como artifacts.
 
@@ -91,7 +91,7 @@ O gate bloqueia secrets no repositório e vulnerabilidades `CRITICAL` com corre�
 2. Abra **Actions > Publicar imagem de container > Run workflow**.
 3. Informe a pasta relativa, o nome da imagem sem `lzocateli/`, a tag imutável, o Dockerfile e uma ou mais plataformas declaradas para a imagem em `tools/container-images.json`.
 4. Mantenha a atualização do README habilitada para publicar a descrição completa no Docker Hub.
-5. O workflow confere os inputs no catálogo, constrói e escaneia cada plataforma antes de autenticar no Docker Hub.
+5. O workflow confere os inputs no catálogo, constrói, executa o smoke test catalogado quando presente e escaneia cada plataforma antes de autenticar no Docker Hub.
 6. Após os gates, o build multi-plataforma publica SBOM e proveniência, valida o digest e os manifests remotos e só então sincroniza o README.
 7. Consulte os artifacts `security-*` para o relatório Trivy e o SBOM CycloneDX de cada plataforma.
 

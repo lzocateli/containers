@@ -5,7 +5,7 @@
     { "id": "azure-cli", "imageName": "azure-cli", "context": "azure-cli", "dockerfile": "Dockerfile", "platforms": ["linux/amd64"], "scanPlatform": "linux/amd64", "validation": "build" },
     { "id": "blog-comentario", "imageName": "comentario", "context": "blog-comentario", "dockerfile": "Dockerfile", "platforms": ["linux/amd64"], "scanPlatform": "linux/amd64", "validation": "build" },
     { "id": "blog-cosyvoice", "imageName": "cosyvoice", "context": "blog-cosyvoice", "dockerfile": "Dockerfile", "platforms": ["linux/amd64"], "scanPlatform": "linux/amd64", "validation": "check", "reason": "Build CUDA pesado; validado integralmente somente na release." },
-    { "id": "blog-hugo", "imageName": "hugo", "context": "blog-hugo", "dockerfile": "Dockerfile", "platforms": ["linux/amd64"], "scanPlatform": "linux/amd64", "validation": "build" },
+    { "id": "hugo", "imageName": "hugo", "context": "hugo", "dockerfile": "Dockerfile", "platforms": ["linux/amd64"], "scanPlatform": "linux/amd64", "validation": "build", "smokeTest": "scripts/smoke-test.sh" },
     { "id": "blog-listmonk", "imageName": "listmonk", "context": "blog-listmonk", "dockerfile": "Dockerfile", "platforms": ["linux/amd64"], "scanPlatform": "linux/amd64", "validation": "build" },
     { "id": "certbot", "imageName": "certbot-dns-cloudflare", "context": "certbot", "dockerfile": "Dockerfile", "platforms": ["linux/amd64"], "scanPlatform": "linux/amd64", "validation": "build" },
     { "id": "cockpit", "imageName": "cockpit", "context": "cockpit", "dockerfile": "Dockerfile", "platforms": ["linux/amd64"], "scanPlatform": "linux/amd64", "validation": "build" },

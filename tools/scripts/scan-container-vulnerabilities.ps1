@@ -47,7 +47,7 @@ Padrao: 20m
 
 .PARAMETER TrivyImage
 Imagem do Trivy usada para scan.
-Padrao: aquasec/trivy:0.70.0
+Padrao: aquasec/trivy:0.72.0
 
 .PARAMETER OutputDir
 Diretorio local para TAR e relatorio JSON.
@@ -198,7 +198,7 @@ Opcoes principais:
     -IgnoreUnfixed <bool>     Ignora vulnerabilidades sem fix (padrao: true)
     -GateCritical <bool>      Aplica gate para CRITICAL corrigivel (padrao: true)
     -Timeout <value>          Timeout do Trivy (padrao: 20m)
-    -TrivyImage <ref>         Imagem Trivy (padrao: aquasec/trivy:0.70.0)
+    -TrivyImage <ref>         Imagem Trivy (padrao: aquasec/trivy:0.72.0)
     -OutputDir <path>         Diretorio de saida (padrao: artifacts/security-local)
     -CacheDir <path>          Diretorio de cache do Trivy (padrao: artifacts/security-local/trivy-cache)
     -DbCachePolicy <mode>     Politica de cache: auto | reuse | refresh (padrao: auto)
@@ -392,21 +392,27 @@ if ($LASTEXITCODE -ne 0) {
 
 if ($gateCriticalEnabled) {
     Write-Host '[trivy] aplicando gate CRITICAL corrigivel...'
-    & docker run --rm `
-        -e TRIVY_DISABLE_VEX_NOTICE=true `
-        -v $dockerMount `
-        -v $cacheMount `
-        $TrivyImage image `
-        --input "/work/$tarFileName" `
-        --scanners vuln `
-        --severity CRITICAL `
-        @ignoreUnfixedArg `
-        @dbPolicyArgs `
-        --timeout $Timeout
-
-    if ($LASTEXITCODE -ne 0) {
+    $report = Get-Content -LiteralPath $jsonPath -Raw | ConvertFrom-Json
+    $criticalFixable = @(
+        $report.Results |
+            ForEach-Object {
+                $vulnerabilities = $_.PSObject.Properties['Vulnerabilities']
+                if ($null -ne $vulnerabilities -and $null -ne $vulnerabilities.Value) {
+                    $vulnerabilities.Value
+                }
+            } |
+            Where-Object {
+                $_.Severity -eq 'CRITICAL' -and
+                -not [string]::IsNullOrWhiteSpace([string]$_.FixedVersion)
+            }
+    )
+    if ($criticalFixable.Count -gt 0) {
+        $criticalFixable |
+            Select-Object VulnerabilityID, PkgName, InstalledVersion, FixedVersion |
+            Format-Table -AutoSize |
+            Out-Host
         Write-Error "Gate falhou: vulnerabilidades CRITICAL corrigiveis detectadas. Veja: $jsonPath"
-        exit $LASTEXITCODE
+        exit 1
     }
 }
 
