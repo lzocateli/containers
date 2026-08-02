@@ -23,6 +23,9 @@ on:
 permissions:
   contents: read
 
+env:
+  AUTHORIZED_WORKFLOW_DISPATCH_ACTOR: ${{ vars.AUTHORIZED_WORKFLOW_DISPATCH_ACTOR || 'lzocateli' }}
+
 concurrency:
   group: validate-images-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -35,6 +38,19 @@ jobs:
       matrix: ${{ steps.matrix.outputs.matrix }}
       count: ${{ steps.matrix.outputs.count }}
     steps:
+      - name: Validar ator autorizado para disparo manual
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        env:
+          ACTOR: ${{ github.actor }}
+          AUTHORIZED: ${{ env.AUTHORIZED_WORKFLOW_DISPATCH_ACTOR }}
+        run: |
+          set -euo pipefail
+          if [[ "$ACTOR" != "$AUTHORIZED" ]]; then
+            echo "Apenas $AUTHORIZED pode disparar este workflow manualmente (actor atual: $ACTOR)." >&2
+            exit 1
+          fi
+
       - name: Obter repositório
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -90,6 +106,19 @@ jobs:
     name: Secrets e configurações
     runs-on: ubuntu-24.04
     steps:
+      - name: Validar ator autorizado para disparo manual
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        env:
+          ACTOR: ${{ github.actor }}
+          AUTHORIZED: ${{ env.AUTHORIZED_WORKFLOW_DISPATCH_ACTOR }}
+        run: |
+          set -euo pipefail
+          if [[ "$ACTOR" != "$AUTHORIZED" ]]; then
+            echo "Apenas $AUTHORIZED pode disparar este workflow manualmente (actor atual: $ACTOR)." >&2
+            exit 1
+          fi
+
       - name: Obter repositório
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
