@@ -1,1 +1,1 @@
-FROM portainer/agent:2.16.2
+FROM portainer/agent:2.39.5

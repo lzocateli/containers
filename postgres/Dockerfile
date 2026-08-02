@@ -1,4 +1,4 @@
-FROM pgvector/pgvector:0.8.5-pg18-bookworm
+FROM pgvector/pgvector:0.8.6-pg18-bookworm
 
 LABEL org.opencontainers.image.title="lzocateli/postgresql" \
 	org.opencontainers.image.description="PostgreSQL 18 com pgvector para uso em contêineres." \

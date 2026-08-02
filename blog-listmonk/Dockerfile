@@ -1,4 +1,4 @@
-FROM listmonk/listmonk:v6.0.0
+FROM listmonk/listmonk:v6.2.0
 
 USER root
 
