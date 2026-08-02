@@ -1,0 +1,32 @@
+# Controle de versão e automação
+.git
+.gitignore
+.github
+
+# Configuração local, secrets e credenciais
+.env
+.env.*
+.secrets/
+secrets/
+credentials/
+*.key
+*.pem
+*.p12
+*.pfx
+*.ini
+
+# Dados persistentes, backups, logs e temporários
+data/
+backups/
+backup/
+logs/
+*.bak
+*.dump
+*.log
+*.sql.gz
+.cache/
+tmp/
+temp/
+
+# Artefatos locais
+coverage/
