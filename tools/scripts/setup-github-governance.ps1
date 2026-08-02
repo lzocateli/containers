@@ -4,14 +4,12 @@ Configura governança de repositório no GitHub usando gh CLI.
 
 .DESCRIPTION
 Aplica proteções para branch principal e governança de workflows:
-1) Define proteção de branch com PR obrigatório e sem bypass administrativo.
-2) Mantém Issues habilitadas para qualquer usuário.
-3) Define variável de repositório para ator autorizado a workflow_dispatch.
-4) Cria/atualiza environment protegido com reviewer obrigatório.
-
-PRs de usuários externos são fechados pelo workflow versionado
-.github/workflows/restrict-pull-request-authors.yml. O GitHub não oferece uma
-restrição nativa de criação de PR por associação sem também restringir Issues.
+1) Define proteção de branch com PR e checks obrigatórios, sem bypass administrativo.
+2) Habilita contribuições públicas por Issues, Discussions e pull requests de forks.
+3) Habilita alertas, correções automáticas, Secret Scanning, Push Protection e reporte privado.
+4) Restringe merge a squash/rebase e remove branches após merge.
+5) Define variável de repositório para ator autorizado a workflow_dispatch.
+6) Cria/atualiza environment protegido com reviewer obrigatório.
 
 .PARAMETER RepoOwner
 Owner do repositório no GitHub.
@@ -34,6 +32,10 @@ Padrao: container-release
 .PARAMETER RequireLinearHistory
 Exige historico linear na branch protegida.
 Padrao: true
+
+.PARAMETER RequiredStatusChecks
+Nomes dos checks obrigatorios para merge.
+Padrao: Validacao obrigatoria
 
 .PARAMETER DryRun
 Mostra as operacoes sem alterar configuracoes remotas.
@@ -92,6 +94,9 @@ param(
     [bool]$RequireLinearHistory = $true,
 
     [Parameter()]
+    [string[]]$RequiredStatusChecks = @('Validação obrigatória'),
+
+    [Parameter()]
     [switch]$DryRun,
 
     [Parameter()]
@@ -109,9 +114,10 @@ function Show-Usage {
 setup-github-governance.ps1
 
 Finalidade:
-- Configurar branch protection para main (ou branch alvo), exigindo PR sem aprovacao obrigatoria.
-- Manter Issues habilitadas para todos os usuarios.
-- Fechar PRs externos por meio do workflow restrict-pull-request-authors.yml.
+- Aceitar Issues, Discussions e pull requests de qualquer usuario.
+- Exigir PR e checks de CI para merge, sem aprovacao obrigatoria para mantenedor solo.
+- Permitir apenas squash/rebase e remover branches apos merge.
+- Habilitar alertas, correcoes, Secret Scanning, Push Protection e reporte privado.
 - Configurar variavel AUTHORIZED_WORKFLOW_DISPATCH_ACTOR no repositorio.
 - Configurar environment protegido com reviewer obrigatorio.
 
@@ -129,6 +135,7 @@ Opcoes principais:
   -AuthorizedActor <login>    Ator autorizado para workflow_dispatch (padrao: lzocateli)
   -EnvironmentName <name>     Environment protegido (padrao: container-release)
   -RequireLinearHistory <b>   Exigir historico linear (padrao: true)
+    -RequiredStatusChecks <s[]> Checks obrigatorios para merge
   -DryRun                     Exibe operacoes sem aplicar
   --help                      Exibe esta ajuda
 
@@ -262,6 +269,7 @@ Write-Host "[info] Repositorio alvo: $repo"
 Write-Host "[info] Branch protegida: $BranchName"
 Write-Host "[info] Ator autorizado workflow_dispatch: $AuthorizedActor"
 Write-Host "[info] Environment protegido: $EnvironmentName"
+Write-Host "[info] Checks obrigatorios: $($RequiredStatusChecks -join ', ')"
 Write-Host "[info] DryRun: $($DryRun.IsPresent)"
 
 $viewer = Invoke-GhJson -Arguments @('api', 'user')
@@ -272,6 +280,9 @@ $protectionEndpoint = "repos/$repo/branches/$BranchName/protection"
 $repositoryEndpoint = "repos/$repo"
 $repoVariableEndpoint = "repos/$repo/actions/variables/AUTHORIZED_WORKFLOW_DISPATCH_ACTOR"
 $environmentEndpoint = "repos/$repo/environments/$EnvironmentName"
+$vulnerabilityAlertsEndpoint = "repos/$repo/vulnerability-alerts"
+$automatedSecurityFixesEndpoint = "repos/$repo/automated-security-fixes"
+$privateVulnerabilityReportingEndpoint = "repos/$repo/private-vulnerability-reporting"
 
 $null = Invoke-GhJson -Arguments @('api', $branchEndpoint)
 
@@ -279,7 +290,10 @@ $authorizedActorUser = Invoke-GhJson -Arguments @('api', "users/$AuthorizedActor
 $authorizedActorId = [int]$authorizedActorUser.id
 
 $protectionBody = @{
-    required_status_checks            = $null
+    required_status_checks            = @{
+        strict   = $true
+        contexts = $RequiredStatusChecks
+    }
     enforce_admins                    = $true
     required_pull_request_reviews     = @{
         # dismissal_restrictions and bypass_pull_request_allowances require
@@ -299,9 +313,25 @@ $protectionBody = @{
     allow_fork_syncing                = $true
 }
 
+$repositoryBody = @{
+    has_issues             = $true
+    has_discussions        = $true
+    allow_merge_commit     = $false
+    allow_squash_merge     = $true
+    allow_rebase_merge     = $true
+    allow_auto_merge       = $false
+    delete_branch_on_merge = $true
+    security_and_analysis  = @{
+        secret_scanning                 = @{ status = 'enabled' }
+        secret_scanning_push_protection = @{ status = 'enabled' }
+    }
+}
+
 $environmentBody = @{
     wait_timer = 0
-    prevent_self_review = $true
+    # O ator autorizado e o unico mantenedor em repositorios pessoais.
+    # A aprovacao continua manual, mas precisa aceitar self-review.
+    prevent_self_review = $false
     reviewers = @(
         @{
             type = 'User'
@@ -318,13 +348,18 @@ if ($DryRun.IsPresent) {
     Write-Host '[dry-run] Operacao 1: aplicar branch protection'
     $protectionBody | ConvertTo-Json -Depth 20 | Write-Host
 
-    Write-Host '[dry-run] Operacao 2: manter Issues habilitadas'
-    (@{ has_issues = $true } | ConvertTo-Json) | Write-Host
+    Write-Host '[dry-run] Operacao 2: configurar colaboracao e estrategia de merge'
+    $repositoryBody | ConvertTo-Json -Depth 20 | Write-Host
 
-    Write-Host '[dry-run] Operacao 3: definir variavel AUTHORIZED_WORKFLOW_DISPATCH_ACTOR'
+    Write-Host '[dry-run] Operacao 3: habilitar alertas e correcoes de dependencias vulneraveis'
+    Write-Host "PUT $vulnerabilityAlertsEndpoint"
+    Write-Host "PUT $automatedSecurityFixesEndpoint"
+    Write-Host "PUT $privateVulnerabilityReportingEndpoint"
+
+    Write-Host '[dry-run] Operacao 4: definir variavel AUTHORIZED_WORKFLOW_DISPATCH_ACTOR'
     (@{ name = 'AUTHORIZED_WORKFLOW_DISPATCH_ACTOR'; value = $AuthorizedActor } | ConvertTo-Json) | Write-Host
 
-    Write-Host '[dry-run] Operacao 4: configurar environment protegido'
+    Write-Host '[dry-run] Operacao 5: configurar environment protegido'
     $environmentBody | ConvertTo-Json -Depth 20 | Write-Host
 
     Write-Host '[dry-run] Nenhuma alteracao foi aplicada.'
@@ -338,8 +373,21 @@ if ($LASTEXITCODE -ne 0) {
     throw 'Falha ao aplicar branch protection.'
 }
 
-Write-Host '[apply] Mantendo Issues habilitadas...'
-Invoke-GhRaw -Arguments @('api', '--method', 'PATCH', $repositoryEndpoint, '-F', 'has_issues=true')
+Write-Host '[apply] Configurando colaboracao e estrategia de merge...'
+$repositoryJson = $repositoryBody | ConvertTo-Json -Depth 20
+Invoke-GhWithInput -InputText $repositoryJson -Arguments @('api', '--method', 'PATCH', $repositoryEndpoint, '--input', '-') | Out-Null
+if ($LASTEXITCODE -ne 0) {
+    throw 'Falha ao configurar colaboracao e estrategia de merge.'
+}
+
+Write-Host '[apply] Habilitando alertas de dependencias vulneraveis...'
+Invoke-GhRaw -Arguments @('api', '--method', 'PUT', $vulnerabilityAlertsEndpoint)
+
+Write-Host '[apply] Habilitando correcoes automaticas de seguranca...'
+Invoke-GhRaw -Arguments @('api', '--method', 'PUT', $automatedSecurityFixesEndpoint)
+
+Write-Host '[apply] Habilitando reporte privado de vulnerabilidades...'
+Invoke-GhRaw -Arguments @('api', '--method', 'PUT', $privateVulnerabilityReportingEndpoint)
 
 Write-Host '[apply] Definindo variavel AUTHORIZED_WORKFLOW_DISPATCH_ACTOR...'
 try {
@@ -359,8 +407,9 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host '[ok] Governanca aplicada com sucesso.'
 Write-Host "[ok] Repositorio: $repo"
 Write-Host "[ok] Branch protegida: $BranchName"
-Write-Host '[ok] Pull requests exigidos sem aprovacao obrigatoria'
-Write-Host '[ok] Issues habilitadas para todos os usuarios'
-Write-Host '[ok] PRs externos fechados pelo workflow restrict-pull-request-authors.yml'
+Write-Host "[ok] Checks obrigatorios: $($RequiredStatusChecks -join ', ')"
+Write-Host '[ok] Issues, Discussions e pull requests externos permitidos'
+Write-Host '[ok] Merge por squash/rebase e exclusao de branch apos merge'
+Write-Host '[ok] Alertas, correcoes, Secret Scanning, Push Protection e reporte privado habilitados'
 Write-Host "[ok] Ator autorizado workflow_dispatch: $AuthorizedActor"
 Write-Host "[ok] Environment protegido: $EnvironmentName"

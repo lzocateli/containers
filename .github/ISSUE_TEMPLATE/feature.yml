@@ -1,0 +1,25 @@
+name: Propor melhoria
+description: Sugira uma imagem, funcionalidade ou evolução de contrato.
+title: "[proposta]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Necessidade
+      description: Qual problema ou caso de uso a proposta atende?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposta
+      description: Descreva o resultado esperado e alternativas consideradas.
+    validations:
+      required: true
+  - type: textarea
+    id: contract
+    attributes:
+      label: Impacto no contrato
+      description: Informe possíveis mudanças em tags, plataformas, usuário, portas, volumes ou variáveis.
