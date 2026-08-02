@@ -1,6 +1,6 @@
 ARG BUILDPLATFORM=linux/amd64
 
-FROM --platform=$BUILDPLATFORM dbeaver/cloudbeaver:25.2.0
+FROM --platform=$BUILDPLATFORM dbeaver/cloudbeaver:26.1.3
 
 ARG DRIVER_VERSION=3.14.5
 

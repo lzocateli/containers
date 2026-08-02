@@ -1,1 +1,1 @@
-FROM portainer/portainer-ee:linux-amd64-2.16.2
+FROM portainer/portainer-ee:linux-amd64-2.21.5

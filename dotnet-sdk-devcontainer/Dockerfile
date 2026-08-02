@@ -1,6 +1,6 @@
 ARG BUILDPLATFORM=linux/amd64
 
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0.410-jammy
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0.422-jammy
 
 RUN apt update -y && apt upgrade -y \
  && apt install -y \
