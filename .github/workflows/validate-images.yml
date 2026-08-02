@@ -203,6 +203,17 @@ jobs:
           cache-from: type=gha,scope=pr-${{ matrix.image.id }}
           cache-to: type=gha,mode=max,scope=pr-${{ matrix.image.id }}
 
+      - name: Executar smoke test catalogado
+        if: matrix.image.validation == 'build' && matrix.image.smokeTest != ''
+        shell: bash
+        env:
+          CONTEXT_PATH: ${{ matrix.image.context }}
+          SMOKE_TEST: ${{ matrix.image.smokeTest }}
+          IMAGE_REF: local/${{ matrix.image.id }}:${{ github.sha }}
+        run: |
+          set -euo pipefail
+          bash "$CONTEXT_PATH/$SMOKE_TEST" --image "$IMAGE_REF"
+
       - name: Gerar relatório de vulnerabilidades
         if: matrix.image.validation == 'build'
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0

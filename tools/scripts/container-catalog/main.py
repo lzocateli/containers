@@ -104,6 +104,24 @@ def validate_policy(image: dict[str, object], image_id: str) -> None:
         fail(f"reason é obrigatório quando validation=check para {image_id}")
 
 
+def validate_smoke_test(image: dict[str, object], image_id: str, root: Path) -> None:
+    smoke_test_value = image.get("smokeTest")
+    if smoke_test_value is None:
+        return
+    if image.get("validation") != "build":
+        fail(f"smokeTest exige validation=build para {image_id}")
+
+    context = safe_relative_path(image.get("context"), f"context de {image_id}")
+    smoke_test = safe_relative_path(smoke_test_value, f"smokeTest de {image_id}")
+    if smoke_test.suffix != ".sh":
+        fail(f"smokeTest deve apontar para um script .sh para {image_id}: {smoke_test}")
+
+    context_path = (root / context).resolve()
+    smoke_test_path = (context_path / smoke_test).resolve()
+    if not smoke_test_path.is_relative_to(context_path) or not smoke_test_path.is_file():
+        fail(f"smokeTest inexistente ou fora do contexto para {image_id}: {smoke_test}")
+
+
 def validate_coverage(root: Path, catalog_dockerfiles: set[str]) -> None:
     discovered = {
         path.relative_to(root).as_posix()
@@ -131,6 +149,7 @@ def load_and_validate_catalog() -> list[dict[str, object]]:
         catalog_dockerfiles.add(validate_paths(image, image_id, root, coordinates))
         validate_platforms(image, image_id)
         validate_policy(image, image_id)
+        validate_smoke_test(image, image_id, root)
 
     validate_coverage(root, catalog_dockerfiles)
     return images

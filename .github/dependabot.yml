@@ -22,7 +22,7 @@ updates:
       - /azure-cli
       - /blog-comentario
       - /blog-cosyvoice
-      - /blog-hugo
+      - /hugo
       - /blog-listmonk
       - /certbot
       - /cockpit

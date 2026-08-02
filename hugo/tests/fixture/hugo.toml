@@ -1,0 +1,4 @@
+baseURL = "https://example.invalid/"
+title = "Hugo Extended smoke test"
+disableKinds = ["taxonomy", "term", "rss", "sitemap", "robotstxt"]
+resourceDir = "/tmp/hugo-resources"
