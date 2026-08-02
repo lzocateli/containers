@@ -7,10 +7,10 @@ services:
     container_name: cloudflared
     image: cloudflare/cloudflared:2024.8.3-amd64
     restart: unless-stopped
-    command: tunnel --no-autoupdate run --token eyJhIjoiZjNjNjQyYmJhM2JjNmExMzkwZTQ3NDY5Nzc5YWNhOGQiLCJ0IjoiODM0NGJhNGYtOTg4NS00OTA4LTlkMjYtYzE1OTI4YWIzMGIzIiwicyI6IllUUXhObVpqTTJVdFpXUXdZaTAwTnpabExXSTJNbUV0TURBMk5UQTNPV0V4TmpOayJ9
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TUNNEL_TOKEN:?defina CLOUDFLARED_TUNNEL_TOKEN}
     environment:
       - TZ=America/Sao_Paulo
-      - TUNNEL_TOKEN=eyJhIjoiZjNjNjQyYmJhM2JjNmExMzkwZTQ3NDY5Nzc5YWNhOGQiLCJ0IjoiODM0NGJhNGYtOTg4NS00OTA4LTlkMjYtYzE1OTI4YWIzMGIzIiwicyI6IllUUXhObVpqTTJVdFpXUXdZaTAwTnpabExXSTJNbUV0TURBMk5UQTNPV0V4TmpOayJ9
+      - TUNNEL_TOKEN=${CLOUDFLARED_TUNNEL_TOKEN:?defina CLOUDFLARED_TUNNEL_TOKEN}
     volumes:
       - /userapps/vol-pihole/etc/cloudflared:/etc/cloudflared
     networks:
@@ -35,7 +35,6 @@ services:
     environment:
       TZ: 'America/Sao_Paulo'
       WEBPASSWORD_FILE: #'/run/secrets/pihole'
-      PIHOLE_DNS_: '127.0.0.1'
 #      PIHOLE_DNS_: '172.16.10.53#5053'
       PIHOLE_DNS_: '172.16.10.53'
       DNSMASQ_LISTENING: 'all'
