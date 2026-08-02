@@ -41,7 +41,7 @@ services:
       proxy:
     environment:
       TZ: 'Europe/London'
-      WEBPASSWORD: 'password'
+      WEBPASSWORD: '${PIHOLE_WEBPASSWORD:?defina PIHOLE_WEBPASSWORD}'
       PIHOLE_DNS_: '172.70.9.2#5053'
       DNSMASQ_LISTENING: 'all'
       VIRTUAL_HOST: pihole.yourdomain.com
