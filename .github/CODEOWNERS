@@ -1,3 +1,6 @@
+# Owner global para exigência de aprovação em PR para main.
+* @lzocateli
+
 # Superfícies de automação e supply chain exigem revisão do mantenedor.
 /.github/workflows/ @lzocateli
 /.github/dependabot.yml @lzocateli
