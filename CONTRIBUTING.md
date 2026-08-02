@@ -33,6 +33,8 @@ tools/scripts/setup-github-governance.ps1 --help
 ```
 
 ## Pull Request
+- Pull requests são aceitos somente de colaboradores do repositório.
+- Usuários externos devem abrir uma Issue para sugerir mudanças, relatar problemas ou propor novas imagens.
 - Descreva objetivo, risco e impacto de contrato da imagem.
 - Informe evidências de validação (build, scan, smoke test).
 - Não inclua segredos, dumps, backups nem dados sensíveis.
