@@ -73,7 +73,15 @@ O script por id resolve automaticamente contexto, Dockerfile e plataforma via `t
 4. Crie o secret `DOCKERHUB_TOKEN` com um Access Token do Docker Hub que tenha permissão de escrita.
 5. Em **Settings > Actions > General**, mantenha a permissão padrão do workflow como somente leitura.
 6. Em **Settings > Code security**, habilite Dependency Graph, Dependabot alerts, Dependabot security updates, Secret Scanning e Push Protection quando disponíveis no plano.
-7. Crie um ruleset para `main` exigindo revisão do CODEOWNERS e os checks **Catálogo e descoberta**, **Secrets e configurações**, **Revisar dependências** e **Imagem** quando houver imagem alterada.
+7. Execute o script de governança para configurar proteção de branch e environment:
+
+```powershell
+tools/scripts/setup-github-governance.ps1 -RepoOwner lzocateli -RepoName containers
+```
+
+Esse script aplica proteção na `main` com revisão obrigatória de CODEOWNERS, sem bypass administrativo, define a variável `AUTHORIZED_WORKFLOW_DISPATCH_ACTOR` e configura o environment protegido `container-release` com reviewer obrigatório.
+
+> Limitação do GitHub: não existe bloqueio nativo por usuário no botão de `workflow_dispatch`; o bloqueio é aplicado na execução por validação de ator no workflow e gate de environment.
 
 O repositório não habilita auto-merge do Dependabot. Toda atualização de base ou Action passa pelos mesmos checks e por revisão humana, especialmente quando altera versão principal ou contrato público.
 
