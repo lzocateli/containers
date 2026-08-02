@@ -277,3 +277,37 @@ jobs:
         with:
           sarif_file: trivy-${{ matrix.image.id }}.sarif
           category: trivy-${{ matrix.image.id }}
+
+  required-validation:
+    name: Validação obrigatória
+    if: always()
+    needs:
+      - catalog
+      - repository-security
+      - dependency-review
+      - image
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Consolidar resultados
+        shell: bash
+        env:
+          CATALOG_RESULT: ${{ needs.catalog.result }}
+          SECURITY_RESULT: ${{ needs.repository-security.result }}
+          DEPENDENCY_RESULT: ${{ needs.dependency-review.result }}
+          IMAGE_RESULT: ${{ needs.image.result }}
+        run: |
+          set -euo pipefail
+
+          failed=false
+          for result in "$CATALOG_RESULT" "$SECURITY_RESULT" "$DEPENDENCY_RESULT" "$IMAGE_RESULT"; do
+            if [[ "$result" != "success" && "$result" != "skipped" ]]; then
+              failed=true
+            fi
+          done
+
+          if [[ "$failed" == "true" ]]; then
+            echo "Validação obrigatória falhou: catálogo=$CATALOG_RESULT, segurança=$SECURITY_RESULT, dependências=$DEPENDENCY_RESULT, imagens=$IMAGE_RESULT" >&2
+            exit 1
+          fi
+
+          echo "Todos os checks obrigatórios foram concluídos com sucesso."

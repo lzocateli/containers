@@ -79,14 +79,14 @@ O script por id resolve automaticamente contexto, Dockerfile e plataforma via `t
 tools/scripts/setup-github-governance.ps1 -RepoOwner lzocateli -RepoName containers
 ```
 
-Esse script aplica proteção na `main` com pull request obrigatório, sem aprovação obrigatória e sem bypass administrativo; mantém Issues habilitadas, define a variável `AUTHORIZED_WORKFLOW_DISPATCH_ACTOR` e configura o environment protegido `container-release` com reviewer obrigatório.
+Esse script aplica proteção na `main` com pull request e checks obrigatórios, sem aprovação obrigatória para o mantenedor solo e sem bypass administrativo. Também habilita Issues, Discussions, alertas de dependências vulneráveis, correções automáticas, Secret Scanning, Push Protection, reporte privado, squash/rebase e exclusão da branch após merge; define a variável `AUTHORIZED_WORKFLOW_DISPATCH_ACTOR` e configura o environment protegido `container-release` com confirmação manual pelo mantenedor autorizado.
 
-O workflow `restrict-pull-request-authors.yml` fecha automaticamente pull requests cujo autor não tenha associação `OWNER`, `MEMBER` ou `COLLABORATOR`. Ele usa `pull_request_target` apenas para consultar metadados, comentar e fechar o PR; nenhum código do autor é obtido ou executado. Issues continuam disponíveis para qualquer usuário.
-
-> Limitação do GitHub: repositórios públicos pessoais não oferecem uma configuração nativa que restrinja a criação de PR a colaboradores e, ao mesmo tempo, mantenha Issues abertas para todos. Por isso, PRs externos podem ser criados, mas são fechados imediatamente pela automação.
+Pull requests de forks são aceitos e executam o workflow `validate-images.yml` com `contents: read`, sem acesso aos secrets de publicação. Relatórios SARIF de forks são preservados como artifacts, mas somente PRs internos podem enviá-los ao Code Scanning. Publicação continua restrita ao ator autorizado e ao environment protegido.
 > Limitação do GitHub: não existe bloqueio nativo por usuário no botão de `workflow_dispatch`; o bloqueio é aplicado na execução por validação de ator no workflow e gate de environment.
 
 O repositório não habilita auto-merge do Dependabot. Toda atualização de base ou Action passa pelos mesmos checks e por revisão humana, especialmente quando altera versão principal ou contrato público.
+
+O check obrigatório da `main` é `Validação obrigatória`. Esse gate agrega catálogo, secrets, dependências e todos os jobs dinâmicos de imagem, falhando quando qualquer validação falhar ou for cancelada. A branch deve estar atualizada antes do merge, todas as conversas devem estar resolvidas e force push ou exclusão da `main` permanecem bloqueados.
 
 ## Validar pull requests
 
