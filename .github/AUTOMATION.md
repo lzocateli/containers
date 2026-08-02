@@ -79,8 +79,11 @@ O script por id resolve automaticamente contexto, Dockerfile e plataforma via `t
 tools/scripts/setup-github-governance.ps1 -RepoOwner lzocateli -RepoName containers
 ```
 
-Esse script aplica proteção na `main` com revisão obrigatória de CODEOWNERS, sem bypass administrativo, define a variável `AUTHORIZED_WORKFLOW_DISPATCH_ACTOR` e configura o environment protegido `container-release` com reviewer obrigatório.
+Esse script aplica proteção na `main` com pull request obrigatório, sem aprovação obrigatória e sem bypass administrativo; mantém Issues habilitadas, define a variável `AUTHORIZED_WORKFLOW_DISPATCH_ACTOR` e configura o environment protegido `container-release` com reviewer obrigatório.
 
+O workflow `restrict-pull-request-authors.yml` fecha automaticamente pull requests cujo autor não tenha associação `OWNER`, `MEMBER` ou `COLLABORATOR`. Ele usa `pull_request_target` apenas para consultar metadados, comentar e fechar o PR; nenhum código do autor é obtido ou executado. Issues continuam disponíveis para qualquer usuário.
+
+> Limitação do GitHub: repositórios públicos pessoais não oferecem uma configuração nativa que restrinja a criação de PR a colaboradores e, ao mesmo tempo, mantenha Issues abertas para todos. Por isso, PRs externos podem ser criados, mas são fechados imediatamente pela automação.
 > Limitação do GitHub: não existe bloqueio nativo por usuário no botão de `workflow_dispatch`; o bloqueio é aplicado na execução por validação de ator no workflow e gate de environment.
 
 O repositório não habilita auto-merge do Dependabot. Toda atualização de base ou Action passa pelos mesmos checks e por revisão humana, especialmente quando altera versão principal ou contrato público.

@@ -38,6 +38,11 @@ Preparar o repositorio para visibilidade publica e incluir automacao via gh para
   - Script valida todos os pre-requisitos antes de aplicar.
 - [x] 3.4. Incluir modo dry-run e saida de auditoria.
   - Dry-run validado com saida completa antes da aplicacao real.
+- [x] 3.5. Restringir PRs a colaboradores sem bloquear Issues publicas.
+  - Branch protection exige PR, mas nao exige aprovacao, permitindo que colaboradores concluam os proprios PRs.
+  - `restrict-pull-request-authors.yml` fecha PRs externos sem obter ou executar codigo do autor.
+  - Issues permanecem habilitadas para qualquer usuario.
+  - Politica remota aplicada em 2026-08-02: `required_approving_review_count: 0`, `require_code_owner_reviews: false`, `require_last_push_approval: false`, `enforce_admins: true`, `has_issues: true`.
 
 ### Fase 4 - Restricao de Actions para unico usuario [concluida]
 - [x] 4.1. Implementar protecao fail-fast com validacao de actor autorizado nos workflows.
@@ -50,8 +55,8 @@ Preparar o repositorio para visibilidade publica e incluir automacao via gh para
   - Documentado em `.github/AUTOMATION.md`: GitHub nao oferece bloqueio nativo per-user do botao `workflow_dispatch`; bloqueio aplicado na execucao (gate de actor + environment).
 
 ### Fase 5 - Validacao final de prontidao publica [pendente - requer acao manual]
-- [ ] 5.1. Testar PR simulado para main sem aprovacao do owner (deve bloquear).
-- [ ] 5.2. Testar PR com aprovacao do owner (deve permitir conforme checks).
+- [ ] 5.1. Testar PR externo para main (deve ser comentado e fechado automaticamente).
+- [ ] 5.2. Testar PR de colaborador para main (deve permitir merge sem aprovacao conforme checks).
 - [ ] 5.3. Testar workflow_dispatch com usuario nao autorizado (deve falhar no gate).
 - [ ] 5.4. Testar workflow_dispatch com usuario autorizado e aprovacao de environment (deve prosseguir).
 
@@ -69,18 +74,21 @@ Preparar o repositorio para visibilidade publica e incluir automacao via gh para
 - [x] CONTRIBUTING.md - adicionado.
 - [x] SECURITY.md - adicionado.
 - [x] tools/scripts/setup-github-governance.ps1 - script de governanca criado e aplicado.
+- [x] .github/workflows/restrict-pull-request-authors.yml - fecha PRs de usuarios externos sem executar codigo do autor.
 
 ## Verification
 - [x] 1. Validar sintaxe e ajuda do script: `--help` executado com saida 0.
 - [x] 2. Dry-run do script executado com sucesso em lzocateli/containers.
 - [x] 3. Regras verificadas por `gh api repos/.../branches/main/protection`:
-  - `require_code_owner_reviews: true`, `enforce_admins.enabled: true`, `required_linear_history.enabled: true`, `allow_force_pushes.enabled: false`.
-- [ ] 4. Testes manuais de PR approval e workflow_dispatch pendentes (Fase 5).
-- [~] 5. Varredura manual de segredos realizada via inspecao de git history. Varredura automatizada recomendada.
+  - `required_approving_review_count: 0`, `require_code_owner_reviews: false`, `require_last_push_approval: false`, `enforce_admins.enabled: true`, `required_linear_history.enabled: true`, `allow_force_pushes.enabled: false`.
+- [x] 4. Issues verificadas por `gh api repos/...`: `has_issues: true`, com repositorio publico.
+- [ ] 5. Testes manuais de autoria de PR e workflow_dispatch pendentes (Fase 5).
+- [~] 6. Varredura manual de segredos realizada via inspecao de git history. Varredura automatizada recomendada.
 
 ## Decisions
 - Escopo do script: reutilizavel para multiplos repositorios.
-- Aprovacao em PR para main: enforced por CODEOWNERS + branch protection sem bypass administrativo.
+- Pull request para main: obrigatorio, sem aprovacao obrigatoria e sem bypass administrativo.
+- Autoria de PR: somente `OWNER`, `MEMBER` ou `COLLABORATOR`; PR externo e fechado por workflow porque o GitHub nao oferece restricao nativa compatível com Issues publicas.
 - Controle de Actions: abordagem combinada (fail-fast por actor + environment protegido com reviewer obrigatorio).
 - Limitacao aceita: GitHub nao oferece bloqueio nativo per-user do botao de disparo; bloqueio ocorre na execucao.
 - Restricoes de organizacao: `bypass_pull_request_allowances` e `dismissal_restrictions` omitidos (suportados apenas em repos de organizacao).

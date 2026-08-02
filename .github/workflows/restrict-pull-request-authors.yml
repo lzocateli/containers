@@ -1,0 +1,34 @@
+name: Restringir autores de pull request
+
+on:
+  pull_request_target:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - ready_for_review
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  enforce-collaborator-policy:
+    name: Validar colaborador
+    if: ${{ !contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association) }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Informar e fechar pull request externo
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          gh api --method POST "repos/${REPOSITORY}/issues/${PR_NUMBER}/comments" \
+            -f body='Este repositório aceita pull requests apenas de colaboradores. Issues permanecem abertas para sugestões, dúvidas e relatos.'
+          gh api --method PATCH "repos/${REPOSITORY}/pulls/${PR_NUMBER}" \
+            -f state=closed
