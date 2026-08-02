@@ -1,1 +1,1 @@
-FROM mvance/unbound:1.20.0
+FROM mvance/unbound:1.22.0

@@ -1,1 +1,1 @@
-FROM cloudflare/cloudflared:2024.8.2-amd64
+FROM cloudflare/cloudflared:2026.7.3-amd64
