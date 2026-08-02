@@ -45,6 +45,7 @@ jobs:
     outputs:
       platform_matrix: ${{ steps.catalog.outputs.platform_matrix }}
       platforms: ${{ steps.catalog.outputs.platforms }}
+      smoke_test: ${{ steps.catalog.outputs.smoke_test }}
     steps:
       - name: Obter repositório
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -131,8 +132,12 @@ jobs:
             --platforms "$PLATFORMS")"
           platform_matrix="$(jq -c '[.platforms[] | {platform: ., suffix: gsub("/"; "-")}]' <<<"$entry")"
           selected_platforms="$(jq -r '.platforms | join(",")' <<<"$entry")"
-          echo "platform_matrix=$platform_matrix" >> "$GITHUB_OUTPUT"
-          echo "platforms=$selected_platforms" >> "$GITHUB_OUTPUT"
+          smoke_test="$(jq -r '.smokeTest // empty' <<<"$entry")"
+          {
+            echo "platform_matrix=$platform_matrix"
+            echo "platforms=$selected_platforms"
+            echo "smoke_test=$smoke_test"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Validar Dockerfile com BuildKit
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
@@ -171,6 +176,17 @@ jobs:
           tags: local/${{ inputs.image_name }}:${{ github.run_id }}-${{ matrix.target.suffix }}
           cache-from: type=gha,scope=${{ inputs.image_name }}-${{ matrix.target.suffix }}
           cache-to: type=gha,mode=max,scope=${{ inputs.image_name }}-${{ matrix.target.suffix }}
+
+      - name: Executar smoke test catalogado
+        if: needs.validate.outputs.smoke_test != ''
+        shell: bash
+        env:
+          CONTEXT_PATH: ${{ inputs.context_path }}
+          SMOKE_TEST: ${{ needs.validate.outputs.smoke_test }}
+          IMAGE_REF: local/${{ inputs.image_name }}:${{ github.run_id }}-${{ matrix.target.suffix }}
+        run: |
+          set -euo pipefail
+          bash "$CONTEXT_PATH/$SMOKE_TEST" --image "$IMAGE_REF"
 
       - name: Gerar relatório Trivy
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0

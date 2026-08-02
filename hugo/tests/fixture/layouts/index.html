@@ -1,0 +1,13 @@
+{{ $style := resources.Get "scss/main.scss" | toCSS | minify | fingerprint "sha256" }}
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ site.Title }}</title>
+    <link rel="stylesheet" href="{{ $style.RelPermalink }}" integrity="{{ $style.Data.Integrity }}">
+  </head>
+  <body>
+    <main>Hugo Extended</main>
+  </body>
+</html>
