@@ -172,7 +172,7 @@ function Invoke-GhWithInput {
     if (Get-Command -Name 'GithubCli' -ErrorAction SilentlyContinue) {
         $tempFile = Join-Path (Get-Location) '.gh-input-temp.json'
         try {
-            [System.IO.File]::WriteAllText($tempFile, $InputText, [System.Text.Encoding]::UTF8)
+            [System.IO.File]::WriteAllText($tempFile, $InputText, [System.Text.UTF8Encoding]::new($false))
             $fixedArgs = [System.Collections.Generic.List[string]]::new()
             for ($i = 0; $i -lt $Arguments.Count; $i++) {
                 if ($Arguments[$i] -eq '--input' -and ($i + 1) -lt $Arguments.Count -and $Arguments[$i + 1] -eq '-') {
@@ -275,31 +275,24 @@ $authorizedActorUser = Invoke-GhJson -Arguments @('api', "users/$AuthorizedActor
 $authorizedActorId = [int]$authorizedActorUser.id
 
 $protectionBody = @{
-    required_status_checks = $null
-    enforce_admins = $true
-    required_pull_request_reviews = @{
-        dismissal_restrictions = @{
-            users = @()
-            teams = @()
-        }
-        dismiss_stale_reviews = $true
-        require_code_owner_reviews = $true
+    required_status_checks            = $null
+    enforce_admins                    = $true
+    required_pull_request_reviews     = @{
+        # dismissal_restrictions and bypass_pull_request_allowances require
+        # an organization repository; omit them for personal repos.
+        dismiss_stale_reviews           = $true
+        require_code_owner_reviews      = $true
         required_approving_review_count = 1
-        require_last_push_approval = $true
-        bypass_pull_request_allowances = @{
-            users = @()
-            teams = @()
-            apps = @()
-        }
+        require_last_push_approval      = $true
     }
-    restrictions = $null
-    required_linear_history = $RequireLinearHistory
-    allow_force_pushes = $false
-    allow_deletions = $false
-    block_creations = $false
-    required_conversation_resolution = $true
-    lock_branch = $false
-    allow_fork_syncing = $true
+    restrictions                      = $null
+    required_linear_history           = $RequireLinearHistory
+    allow_force_pushes                = $false
+    allow_deletions                   = $false
+    block_creations                   = $false
+    required_conversation_resolution  = $true
+    lock_branch                       = $false
+    allow_fork_syncing                = $true
 }
 
 $environmentBody = @{
