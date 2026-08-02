@@ -4,9 +4,14 @@ Configura governança de repositório no GitHub usando gh CLI.
 
 .DESCRIPTION
 Aplica proteções para branch principal e governança de workflows:
-1) Define proteção de branch com PR obrigatório, review de CODEOWNERS e sem bypass.
-2) Define variável de repositório para ator autorizado a workflow_dispatch.
-3) Cria/atualiza environment protegido com reviewer obrigatório.
+1) Define proteção de branch com PR obrigatório e sem bypass administrativo.
+2) Mantém Issues habilitadas para qualquer usuário.
+3) Define variável de repositório para ator autorizado a workflow_dispatch.
+4) Cria/atualiza environment protegido com reviewer obrigatório.
+
+PRs de usuários externos são fechados pelo workflow versionado
+.github/workflows/restrict-pull-request-authors.yml. O GitHub não oferece uma
+restrição nativa de criação de PR por associação sem também restringir Issues.
 
 .PARAMETER RepoOwner
 Owner do repositório no GitHub.
@@ -104,7 +109,9 @@ function Show-Usage {
 setup-github-governance.ps1
 
 Finalidade:
-- Configurar branch protection para main (ou branch alvo), exigindo PR com aprovacao de CODEOWNERS.
+- Configurar branch protection para main (ou branch alvo), exigindo PR sem aprovacao obrigatoria.
+- Manter Issues habilitadas para todos os usuarios.
+- Fechar PRs externos por meio do workflow restrict-pull-request-authors.yml.
 - Configurar variavel AUTHORIZED_WORKFLOW_DISPATCH_ACTOR no repositorio.
 - Configurar environment protegido com reviewer obrigatorio.
 
@@ -132,14 +139,10 @@ Exemplos:
 '@ | Write-Host
 }
 
-function Assert-CommandExists {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Name
-    )
-
-    if (-not (Get-Command -Name $Name -ErrorAction SilentlyContinue)) {
-        throw "Comando obrigatorio nao encontrado: $Name"
+function Assert-GhCommandExists {
+    if (-not (Get-Command -Name 'GithubCli' -ErrorAction SilentlyContinue) -and
+        -not (Get-Command -Name 'gh' -ErrorAction SilentlyContinue)) {
+        throw 'Comando obrigatorio nao encontrado: gh ou GithubCli'
     }
 }
 
@@ -251,7 +254,7 @@ if ([string]::IsNullOrWhiteSpace($RepoOwner) -or [string]::IsNullOrWhiteSpace($R
     exit 2
 }
 
-Assert-CommandExists -Name 'gh'
+Assert-GhCommandExists
 
 $repo = "$RepoOwner/$RepoName"
 
@@ -266,6 +269,7 @@ Write-Host "[info] Autenticado no gh como: $($viewer.login)"
 
 $branchEndpoint = "repos/$repo/branches/$BranchName"
 $protectionEndpoint = "repos/$repo/branches/$BranchName/protection"
+$repositoryEndpoint = "repos/$repo"
 $repoVariableEndpoint = "repos/$repo/actions/variables/AUTHORIZED_WORKFLOW_DISPATCH_ACTOR"
 $environmentEndpoint = "repos/$repo/environments/$EnvironmentName"
 
@@ -281,9 +285,9 @@ $protectionBody = @{
         # dismissal_restrictions and bypass_pull_request_allowances require
         # an organization repository; omit them for personal repos.
         dismiss_stale_reviews           = $true
-        require_code_owner_reviews      = $true
-        required_approving_review_count = 1
-        require_last_push_approval      = $true
+        require_code_owner_reviews      = $false
+        required_approving_review_count = 0
+        require_last_push_approval      = $false
     }
     restrictions                      = $null
     required_linear_history           = $RequireLinearHistory
@@ -314,10 +318,13 @@ if ($DryRun.IsPresent) {
     Write-Host '[dry-run] Operacao 1: aplicar branch protection'
     $protectionBody | ConvertTo-Json -Depth 20 | Write-Host
 
-    Write-Host '[dry-run] Operacao 2: definir variavel AUTHORIZED_WORKFLOW_DISPATCH_ACTOR'
+    Write-Host '[dry-run] Operacao 2: manter Issues habilitadas'
+    (@{ has_issues = $true } | ConvertTo-Json) | Write-Host
+
+    Write-Host '[dry-run] Operacao 3: definir variavel AUTHORIZED_WORKFLOW_DISPATCH_ACTOR'
     (@{ name = 'AUTHORIZED_WORKFLOW_DISPATCH_ACTOR'; value = $AuthorizedActor } | ConvertTo-Json) | Write-Host
 
-    Write-Host '[dry-run] Operacao 3: configurar environment protegido'
+    Write-Host '[dry-run] Operacao 4: configurar environment protegido'
     $environmentBody | ConvertTo-Json -Depth 20 | Write-Host
 
     Write-Host '[dry-run] Nenhuma alteracao foi aplicada.'
@@ -330,6 +337,9 @@ Invoke-GhWithInput -InputText $protectionJson -Arguments @('api', '--method', 'P
 if ($LASTEXITCODE -ne 0) {
     throw 'Falha ao aplicar branch protection.'
 }
+
+Write-Host '[apply] Mantendo Issues habilitadas...'
+Invoke-GhRaw -Arguments @('api', '--method', 'PATCH', $repositoryEndpoint, '-F', 'has_issues=true')
 
 Write-Host '[apply] Definindo variavel AUTHORIZED_WORKFLOW_DISPATCH_ACTOR...'
 try {
@@ -349,5 +359,8 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host '[ok] Governanca aplicada com sucesso.'
 Write-Host "[ok] Repositorio: $repo"
 Write-Host "[ok] Branch protegida: $BranchName"
+Write-Host '[ok] Pull requests exigidos sem aprovacao obrigatoria'
+Write-Host '[ok] Issues habilitadas para todos os usuarios'
+Write-Host '[ok] PRs externos fechados pelo workflow restrict-pull-request-authors.yml'
 Write-Host "[ok] Ator autorizado workflow_dispatch: $AuthorizedActor"
 Write-Host "[ok] Environment protegido: $EnvironmentName"
