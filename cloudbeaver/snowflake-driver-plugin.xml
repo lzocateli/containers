@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+    <!-- Resource mappings for Snowflake driver JAR -->
+    <extension point="org.jkiss.dbeaver.resources">
+        <resource name="drivers/snowflake"/>
+    </extension>
+
+    <!-- Bundle registration -->
+    <extension point="org.jkiss.dbeaver.product.bundles">
+        <bundle id="drivers.snowflake" label="Snowflake drivers"/>
+    </extension>
+
+    <!-- Enable Snowflake driver in CloudBeaver UI -->
+    <extension point="io.cloudbeaver.driver">
+        <driver id="snowflake:snowflake_jdbc"/>
+    </extension>
+</plugin>

@@ -46,11 +46,13 @@ Padrao: aquasec/trivy:0.70.0
 
 .PARAMETER OutputDir
 Diretorio de saida para TAR e JSON.
-Padrao: artifacts/security-local
+Padrao fixo: <repo>/artifacts/security-local
+Observacao: parametro customizado e ignorado para manter o cache centralizado.
 
 .PARAMETER CacheDir
 Diretorio de cache do banco do Trivy.
-Padrao: artifacts/security-local/trivy-cache
+Padrao fixo: <repo>/artifacts/security-local/trivy-cache
+Observacao: parametro customizado e ignorado para manter o cache centralizado.
 
 .PARAMETER DbCachePolicy
 Politica de atualizacao do cache do banco do Trivy.
@@ -155,7 +157,7 @@ Opcoes principais:
   -IncludeInternalBaseScan <b>   Escaneia base interna do projeto (padrao: true)
   -ResolveOnly                   Apenas imprime resolucao (sem scan)
   -SkipBuild                     Nao executa build local
-    -CacheDir <path>               Diretorio de cache do Trivy
+    -CacheDir <path>               Compatibilidade legada. Ignorado; usa <repo>/artifacts/security-local/trivy-cache
     -DbCachePolicy <mode>          Politica de cache: auto | reuse | refresh
   --help                         Exibe esta ajuda
 
@@ -181,6 +183,9 @@ $repoRoot = (Resolve-Path -LiteralPath (Join-Path $scriptDir '..\..')).Path
 $catalogPath = Join-Path -Path $repoRoot -ChildPath 'tools/container-images.json'
 $scanScriptPath = Join-Path -Path $repoRoot -ChildPath 'tools/scripts/scan-container-vulnerabilities.ps1'
 
+$OutputDir = Join-Path -Path $repoRoot -ChildPath 'artifacts/security-local'
+$CacheDir = Join-Path -Path $repoRoot -ChildPath 'artifacts/security-local/trivy-cache'
+
 if (-not (Test-Path -LiteralPath $catalogPath -PathType Leaf)) {
     Write-Error "Catalogo nao encontrado: $catalogPath"
     exit 3
@@ -191,7 +196,7 @@ if (-not (Test-Path -LiteralPath $scanScriptPath -PathType Leaf)) {
     exit 4
 }
 
-$catalog = Get-Content -LiteralPath $catalogPath -Raw | ConvertFrom-Json
+$catalog = Microsoft.PowerShell.Management\Get-Content -LiteralPath $catalogPath -Raw | ConvertFrom-Json
 $entry = $catalog.images | Where-Object { $_.id -eq $ImageId }
 
 if ($null -eq $entry) {
@@ -214,7 +219,7 @@ function Resolve-DockerfileArgDefaults {
     param([string]$DockerfilePath)
 
     $argMap = @{}
-    foreach ($line in (Get-Content -LiteralPath $DockerfilePath)) {
+    foreach ($line in (Microsoft.PowerShell.Management\Get-Content -LiteralPath $DockerfilePath)) {
         $trimmed = $line.Trim()
         if ($trimmed -match '^(?i:ARG)\s+([A-Za-z_][A-Za-z0-9_]*)=(.+)$') {
             $argMap[$Matches[1]] = $Matches[2].Trim()
@@ -232,7 +237,7 @@ function Resolve-FromImageRefs {
 
     $refs = [System.Collections.Generic.List[string]]::new()
 
-    foreach ($line in (Get-Content -LiteralPath $DockerfilePath)) {
+    foreach ($line in (Microsoft.PowerShell.Management\Get-Content -LiteralPath $DockerfilePath)) {
         $trimmed = $line.Trim()
         if ($trimmed -match '^(?i:FROM)\s+([^\s]+)') {
             $ref = $Matches[1]
