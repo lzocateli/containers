@@ -9,6 +9,7 @@ Execute a skill container-vulnerability-remediation para a imagem informada.
 
 Requisitos:
 - Rodar scan local via tools/scripts/scan-container-vulnerabilities-by-id.ps1.
+- Usar exclusivamente `containers/artifacts/security-local` para evidencias e `containers/artifacts/security-local/trivy-cache` para cache do Trivy.
 - Se a base da imagem tambem for interna e mantida no projeto, escanear e corrigir no ponto mais adequado (base ou filha).
 - Corrigir vulnerabilidades CRITICAL corrigiveis no Dockerfile.
 - Preservar contrato da imagem e atualizar README quando houver mudanca.

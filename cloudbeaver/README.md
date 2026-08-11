@@ -1,6 +1,6 @@
 # CloudBeaver — Build e execução local
 
-Imagem baseada em `dbeaver/cloudbeaver:26.0.3` com o driver JDBC do Snowflake (`3.22.0`) pré-instalado.
+Imagem baseada em `dbeaver/cloudbeaver:26.1.4` com o driver JDBC do Snowflake (`3.22.0`) pré-instalado.
 
 **Registry:** `lzocateli/cloudbeaver`
 
@@ -28,7 +28,7 @@ Execute a partir da pasta `containers/cloudbeaver/`:
 
 ```powershell
 $IMAGE = "lzocateli/cloudbeaver"
-$TAG   = "26.0.3"
+$TAG   = "26.1.4"
 
 docker build `
     --platform linux/amd64 `
@@ -36,7 +36,6 @@ docker build `
     --build-arg Env_HttpsProxy=proxy.xxx.com:80 `
     --build-arg Env_NoProxy=dominio.com `
     -t "$($IMAGE):$($TAG)" `
-    -t "$($IMAGE):latest" `
     .
 ```
 
@@ -49,7 +48,6 @@ docker build `
 
 ```powershell
 docker push "$($IMAGE):$($TAG)"
-docker push "$($IMAGE):latest"
 ```
 
 ---
@@ -93,7 +91,7 @@ nslookup blog.zocate.li
 
 ```powershell
 $IMAGE = "lzocateli/cloudbeaver"
-$TAG   = "26.0.3"
+$TAG   = "26.1.4"
 
 # Garante que o path está definido (fallback se a variável de ambiente não existir)
 $WORKSPACE = if ($env:DBEAVER_WORKSPACE) { $env:DBEAVER_WORKSPACE } else { "$env:USERPROFILE\cloudbeaver\workspace" }
@@ -128,7 +126,7 @@ Parâmetros para o pipeline de build corporativo:
 | Parâmetro | Valor |
 |---|---|
 | Nome da imagem | `cloudbeaver` |
-| Tag | `26.0.3` |
+| Tag | `26.1.4` |
 | Repositório | `lzocateli/containers` |
 | Caminho do Dockerfile | `containers/cloudbeaver` |
 | Build args | `--build-arg Env_HttpProxy=proxy.xxx.com:80 --build-arg Env_NoProxy=dominio.com` |
