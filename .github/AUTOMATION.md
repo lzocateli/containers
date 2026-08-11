@@ -35,11 +35,15 @@ tools/scripts/scan-container-vulnerabilities-by-id.ps1 --help
 tools/scripts/scan-container-vulnerabilities-by-id.ps1 -ImageId <id-do-catalogo>
 ```
 
-Para reduzir tempo e download repetido do banco de vulnerabilidades, use cache local do Trivy:
+Para reduzir tempo e download repetido do banco de vulnerabilidades, use cache local do Trivy no local unico do repositório:
+
+- `containers/artifacts/security-local/trivy-cache`
+
+Esse caminho e obrigatorio. Os scripts de scan ignoram `-CacheDir` e `-OutputDir` customizados para manter toda evidencia e cache sob `containers/artifacts`.
 
 ```powershell
-tools/scripts/scan-container-vulnerabilities.ps1 -ContextPath <pasta-da-imagem> -CacheDir artifacts/security-local/trivy-cache
-tools/scripts/scan-container-vulnerabilities-by-id.ps1 -ImageId <id-do-catalogo> -CacheDir artifacts/security-local/trivy-cache
+tools/scripts/scan-container-vulnerabilities.ps1 -ContextPath <pasta-da-imagem>
+tools/scripts/scan-container-vulnerabilities-by-id.ps1 -ImageId <id-do-catalogo>
 ```
 
 Política de atualização do cache (`-DbCachePolicy`):
