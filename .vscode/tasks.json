@@ -1,0 +1,29 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "scan-cloudbeaver-rem-2610",
+			"type": "shell",
+			"command": "rtk pwsh -NoLogo -NoProfile -Command \"& './tools/scripts/scan-container-vulnerabilities-by-id.ps1' -ImageId cloudbeaver -ImageTag rem-2610\"",
+			"isBackground": false
+		},
+		{
+			"label": "scan-cloudbeaver-rem-2610-filemode",
+			"type": "shell",
+			"command": "rtk pwsh -NoLogo -NoProfile -File ./tools/scripts/scan-container-vulnerabilities-by-id.ps1 -ImageId cloudbeaver -ImageTag rem-2610",
+			"isBackground": false
+		},
+		{
+			"label": "scan-cloudbeaver-direct-rem-2610",
+			"type": "shell",
+			"command": "rtk pwsh -NoLogo -NoProfile -File ./tools/scripts/scan-container-vulnerabilities.ps1 -ContextPath ./cloudbeaver -ImageName cloudbeaver -ImageTag rem-2610 -Platform linux/amd64",
+			"isBackground": false
+		},
+		{
+			"label": "scan-cloudbeaver-direct-rem-2610-proxy",
+			"type": "shell",
+			"command": "rtk proxy pwsh -NoLogo -NoProfile -File ./tools/scripts/scan-container-vulnerabilities.ps1 -ContextPath ./cloudbeaver -ImageName cloudbeaver -ImageTag rem-2610 -Platform linux/amd64",
+			"isBackground": false
+		}
+	]
+}

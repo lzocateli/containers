@@ -51,11 +51,13 @@ Padrao: aquasec/trivy:0.72.0
 
 .PARAMETER OutputDir
 Diretorio local para TAR e relatorio JSON.
-Padrao: artifacts/security-local
+Padrao fixo: <repo>/artifacts/security-local
+Observacao: parametros customizados sao ignorados para manter o cache centralizado.
 
 .PARAMETER CacheDir
 Diretorio local para cache do banco do Trivy.
-Padrao: artifacts/security-local/trivy-cache
+Padrao fixo: <repo>/artifacts/security-local/trivy-cache
+Observacao: parametros customizados sao ignorados para manter o cache centralizado.
 
 .PARAMETER DbCachePolicy
 Politica de atualizacao do cache de banco do Trivy.
@@ -199,8 +201,8 @@ Opcoes principais:
     -GateCritical <bool>      Aplica gate para CRITICAL corrigivel (padrao: true)
     -Timeout <value>          Timeout do Trivy (padrao: 20m)
     -TrivyImage <ref>         Imagem Trivy (padrao: aquasec/trivy:0.72.0)
-    -OutputDir <path>         Diretorio de saida (padrao: artifacts/security-local)
-    -CacheDir <path>          Diretorio de cache do Trivy (padrao: artifacts/security-local/trivy-cache)
+    -OutputDir <path>         Compatibilidade legada. Ignorado; usa <repo>/artifacts/security-local
+    -CacheDir <path>          Compatibilidade legada. Ignorado; usa <repo>/artifacts/security-local/trivy-cache
     -DbCachePolicy <mode>     Politica de cache: auto | reuse | refresh (padrao: auto)
     -SkipBuild                Nao executa build; usa imagem local existente
     --help                    Exibe esta ajuda
@@ -264,6 +266,15 @@ if ([string]::IsNullOrWhiteSpace($ContextPath)) {
     exit 2
 }
 
+$scriptDir = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
+$repoRoot = (Resolve-Path -LiteralPath (Join-Path $scriptDir '..\..')).Path
+$enforcedOutputDir = Join-Path -Path $repoRoot -ChildPath 'artifacts/security-local'
+$enforcedCacheDir = Join-Path -Path $repoRoot -ChildPath 'artifacts/security-local/trivy-cache'
+
+if ($OutputDir -ne 'artifacts/security-local' -or $CacheDir -ne 'artifacts/security-local/trivy-cache') {
+    Write-Warning 'OutputDir e CacheDir customizados sao ignorados. O unico local permitido e containers/artifacts/security-local (cache em trivy-cache).'
+}
+
 $ignoreUnfixedEnabled = ConvertTo-Boolean -Value $IgnoreUnfixed -ParameterName 'IgnoreUnfixed'
 $gateCriticalEnabled = ConvertTo-Boolean -Value $GateCritical -ParameterName 'GateCritical'
 
@@ -300,15 +311,15 @@ if ([string]::IsNullOrWhiteSpace($ImageName)) {
 
 $localImageRef = "local/${ImageName}:$ImageTag"
 
-if (-not (Test-Path -LiteralPath $OutputDir -PathType Container)) {
-    New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
+if (-not (Test-Path -LiteralPath $enforcedOutputDir -PathType Container)) {
+    New-Item -ItemType Directory -Path $enforcedOutputDir -Force | Out-Null
 }
-$resolvedOutputDir = (Resolve-Path -LiteralPath $OutputDir).Path
+$resolvedOutputDir = (Resolve-Path -LiteralPath $enforcedOutputDir).Path
 
-if (-not (Test-Path -LiteralPath $CacheDir -PathType Container)) {
-    New-Item -ItemType Directory -Path $CacheDir -Force | Out-Null
+if (-not (Test-Path -LiteralPath $enforcedCacheDir -PathType Container)) {
+    New-Item -ItemType Directory -Path $enforcedCacheDir -Force | Out-Null
 }
-$resolvedCacheDir = (Resolve-Path -LiteralPath $CacheDir).Path
+$resolvedCacheDir = (Resolve-Path -LiteralPath $enforcedCacheDir).Path
 
 $safeTag = ($ImageTag -replace '[^A-Za-z0-9_.-]', '-')
 $tarFileName = "$ImageName-$safeTag.tar"
