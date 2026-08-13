@@ -4,19 +4,6 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - "**/Dockerfile*"
-      - "**/.dockerignore"
-      - "**/.gitignore"
-      - "**/README.md"
-      - "**/readme.md"
-      - "**/*.sh"
-      - "**/*.conf"
-      - "**/*.toml"
-      - "tools/container-images.json"
-      - ".github/dependabot.yml"
-      - "tools/**"
-      - ".github/workflows/**"
   merge_group:
   workflow_dispatch:
 
