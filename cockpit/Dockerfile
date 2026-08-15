@@ -1,1 +1,1 @@
-FROM quay.io/cockpit/ws:364
+FROM quay.io/cockpit/ws:365
