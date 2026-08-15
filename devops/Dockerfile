@@ -7,7 +7,7 @@ FROM ${BASE_IMAGE}
 
 # ---- Re-declara ARGs após FROM (necessário para uso nos RUN abaixo) ---------
 ARG BASE_IMAGE=nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04
-ARG INSTALL_ML=true
+ARG INSTALL_ML=false
 ARG INSTALL_GOOGLE=true
 ARG GH_VERSION=2.92.0
 ARG SQLCMD_VERSION=1.10.0
