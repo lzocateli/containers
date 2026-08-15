@@ -1,15 +1,18 @@
 # Plano de publicacao segura e governanca GitHub
 
 ## Status geral: concluido (2026-08-02)
+
 Repositorio `lzocateli/containers` publicado e governanca aplicada via `tools/scripts/setup-github-governance.ps1`.
 Validacao manual de PR e workflow_dispatch pendente (Fase 5, requer acao humana).
 
 ## Objetivo
+
 Preparar o repositorio para visibilidade publica e incluir automacao via gh para protecao da main, aprovacao de PR por owner e controle de disparo de Actions.
 
 ## Steps
 
 ### Fase 1 - Seguranca pre-publicacao (bloqueador) [concluida]
+
 - [x] 1.1. Sanitizar segredos e credenciais versionadas em arquivos criticos.
   - dns/docker-dot-compose.yml: token migrado para `${CLOUDFLARED_TUNNEL_TOKEN:?defina CLOUDFLARED_TUNNEL_TOKEN}` (commit 37302c5).
   - dns/pihole/docker-compose.yml e dns/unbound/docker-compose.yaml: senha migrada para `${PIHOLE_WEBPASSWORD:?defina PIHOLE_WEBPASSWORD}` (commit 37302c5).
@@ -21,12 +24,14 @@ Preparar o repositorio para visibilidade publica e incluir automacao via gh para
   - Nota: varredura automatizada com gitleaks/truffleHog nao executada nesta sessao; recomendada antes do proximo release.
 
 ### Fase 2 - Community Health para repositorio publico [concluida]
+
 - [x] 2.1. Confirmar baseline ja existente (README, LICENSE, CODEOWNERS).
   - README.md, LICENSE e CODEOWNERS existiam; CODEOWNERS atualizado (commit 0c3b948).
 - [x] 2.2. Adicionar documentacao de seguranca, contribuicao e conduta para governanca publica.
   - CODE_OF_CONDUCT.md, CONTRIBUTING.md e SECURITY.md adicionados (commit 0c3b948).
 
 ### Fase 3 - Script gh reutilizavel de governanca [concluida]
+
 - [x] 3.1. Criar script PowerShell de automacao em tools/scripts com parametros de owner/repo/branch/actor autorizado.
   - `tools/scripts/setup-github-governance.ps1` adicionado (commit 81a221e, corrigido em 8319fe4).
   - Parametros: `-RepoOwner`, `-RepoName`, `-BranchName`, `-AuthorizedActor`, `-EnvironmentName`, `-RequireLinearHistory`, `-DryRun`.
@@ -52,6 +57,7 @@ Preparar o repositorio para visibilidade publica e incluir automacao via gh para
   - Politica remota aplicada e verificada em 2026-08-02: `Validação obrigatória` com `strict: true`, Issues e Discussions habilitadas, merge commit desabilitado, squash/rebase habilitados, exclusao de branch apos merge, Dependabot Security Updates, Secret Scanning, Push Protection e reporte privado habilitados.
 
 ### Fase 4 - Restricao de Actions para unico usuario [concluida]
+
 - [x] 4.1. Implementar protecao fail-fast com validacao de actor autorizado nos workflows.
   - `publish-image.yml` e `validate-images.yml` com gate de ator via variavel `AUTHORIZED_WORKFLOW_DISPATCH_ACTOR` (commit 13993ea).
 - [x] 4.2. Configurar Environment protegido com reviewer obrigatorio para jobs sensiveis.
@@ -62,12 +68,14 @@ Preparar o repositorio para visibilidade publica e incluir automacao via gh para
   - Documentado em `.github/AUTOMATION.md`: GitHub nao oferece bloqueio nativo per-user do botao `workflow_dispatch`; bloqueio aplicado na execucao (gate de actor + environment).
 
 ### Fase 5 - Validacao final de prontidao publica [pendente - requer acao manual]
+
 - [ ] 5.1. Testar PR externo para main (deve executar CI sem acesso a secrets).
 - [ ] 5.2. Testar merge com check pendente ou falho (deve permanecer bloqueado).
 - [ ] 5.3. Testar workflow_dispatch com usuario nao autorizado (deve falhar no gate).
 - [ ] 5.4. Testar workflow_dispatch com usuario autorizado e aprovacao de environment (deve prosseguir).
 
 ## Relevant files
+
 - [x] dns/docker-dot-compose.yml - token migrado para variavel de ambiente obrigatoria.
 - [~] certbot/.secrets/cloudflare.ini - historico verificado; contem apenas placeholder. Arquivo ainda versionado como exemplo intencional.
 - [x] dns/pihole/docker-compose.yml - senha migrada para variavel de ambiente obrigatoria.
@@ -85,6 +93,7 @@ Preparar o repositorio para visibilidade publica e incluir automacao via gh para
 - [x] .github/workflows/restrict-pull-request-authors.yml - removido ao adotar contribuicao aberta.
 
 ## Verification
+
 - [x] 1. Validar sintaxe e ajuda do script: `--help` executado com saida 0.
 - [x] 2. Dry-run do script executado com sucesso em lzocateli/containers.
 - [x] 3. Regras verificadas por `gh api repos/.../branches/main/protection`:
@@ -95,6 +104,7 @@ Preparar o repositorio para visibilidade publica e incluir automacao via gh para
 - [~] 7. Varredura manual de segredos realizada via inspecao de git history. Varredura automatizada recomendada.
 
 ## Decisions
+
 - Escopo do script: reutilizavel para multiplos repositorios.
 - Pull request para main: obrigatorio, sem aprovacao obrigatoria e sem bypass administrativo.
 - Autoria de PR: aberta a qualquer usuario por fork; merge condicionado a checks obrigatorios e conversas resolvidas.
@@ -105,5 +115,6 @@ Preparar o repositorio para visibilidade publica e incluir automacao via gh para
 - Bootstrap: para o push inicial apos ativacao de branch protection, `enforce_admins` foi temporariamente desabilitado via `gh api --method DELETE .../enforce_admins` e reabilitado logo em seguida via `gh api --method POST`.
 
 ## Further considerations
+
 1. [resolvido] Definir se o script deve atualizar regra existente ou sempre recriar: update idempotente implementado (PUT sobreescreve a protecao).
 2. [resolvido] Definir lista de workflows sensiveis que exigirao environment: apenas `publish-image.yml` usa `container-release`.
