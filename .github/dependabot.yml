@@ -41,7 +41,7 @@ updates:
       - /mariadb
       - /mssql-server
       - /nginx
-      - /nginx-geoip2
+      - /geoipupdate
       - /node
       - /oracle
       - /portainer/agent
