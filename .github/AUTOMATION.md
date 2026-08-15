@@ -90,7 +90,7 @@ Pull requests de forks são aceitos e executam o workflow `validate-images.yml` 
 
 O repositório não habilita auto-merge do Dependabot. Toda atualização de base ou Action passa pelos mesmos checks e por revisão humana, especialmente quando altera versão principal ou contrato público.
 
-O check obrigatório da `main` é `Validação obrigatória`. Esse gate agrega catálogo, secrets, dependências e todos os jobs dinâmicos de imagem, falhando quando qualquer validação falhar ou for cancelada. A branch deve estar atualizada antes do merge, todas as conversas devem estar resolvidas e force push ou exclusão da `main` permanecem bloqueados.
+O check obrigatório da `main` é `Validação obrigatória`. Esse gate agrega catálogo, secrets, dependências e todos os jobs dinâmicos de imagem, falhando quando qualquer validação falhar ou for cancelada. O workflow é iniciado em todo pull request para a `main`, sem filtro de caminhos no gatilho, para que o check obrigatório sempre seja reportado; a matriz dinâmica evita builds de imagens não alteradas. A branch deve estar atualizada antes do merge, todas as conversas devem estar resolvidas e force push ou exclusão da `main` permanecem bloqueados.
 
 ## Validar pull requests
 
