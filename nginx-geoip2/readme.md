@@ -46,9 +46,6 @@ https://dev.maxmind.com/geoip/updating-databases?lang=en
 
 - RunGeoIpUpdate.ps1
 
-Pipeline: `pipelines-store/pipeline-templates/execute-geoip2-update.yml`
-
-
 ```bash
 # Para excluir a imgem e o container anterior
 podman rmi $(podman images --filter=reference='nginx-geoipupdate:' -q) -f
