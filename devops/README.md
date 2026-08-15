@@ -6,8 +6,8 @@ SPDX-License-Identifier: MIT
 # DEVOPS
 
 ![Docker Hub](https://img.shields.io/badge/image-lzocateli%2Fdevops-2496ED?logo=docker&logoColor=white)
-![Version](https://img.shields.io/badge/version-cuda--12.4.1-2E7D32)
-![Base](https://img.shields.io/badge/base-nvidia%2Fcuda%3A12.4.1--cudnn--runtime--ubuntu22.04-555555?logo=docker&logoColor=white)
+![Version](https://img.shields.io/badge/version-cuda--12.6.3-2E7D32)
+![Base](https://img.shields.io/badge/base-nvidia%2Fcuda%3A12.6.3--cudnn--runtime--ubuntu24.04-555555?logo=docker&logoColor=white)
 ![Platforms](https://img.shields.io/badge/platforms-linux%2Famd64-607D8B)
 ![Repository code license](https://img.shields.io/badge/repository_code-MIT-1565C0)
 ![Build](https://img.shields.io/badge/build-validado-success)
@@ -19,9 +19,9 @@ Imagem multifuncional para automacao, IaC, CI local e fluxos de conteudo, unific
 | Item | Valor |
 | --- | --- |
 | Imagem | `lzocateli/devops:<tag>` |
-| Tag recomendada (GPU) | `lzocateli/devops:cuda-12.4.1` |
+| Tag recomendada (GPU) | `lzocateli/devops:cuda-12.6.3` |
 | Tag recomendada (CPU) | `lzocateli/devops:cpu` |
-| Imagem base padrao | `nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04` |
+| Imagem base padrao | `nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04` |
 | Plataformas | `linux/amd64` |
 | Usuario padrao | `root` (necessario para ferramentas administrativas e shell de automacao) |
 | Entry point | `/usr/local/bin/devops-entrypoint` |
@@ -33,13 +33,13 @@ Imagem multifuncional para automacao, IaC, CI local e fluxos de conteudo, unific
 
 ### Incluido
 
-- Python 3.11 com `uv` e venv pre-aquecido em `/opt/venv`.
+- Python 3.12 com `uv` e venv pre-aquecido em `/opt/venv`.
 - Azure CLI, Terraform e Ansible (`ansible-dev-tools`, `passlib`).
 - GitHub CLI (`gh`) com versao pinada por `GH_VERSION`.
 - `sqlcmd` (go-sqlcmd Microsoft) com versao pinada por `SQLCMD_VERSION`.
 - Node.js 20, Marp CLI, ffmpeg/ffprobe e dependencias de Chromium headless.
 - zsh, oh-my-posh, zsh-autosuggestions, sshpass, openssh-client, jq e git.
-- Opcional: PyTorch (`cu124` ou `cpu`) + `openai-whisper` com `INSTALL_ML=true`.
+- Opcional: PyTorch (`cu126` ou `cpu`) + `openai-whisper` com `INSTALL_ML=true`.
 - Opcional: Google APIs (`google-api-python-client` e auth libs) com `INSTALL_GOOGLE=true`.
 
 ### Nao incluido
@@ -51,8 +51,8 @@ Imagem multifuncional para automacao, IaC, CI local e fluxos de conteudo, unific
 ## Inicio rapido
 
 ```bash
-docker pull lzocateli/devops:cuda-12.4.1
-docker run --rm -it lzocateli/devops:cuda-12.4.1 zsh
+docker pull lzocateli/devops:cuda-12.6.3
+docker run --rm -it lzocateli/devops:cuda-12.6.3 zsh
 ```
 
 Exemplo minimo executavel (CPU):
@@ -68,7 +68,7 @@ docker run --rm -it \
 ```yaml
 services:
   devops:
-    image: lzocateli/devops:cuda-12.4.1
+    image: lzocateli/devops:cuda-12.6.3
     restart: unless-stopped
     working_dir: /workspace
     volumes:
@@ -90,7 +90,7 @@ services:
 | `INSTALL_GOOGLE` (build arg) | Nao | Nao | `true` | Liga instalacao de libs Google API. |
 | `GH_VERSION` (build arg) | Nao | Nao | `2.92.0` | Versao do GitHub CLI. |
 | `SQLCMD_VERSION` (build arg) | Nao | Nao | `1.10.0` | Versao do go-sqlcmd. |
-| `BASE_IMAGE` (build arg) | Nao | Nao | `nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04` | Define base CUDA ou CPU. |
+| `BASE_IMAGE` (build arg) | Nao | Nao | `nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04` | Define base CUDA ou CPU. |
 
 ### Portas
 
@@ -130,7 +130,7 @@ Build GPU (padrao):
 ```bash
 docker build \
   --pull \
-  --tag lzocateli/devops:cuda-12.4.1 \
+  --tag lzocateli/devops:cuda-12.6.3 \
   devops
 ```
 
@@ -139,7 +139,7 @@ Build CPU sem ML e sem Google APIs:
 ```bash
 docker build \
   --pull \
-  --build-arg BASE_IMAGE=ubuntu:22.04 \
+  --build-arg BASE_IMAGE=ubuntu:24.04 \
   --build-arg INSTALL_ML=false \
   --build-arg INSTALL_GOOGLE=false \
   --tag lzocateli/devops:cpu-slim \
@@ -150,7 +150,7 @@ docker build \
 
 | Tag | Mutabilidade | Compatibilidade | Uso recomendado |
 | --- | --- | --- | --- |
-| `cuda-12.4.1` | Imutavel | GPU NVIDIA (quando disponivel) e CPU | Producao e automacao com ML |
+| `cuda-12.6.3` | Imutavel | GPU NVIDIA (quando disponivel) e CPU | Producao e automacao com ML |
 | `cpu` | Imutavel | Hosts sem GPU | Producao sem aceleracao CUDA |
 | `cpu-slim` | Imutavel | Hosts sem GPU, sem stack ML/Google | Automacao IaC e CI local |
 
@@ -174,7 +174,7 @@ Use **Actions > Publicar imagem de container > Run workflow** com:
 
 - `context_path`: `devops`;
 - `image_name`: `devops`;
-- `image_tag`: tag imutavel (ex.: `cuda-12.4.1`);
+- `image_tag`: tag imutavel (ex.: `cuda-12.6.3`);
 - `dockerfile`: `Dockerfile`;
 - `platforms`: `linux/amd64`.
 
@@ -203,7 +203,7 @@ Use **Actions > Publicar imagem de container > Run workflow** com:
 | Componente | Versao | Licenca | Fonte |
 | --- | --- | --- | --- |
 | Conteudo original deste repositorio | Atual | MIT | `https://github.com/lzocateli/containers` |
-| Imagem base CUDA | `12.4.1-cudnn-runtime-ubuntu22.04` | Conforme upstream | `https://hub.docker.com/r/nvidia/cuda` |
+| Imagem base CUDA | `12.6.3-cudnn-runtime-ubuntu24.04` | Conforme upstream | `https://hub.docker.com/r/nvidia/cuda` |
 | Azure CLI | Variavel no build | Conforme upstream | `https://learn.microsoft.com/cli/azure` |
 | Terraform | Variavel no build | MPL-2.0 | `https://github.com/hashicorp/terraform` |
 | GitHub CLI | `GH_VERSION` | MIT | `https://github.com/cli/cli` |
