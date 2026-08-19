@@ -3,10 +3,19 @@
 # veja README.md desta pasta.
 
 ARG BASE_IMAGE=nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04
+ARG NODE_VERSION=24.15.0
+ARG TERRAFORM_VERSION=1.15.8
+
+FROM node:${NODE_VERSION}-bookworm AS node-runtime
+FROM hashicorp/terraform:${TERRAFORM_VERSION} AS terraform-runtime
+
 FROM ${BASE_IMAGE}
 
 # ---- Re-declara ARGs após FROM (necessário para uso nos RUN abaixo) ---------
 ARG BASE_IMAGE=nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04
+ARG NODE_VERSION=24.15.0
+ARG NPM_VERSION=12.0.2
+ARG TERRAFORM_VERSION=1.15.8
 ARG INSTALL_ML=false
 ARG INSTALL_GOOGLE=true
 ARG GH_VERSION=2.92.0
@@ -31,7 +40,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     UV_PROJECT_ENVIRONMENT=/opt/venv
 
 LABEL org.opencontainers.image.title="devops" \
-    org.opencontainers.image.description="Imagem multifuncional com Python, Azure CLI, Terraform, Ansible, GitHub CLI, Node.js/Marp e ferramentas opcionais de ML" \
+    org.opencontainers.image.description="Imagem multifuncional com Python, Azure CLI, Terraform 1.15.8, Ansible, GitHub CLI, Node.js 24 LTS/Marp e ferramentas opcionais de ML" \
     org.opencontainers.image.source="https://github.com/lzocateli/containers" \
     org.opencontainers.image.documentation="https://github.com/lzocateli/containers/tree/main/devops" \
     org.opencontainers.image.url="https://github.com/lzocateli/containers/tree/main/devops" \
@@ -57,13 +66,8 @@ RUN apt-get update -y && apt-get upgrade -y \
     && update-alternatives --install /usr/bin/python python /usr/bin/python3.12 1 \
     && rm -rf /var/lib/apt/lists/*
 
-# ---- Terraform (HashiCorp apt) ----------------------------------------------
-RUN wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg \
-    && echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" \
-    > /etc/apt/sources.list.d/hashicorp.list \
-    && apt-get update -y \
-    && apt-get install -y --no-install-recommends terraform \
-    && rm -rf /var/lib/apt/lists/*
+# ---- Terraform 1.15.8 (binario oficial HashiCorp) --------------------------
+COPY --from=terraform-runtime /bin/terraform /usr/local/bin/terraform
 
 # ---- Azure CLI --------------------------------------------------------------
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
@@ -96,11 +100,16 @@ RUN ARCH=$(dpkg --print-architecture) \
     && rm -rf /tmp/sqlcmd /tmp/sqlcmd.tar.bz2 \
     && sqlcmd --version
 
-# ---- Node.js 20 + Marp CLI --------------------------------------------------
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y --no-install-recommends nodejs \
-    && npm install -g @marp-team/marp-cli \
-    && rm -rf /var/lib/apt/lists/*
+# ---- Node.js 24 LTS + npm 12 + Marp CLI ------------------------------------
+COPY --from=node-runtime /usr/local/ /usr/local/
+RUN npm install --global "npm@${NPM_VERSION}" \
+    && ln -sf /usr/local/bin/corepack /usr/local/bin/pnpm \
+    && ln -sf /usr/local/bin/corepack /usr/local/bin/pnpx \
+    && ln -sf /usr/local/bin/corepack /usr/local/bin/yarn \
+    && ln -sf /usr/local/bin/corepack /usr/local/bin/yarnpkg \
+    && corepack enable \
+    && npm install --global @marp-team/marp-cli \
+    && npm cache clean --force
 
 # ---- uv (gerenciador Python) -------------------------------------------------
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
