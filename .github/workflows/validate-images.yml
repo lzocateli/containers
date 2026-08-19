@@ -44,7 +44,7 @@ jobs:
           fetch-depth: 0
 
       - name: Configurar uv
-        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           version: "0.9.26"
           enable-cache: false
@@ -260,7 +260,7 @@ jobs:
 
       - name: Enviar resultado ao Code Scanning
         if: always() && matrix.image.validation == 'build' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && hashFiles(format('trivy-{0}.sarif', matrix.image.id)) != ''
-        uses: github/codeql-action/upload-sarif@5595ccaf912efad79be6eef63a5619ff05969be3 # v4.37.6
+        uses: github/codeql-action/upload-sarif@ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd # v4.37.7
         with:
           sarif_file: trivy-${{ matrix.image.id }}.sarif
           category: trivy-${{ matrix.image.id }}

@@ -61,7 +61,8 @@ entrypoint="$("$DOCKER_COMMAND" image inspect --format '{{json .Config.Entrypoin
 version_output="$("$DOCKER_COMMAND" run --rm --read-only "$image_ref" version)"
 [[ "$version_output" == *"v8.30.1"* ]] || fail "versao Gitleaks inesperada: $version_output"
 
-repository_root="$(git rev-parse --show-toplevel)"
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+repository_root="$(cd -- "$script_dir/.." && pwd)"
 if command -v wslpath >/dev/null 2>&1; then
   docker_repository_root="$(wslpath -w "$repository_root")"
 elif command -v cygpath >/dev/null 2>&1; then
