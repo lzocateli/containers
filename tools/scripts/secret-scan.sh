@@ -155,7 +155,7 @@ if [[ "$MODE" == "rewrite" ]]; then
   done
   if [[ "$DRY_RUN" != "true" ]]; then
     [[ "$CONFIRM_REWRITE" == "true" ]] || fail_usage "a reescrita exige --confirm-rewrite"
-    [[ -z "$(git status --porcelain)" ]] || {
+    [[ -z "$(git -c core.autocrlf=true status --porcelain)" ]] || {
       log_error "A reescrita exige working tree limpo; salve ou descarte alteracoes primeiro."
       exit 1
     }
@@ -174,12 +174,16 @@ if [[ "$MODE" == "rewrite" ]]; then
     log INFO "[DRY-RUN] Reescrita planejada: git ${FILTER_ARGS[*]}"
     exit 0
   fi
-  command -v git-filter-repo >/dev/null 2>&1 || git filter-repo --version >/dev/null 2>&1 || {
+  if command -v git-filter-repo >/dev/null 2>&1; then
+    FILTER_REPO_COMMAND=git-filter-repo
+  elif command -v git-filter-repo.exe >/dev/null 2>&1; then
+    FILTER_REPO_COMMAND=git-filter-repo.exe
+  else
     log_error "git-filter-repo nao foi encontrado. Instale-o antes da reescrita."
     exit 1
-  }
+  fi
   log WARN "Reescrevendo historico; remotes e clones existentes exigirao coordenacao."
-  git "${FILTER_ARGS[@]}"
+  "$FILTER_REPO_COMMAND" "${FILTER_ARGS[@]}"
   log INFO "Historico reescrito. Revogue credenciais, force push autorizado e execute --history novamente."
   exit 0
 fi
