@@ -160,7 +160,7 @@ if [[ "$MODE" == "rewrite" ]]; then
       exit 1
     }
   fi
-  FILTER_ARGS=(filter-repo --force)
+  FILTER_ARGS=(--force)
   if ((${#REWRITE_PATHS[@]} > 0)); then
     FILTER_ARGS+=(--invert-paths)
     for rewrite_path in "${REWRITE_PATHS[@]}"; do
