@@ -1,0 +1,39 @@
+# Configuracao local e secrets
+.env
+.env.*
+!.env.example
+secrets/
+credentials/
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Dados persistentes e backups
+data/
+backups/
+backup/
+*.bak
+*.dump
+*.sql.gz
+
+# Relatorios, logs e caches locais
+*.log
+*.report
+*.sarif
+.cache/
+logs/
+tmp/
+temp/
+
+# Artefatos de build e testes
+coverage/
+node_modules/
+__pycache__/
+*.py[cod]
+
+# Editores e sistema operacional
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

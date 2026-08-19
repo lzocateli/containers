@@ -18,6 +18,7 @@
     { "id": "mssql-server", "imageName": "mssql-server", "context": "mssql-server", "dockerfile": "Dockerfile", "platforms": ["linux/amd64"], "scanPlatform": "linux/amd64", "validation": "check", "reason": "Build e smoke test exigem recursos e licença específicos." },
     { "id": "nginx", "imageName": "nginx", "context": "nginx", "dockerfile": "Dockerfile", "platforms": ["linux/amd64"], "scanPlatform": "linux/amd64", "validation": "build" },
     { "id": "geoipupdate", "imageName": "geoipupdate", "context": "geoipupdate", "dockerfile": "Dockerfile", "platforms": ["linux/amd64"], "scanPlatform": "linux/amd64", "validation": "build" },
+    { "id": "gitleaks", "imageName": "gitleaks", "context": "gitleaks", "dockerfile": "Dockerfile", "platforms": ["linux/amd64", "linux/arm64"], "scanPlatform": "linux/amd64", "validation": "build", "smokeTest": "scripts/smoke-test.sh" },
     { "id": "node", "imageName": "node", "context": "node", "dockerfile": "Dockerfile", "platforms": ["linux/amd64"], "scanPlatform": "linux/amd64", "validation": "build" },
     { "id": "oracle", "imageName": "oracle", "context": "oracle", "dockerfile": "Dockerfile", "platforms": ["linux/amd64"], "scanPlatform": "linux/amd64", "validation": "check", "reason": "Build e smoke test exigem recursos e licença específicos." },
     { "id": "postgres", "imageName": "postgresql", "context": "postgres", "dockerfile": "Dockerfile", "platforms": ["linux/amd64"], "scanPlatform": "linux/amd64", "validation": "build" },
