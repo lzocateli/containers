@@ -24,7 +24,7 @@ Uso: ${PROGRAM_NAME} [OPCOES]
 
 O que faz:
   Detecta credenciais com Gitleaks no historico Git, no indice staged ou em um
-  diretorio. O modo history examina todas as referencias locais (--all).
+  diretorio. O modo history examina o historico alcancavel pelo HEAD atual.
 
 Dependencias:
   Bash 5.1 ou superior; Git; Gitleaks 8.30.1 ou Docker com acesso ao daemon.
@@ -215,7 +215,7 @@ fi
 
 case "$MODE" in
   history)
-    SCAN_ARGS=(git --redact --report-format json --report-path "/reports/$(basename -- "$REPORT_FILE")" --log-opts="--all" .)
+    SCAN_ARGS=(git --redact --report-format json --report-path "/reports/$(basename -- "$REPORT_FILE")" --log-opts="HEAD" .)
     ;;
   staged)
     SCAN_ARGS=(stdin --redact --report-format json --report-path "/reports/$(basename -- "$REPORT_FILE")")

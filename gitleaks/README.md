@@ -71,7 +71,7 @@ docker run --rm --read-only \
   --volume "$PWD:/repo:ro" \
   --workdir /repo \
   lzocateli/gitleaks:8.30.1 \
-  git --redact --log-opts="--all" .
+  git --redact --log-opts="HEAD" .
 ```
 
 Escanear somente o diff staged sem permitir escrita no repositorio:
