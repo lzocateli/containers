@@ -11,7 +11,7 @@ RUN apk add --no-cache git \
   && git clone --depth 1 --branch "${GITLEAKS_VERSION}" https://github.com/gitleaks/gitleaks.git . \
   && go get "golang.org/x/crypto@${X_CRYPTO_VERSION}" "golang.org/x/text@${X_TEXT_VERSION}" \
   && go mod tidy \
-  && CGO_ENABLED=0 go build -trimpath -ldflags="-s -w -X github.com/gitleaks/gitleaks/v8/version.Version=${GITLEAKS_VERSION#v}" -o /out/gitleaks . \
+  && CGO_ENABLED=0 go build -trimpath -ldflags="-s -w -X=github.com/zricethezav/gitleaks/v8/version.Version=${GITLEAKS_VERSION}" -o /out/gitleaks . \
   && apk del git
 
 FROM alpine:3.22@sha256:14358309a308569c32bdc37e2e0e9694be33a9d99e68afb0f5ff33cc1f695dce
