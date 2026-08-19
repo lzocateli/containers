@@ -1,6 +1,6 @@
 # Controle de versão e automação
-.git
 .gitignore
+.git/
 .github
 
 # Configuração local, secrets e credenciais
