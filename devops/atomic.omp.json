@@ -146,34 +146,6 @@
         {
           "properties": {
             "cache_duration": "none",
-            "command": "if (Test-Path ./main.tf) { Write-Output 'true' } else { Write-Output 'false' }",
-            "shell": "pwsh"
-          },
-          "leading_diamond": "\ue0b6",
-          "trailing_diamond": "\ue0b4 ",
-          "template": "{{ if eq .Output \"true\" }}\udb84\udc62 Terraform{{ end }}",
-          "foreground": "#000000",
-          "background": "#9900ff",
-          "type": "command",
-          "style": "diamond"
-        },
-        {
-          "properties": {
-            "cache_duration": "none",
-            "command": "test -f main.tf && echo true || echo false",
-            "shell": "{{ env.POSH_SHELL }}"
-          },
-          "leading_diamond": "\ue0b6",
-          "trailing_diamond": "\ue0b4 ",
-          "template": "{{ if eq .Output \"true\" }}\udb84\udc62 Terraform{{ end }}",
-          "foreground": "#000000",
-          "background": "#9900ff",
-          "type": "command",
-          "style": "diamond"
-        },
-        {
-          "properties": {
-            "cache_duration": "none",
             "fetch_package_manager": true,
             "npm_icon": " <#cc3a3a>\ue5fa</> ",
             "yarn_icon": " <#348cba>\ue6a7</>"

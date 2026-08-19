@@ -1,0 +1,35 @@
+# Normalize text files to LF across Windows, Git Bash, WSL and CI.
+* text=auto eol=lf working-tree-encoding=UTF-8
+
+# Repository configuration and documentation.
+*.json text eol=lf
+*.md text eol=lf
+*.toml text eol=lf
+*.xml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Executable scripts must keep LF for Bash and POSIX runners.
+.githooks/* text eol=lf
+*.bash text eol=lf
+*.sh text eol=lf
+
+# Windows scripts remain text and are normalized consistently in the repository.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=lf
+*.psm1 text eol=lf
+
+# Do not inspect binary assets as text.
+*.7z binary
+*.dll binary
+*.exe binary
+*.gif binary
+*.ico binary
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.pdf binary
+*.tar binary
+*.tar.gz binary
+*.zip binary

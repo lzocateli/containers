@@ -1,0 +1,41 @@
+# Controle de versao e automacao
+.git
+.gitignore
+.github
+
+# Configuracao local, secrets e credenciais
+.env
+.env.*
+secrets/
+credentials/
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Dados persistentes, backups e artefatos
+data/
+backups/
+backup/
+*.bak
+*.dump
+*.sql.gz
+*.log
+*.report
+*.sarif
+.cache/
+logs/
+tmp/
+temp/
+
+# Documentacao e arquivos locais
+README.md
+readme.md
+compose*.yml
+compose*.yaml
+docker-compose*.yml
+docker-compose*.yaml
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
