@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 ![Docker Hub](https://img.shields.io/badge/image-lzocateli%2Fgitleaks-2496ED?logo=docker&logoColor=white)
 ![Version](https://img.shields.io/badge/version-8.30.1-2E7D32)
-![Base](https://img.shields.io/badge/base-zricethezav%2Fgitleaks%3Av8.30.1-555555?logo=docker&logoColor=white)
+![Base](https://img.shields.io/badge/base-golang%3A1.25--alpine%20%2B%20alpine%3A3.22-555555?logo=docker&logoColor=white)
 ![Platforms](https://img.shields.io/badge/platforms-linux%2Famd64%20%7C%20linux%2Farm64-607D8B)
 ![Repository code license](https://img.shields.io/badge/repository_code-MIT-1565C0)
 ![Build](https://img.shields.io/badge/build-validado-success)
@@ -21,8 +21,10 @@ volumes obrigatorios ou servico persistente.
 | Item | Valor |
 | --- | --- |
 | Imagem | `lzocateli/gitleaks:8.30.1` |
-| Imagem base | `zricethezav/gitleaks:v8.30.1` |
-| Digest da base | `sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f` |
+| Imagem base de build | `golang:1.25-alpine` |
+| Digest da base de build | `sha256:1e0126852075c9c60731c8ba49088448b91f63e2aed97ca9d1a9791622a05946` |
+| Imagem base runtime | `alpine:3.22` |
+| Digest da base runtime | `sha256:14358309a308569c32bdc37e2e0e9694be33a9d99e68afb0f5ff33cc1f695dce` |
 | Gitleaks | `8.30.1` |
 | Plataformas | `linux/amd64`, `linux/arm64` |
 | Usuario padrao | `root` (contrato upstream; sem shell ou daemon adicional) |
@@ -38,7 +40,8 @@ volumes obrigatorios ou servico persistente.
 
 ### Incluido
 
-- Gitleaks 8.30.1 e sua configuracao upstream padrao.
+- Gitleaks 8.30.1 compilado do codigo upstream com Go 1.25.
+- Dependencias Go `x/crypto v0.55.0` e `x/text v0.41.0` atualizadas para eliminar CVEs.
 - Entry point `gitleaks` para os comandos `git`, `dir` e `stdin`.
 - Labels OCI do projeto `lzocateli/containers`.
 
@@ -236,7 +239,7 @@ revisada e sem inserir o valor secreto na allowlist.
 - O scanner nao revoga credenciais nem limpa historico Git.
 - O scan historico cobre as refs presentes no clone; refs remotas removidas
   anteriormente exigem auditoria adicional.
-- A imagem upstream e mantida como CLI; nao ha servidor ou endpoint de health.
+- A ferramenta upstream e mantida como CLI; nao ha servidor ou endpoint de health.
 - Relatorios podem conter contexto sensivel; use `--redact` e controle o destino.
 
 ## Licencas e fontes
@@ -245,7 +248,8 @@ revisada e sem inserir o valor secreto na allowlist.
 | --- | --- | --- | --- |
 | Conteudo original deste repositorio | Atual | MIT | `https://github.com/lzocateli/containers` |
 | Gitleaks | 8.30.1 | MIT | `https://github.com/gitleaks/gitleaks` |
-| Imagem base upstream | v8.30.1 | MIT | `https://hub.docker.com/r/zricethezav/gitleaks` |
+| Go toolchain de build | 1.25 | BSD-3-Clause | `https://go.dev/` |
+| Imagem base runtime | Alpine 3.22 | MIT | `https://www.alpinelinux.org/` |
 
 O badge MIT descreve somente o conteudo original deste repositorio. Componentes
 de terceiros permanecem sujeitos aos seus termos e avisos de licenca. Consulte a
@@ -254,4 +258,4 @@ e preserve os avisos upstream.
 
 ## Historico de alteracoes
 
-- `8.30.1`: adiciona a imagem CLI baseada no digest upstream de Gitleaks 8.30.1.
+- `8.30.1`: compila Gitleaks do codigo upstream com toolchain Go atualizada e runtime Alpine atualizado.
