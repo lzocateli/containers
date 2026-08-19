@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+readonly HOOK_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+readonly REPOSITORY_ROOT="$(cd -- "$HOOK_DIR/.." && pwd)"
+exec bash -- "$REPOSITORY_ROOT/tools/scripts/secret-scan.sh" --staged
