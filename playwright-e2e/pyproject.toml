@@ -1,0 +1,12 @@
+[project]
+name = "playwright-e2e-image"
+version = "0.1.0"
+description = "Dependencias da imagem base para testes E2E com Playwright"
+requires-python = ">=3.12"
+dependencies = [
+  "playwright==1.49.0",
+  "pytest==8.3.4",
+  "pytest-html==4.1.1",
+  "pytest-playwright==0.6.2",
+  "pytest-xdist==3.6.1",
+]
