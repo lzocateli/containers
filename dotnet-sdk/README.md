@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 # .NET 10 SDK
 
 ![Docker Hub](https://img.shields.io/badge/image-lzocateli%2Fdotnet--sdk-2496ED?logo=docker&logoColor=white)
-![Version](https://img.shields.io/badge/version-10.0.302--noble-2E7D32)
+![Version](https://img.shields.io/badge/version-10.0.400--noble-2E7D32)
 ![Base](https://img.shields.io/badge/base-dotnet%2Fsdk%3A10.0--noble-555555?logo=docker&logoColor=white)
 ![Platforms](https://img.shields.io/badge/platforms-linux%2Famd64%20%7C%20linux%2Farm64-607D8B)
 ![Repository code license](https://img.shields.io/badge/repository_code-MIT-1565C0)
@@ -18,7 +18,7 @@ Imagem do .NET 10 SDK para compilação, testes e publicação de aplicações e
 
 | Item | Valor |
 | --- | --- |
-| Imagem | `lzocateli/dotnet-sdk:10.0.302-noble` |
+| Imagem | `lzocateli/dotnet-sdk:10.0.400-noble` |
 | Imagem base | Digest do manifest multi-arquitetura de `mcr.microsoft.com/dotnet/sdk:10.0-noble` |
 | Plataformas | `linux/amd64`, `linux/arm64` |
 | Usuário padrão | `1654:1654` (`APP_UID` da imagem oficial) |
@@ -31,7 +31,7 @@ Imagem do .NET 10 SDK para compilação, testes e publicação de aplicações e
 
 ### Incluído
 
-- .NET SDK 10.0.302 e os runtimes fornecidos pela imagem oficial Microsoft;
+- .NET SDK 10.0.400 e os runtimes fornecidos pela imagem oficial Microsoft;
 - `curl`, `iputils-ping`, `libxml2-dev`, `net-tools` e `telnet` instalados dos repositórios Ubuntu Noble;
 - diretório `/workspace` gravável pelo usuário não root.
 
@@ -45,8 +45,8 @@ Imagem do .NET 10 SDK para compilação, testes e publicação de aplicações e
 ## Início rápido
 
 ```bash
-docker pull lzocateli/dotnet-sdk:10.0.302-noble
-docker run --rm lzocateli/dotnet-sdk:10.0.302-noble
+docker pull lzocateli/dotnet-sdk:10.0.400-noble
+docker run --rm lzocateli/dotnet-sdk:10.0.400-noble
 ```
 
 Para compilar um projeto no diretório atual:
@@ -54,7 +54,7 @@ Para compilar um projeto no diretório atual:
 ```bash
 docker run --rm \
   --volume "$PWD:/workspace" \
-  lzocateli/dotnet-sdk:10.0.302-noble \
+  lzocateli/dotnet-sdk:10.0.400-noble \
   dotnet publish --configuration Release --output /workspace/out
 ```
 
@@ -65,7 +65,7 @@ O diretório montado deve permitir escrita pelo UID `1654`. Não monte o socket 
 ```yaml
 services:
   build:
-    image: lzocateli/dotnet-sdk:10.0.302-noble
+    image: lzocateli/dotnet-sdk:10.0.400-noble
     user: "1654:1654"
     working_dir: /workspace
     volumes:
@@ -93,7 +93,7 @@ Sem entrypoint fixo, o primeiro argumento de `docker run` pode substituir `dotne
 
 ```dockerfile
 # syntax=docker/dockerfile:1
-FROM lzocateli/dotnet-sdk:10.0.302-noble AS build
+FROM lzocateli/dotnet-sdk:10.0.400-noble AS build
 WORKDIR /workspace
 COPY --chown=1654:1654 . .
 RUN --mount=type=cache,target=/home/app/.nuget/packages,uid=1654,gid=1654 \
@@ -108,7 +108,7 @@ ENTRYPOINT ["dotnet", "Aplicacao.dll"]
 ## Build local
 
 ```bash
-docker build --pull --tag lzocateli/dotnet-sdk:10.0.302-noble dotnet-sdk
+docker build --pull --tag lzocateli/dotnet-sdk:10.0.400-noble dotnet-sdk
 ```
 
 Para múltiplas plataformas:
@@ -116,7 +116,7 @@ Para múltiplas plataformas:
 ```bash
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  --tag lzocateli/dotnet-sdk:10.0.302-noble \
+  --tag lzocateli/dotnet-sdk:10.0.400-noble \
   dotnet-sdk
 ```
 
@@ -124,7 +124,7 @@ docker buildx build \
 
 | Tag | Mutabilidade | Compatibilidade | Uso recomendado |
 | --- | --- | --- | --- |
-| `10.0.302-noble` | Imutável | .NET SDK 10.0.302 em Ubuntu 24.04 | Builds versionados e CI |
+| `10.0.400-noble` | Imutável | .NET SDK 10.0.400 em Ubuntu 24.04 | Builds versionados e CI |
 
 Não há política para `latest`. Uma atualização do SDK, da base, dos pacotes APT ou do contrato exige nova tag imutável e nova validação.
 
@@ -134,9 +134,9 @@ Antes da publicação, execute:
 
 ```bash
 docker buildx build --check --file dotnet-sdk/Dockerfile dotnet-sdk
-docker build --pull --tag lzocateli/dotnet-sdk:10.0.302-noble dotnet-sdk
-docker run --rm lzocateli/dotnet-sdk:10.0.302-noble dotnet --info
-docker inspect lzocateli/dotnet-sdk:10.0.302-noble
+docker build --pull --tag lzocateli/dotnet-sdk:10.0.400-noble dotnet-sdk
+docker run --rm lzocateli/dotnet-sdk:10.0.400-noble dotnet --info
+docker inspect lzocateli/dotnet-sdk:10.0.400-noble
 ```
 
 Confirme também os ignores, as duas plataformas, o usuário não root, as ferramentas instaladas, scan de vulnerabilidades, SBOM e proveniência.
@@ -147,7 +147,7 @@ Use **Actions > Publicar imagem de container > Run workflow** com:
 
 - `context_path`: `dotnet-sdk`;
 - `image_name`: `dotnet-sdk`;
-- `image_tag`: `10.0.302-noble`;
+- `image_tag`: `10.0.400-noble`;
 - `dockerfile`: `Dockerfile`;
 - `platforms`: `linux/amd64,linux/arm64`.
 
@@ -168,7 +168,7 @@ Não há dados persistentes para backup ou restore. Para rollback, volte à tag 
 
 - As ferramentas de rede aumentam a superfície da imagem e destinam-se somente a diagnóstico durante builds.
 - A imagem não oferece daemon Docker nem suporte a Docker-in-Docker.
-- O SDK oficial 10.0.302 pode emitir um aviso ao verificar workloads sob UID não root, mesmo sem workloads instalados.
+- O SDK oficial 10.0.400 pode emitir um aviso ao verificar workloads sob UID não root, mesmo sem workloads instalados.
 - Em 2026-07-28, o Docker Scout reportou zero CVEs críticas e 46 altas na imagem de build: 41 atribuídas ao pacote de headers do kernel Ubuntu e cinco a `System.Security.Cryptography.Xml` 10.0.6. Não promova esta imagem a runtime e repita o scan antes da publicação.
 - Pacotes APT são resolvidos no build; registre o digest publicado e reconstrua sob nova tag após atualizações.
 
@@ -184,4 +184,5 @@ O badge MIT descreve somente o conteúdo original deste repositório. A imagem i
 
 ## Histórico de alterações
 
+- `10.0.400-noble`: atualização para .NET SDK 10.0.400 com imagem base oficial fixada por digest.
 - `10.0.302-noble`: migração para .NET 10, execução não root, ferramentas de diagnóstico e metadados OCI.

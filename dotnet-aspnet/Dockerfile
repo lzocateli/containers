@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1
 
-FROM mcr.microsoft.com/dotnet/aspnet@sha256:1fa23fc4872d95fd71c2833ebe65d7e84a43b2d51a31d119516852f13d9505a7 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet@sha256:a4556ed033fa96f984bb7a8d348851cb2d36b1281dd2420070045f664fbb5f94 AS runtime
 
-ARG IMAGE_VERSION="10.0.10-noble"
+ARG IMAGE_VERSION="10.0.11-noble"
 
 LABEL org.opencontainers.image.title="lzocateli/dotnet-aspnet" \
 	org.opencontainers.image.description="Runtime ASP.NET Core 10 em Ubuntu Noble para aplicações em contêineres produtivos." \
