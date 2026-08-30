@@ -1,9 +1,9 @@
 # syntax=docker/dockerfile:1
-FROM golang:1.25.7-bookworm AS gosu-builder
+FROM golang:1.27.0-bookworm AS gosu-builder
 
 RUN CGO_ENABLED=0 go install -trimpath -ldflags="-s -w" github.com/tianon/gosu@1.19
 
-FROM mariadb:11.4.11-ubi9
+FROM mariadb:11.8.9-ubi9
 
 COPY --chmod=0755 --from=gosu-builder /go/bin/gosu /usr/local/bin/gosu
 
