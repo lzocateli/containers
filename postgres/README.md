@@ -7,7 +7,7 @@
 ![Repository code license](https://img.shields.io/badge/repository_code-MIT-1565C0)
 ![Build](https://img.shields.io/badge/build-workflow__dispatch-success)
 
-Imagem PostgreSQL 18.4 para aplicações que precisam de busca vetorial. Ela compila pgvector 0.8.6 sobre a imagem oficial `postgres:18.4-bookworm`, acrescenta metadados OCI, locale UTF-8 e um comando de health check, preservando o entrypoint oficial do PostgreSQL.
+Imagem PostgreSQL 18.4 para aplicações que precisam de busca vetorial. Ela compila pgvector 0.8.6 sobre a imagem oficial `postgres:18.4-bookworm`, recompila o `gosu` 1.19 com Go 1.24.13, acrescenta metadados OCI, locale UTF-8 e um comando de health check, preservando o entrypoint oficial do PostgreSQL.
 
 O `pgvector` está instalado, mas a extensão `vector` precisa ser habilitada em cada database. Os scripts de bootstrap incluídos também habilitam `pg_trgm`, `pgcrypto` e `citext` no database inicial.
 
@@ -20,6 +20,7 @@ O `pgvector` está instalado, mas a extensão `vector` precisa ser habilitada em
 | PostgreSQL | `18.4` |
 | pgvector | `0.8.6` |
 | Fonte pgvector | commit `8ee86c96f0fd72390f890aa8a336fda6d3ab4c6c` da tag `v0.8.6` |
+| gosu | `1.19`, commit `6456aaa0f3c854d199d0f037f068eb97515b7513`, recompilado com Go `1.24.13` |
 | Plataforma publicada | `linux/amd64` |
 | Processo principal | `postgres` como usuário `postgres` (`999:999`) |
 | Entry point | `/usr/local/bin/docker-entrypoint.sh` |
