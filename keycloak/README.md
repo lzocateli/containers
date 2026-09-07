@@ -33,7 +33,7 @@ Verificacao realizada com a matriz oficial do Keycloak 26.7.0:
 
 | Imagem do repositorio | Matriz oficial do Keycloak | Status |
 | --- | --- | --- |
-| `lzocateli/postgresql:18.4-pgvector0.8.5-bookworm` | PostgreSQL `18.x`, `17.x`, `16.x`, `15.x` e `14.x` | **Suportada oficialmente** |
+| `lzocateli/postgresql:18.4-pgvector0.8.6-bookworm` | PostgreSQL `18.x`, `17.x`, `16.x`, `15.x` e `14.x` | **Suportada oficialmente** |
 | `lzocateli/mssql-server:2025-CU7-ubuntu-24.04` | SQL Server `2022` e `2019` | **Nao suportada oficialmente** |
 
 SQL Server 2025 pode funcionar com o driver `mssql` incluido, mas fica fora da matriz suportada pelo Keycloak. Para producao com suporte do fornecedor, use PostgreSQL 18.4 deste repositorio ou uma versao SQL Server suportada. Azure SQL Database e Azure SQL Managed Instance `latest` aparecem separadamente como suportados e nao tornam SQL Server 2025 local uma configuracao suportada.
@@ -73,7 +73,7 @@ Esta e a combinacao recomendada entre as imagens atuais do repositorio:
 ```yaml
 services:
   postgres:
-    image: lzocateli/postgresql:18.4-pgvector0.8.5-bookworm
+    image: lzocateli/postgresql:18.4-pgvector0.8.6-bookworm
     environment:
       POSTGRES_USER: ${KC_DB_USERNAME}
       POSTGRES_PASSWORD: ${KC_DB_PASSWORD}

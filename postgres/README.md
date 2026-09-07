@@ -1,13 +1,13 @@
 # PostgreSQL com pgvector
 
 ![Docker Hub](https://img.shields.io/badge/image-lzocateli%2Fpostgresql-2496ED?logo=docker&logoColor=white)
-![Version](https://img.shields.io/badge/version-18.4--pgvector0.8.5--bookworm-2E7D32)
-![Base](https://img.shields.io/badge/base-pgvector%2Fpgvector%3A0.8.5--pg18--bookworm-555555?logo=docker&logoColor=white)
+![Version](https://img.shields.io/badge/version-18.4--pgvector0.8.6--bookworm-2E7D32)
+![Base](https://img.shields.io/badge/base-postgres%3A18.4--bookworm-555555?logo=postgresql&logoColor=white)
 ![Platforms](https://img.shields.io/badge/platforms-linux%2Famd64-607D8B)
 ![Repository code license](https://img.shields.io/badge/repository_code-MIT-1565C0)
 ![Build](https://img.shields.io/badge/build-workflow__dispatch-success)
 
-Imagem PostgreSQL 18 para aplicações que precisam de busca vetorial. Ela acrescenta metadados OCI, locale UTF-8 e um comando de health check à imagem `pgvector/pgvector`, preservando o entrypoint oficial do PostgreSQL.
+Imagem PostgreSQL 18.4 para aplicações que precisam de busca vetorial. Ela compila pgvector 0.8.6 sobre a imagem oficial `postgres:18.4-bookworm`, acrescenta metadados OCI, locale UTF-8 e um comando de health check, preservando o entrypoint oficial do PostgreSQL.
 
 O `pgvector` está instalado, mas a extensão `vector` precisa ser habilitada em cada database. Os scripts de bootstrap incluídos também habilitam `pg_trgm`, `pgcrypto` e `citext` no database inicial.
 
@@ -15,10 +15,11 @@ O `pgvector` está instalado, mas a extensão `vector` precisa ser habilitada em
 
 | Item | Valor |
 | --- | --- |
-| Imagem | `lzocateli/postgresql:18.4-pgvector0.8.5-bookworm` |
-| Imagem base | `pgvector/pgvector:0.8.5-pg18-bookworm` |
+| Imagem | `lzocateli/postgresql:18.4-pgvector0.8.6-bookworm` |
+| Imagem base | `postgres:18.4-bookworm@sha256:882236b897e39051d2368c5ccc6cda944904723506b2dfc97f2a8f5bc9afa382` |
 | PostgreSQL | `18.4` |
-| pgvector | `0.8.5` |
+| pgvector | `0.8.6` |
+| Fonte pgvector | commit `8ee86c96f0fd72390f890aa8a336fda6d3ab4c6c` da tag `v0.8.6` |
 | Plataforma publicada | `linux/amd64` |
 | Processo principal | `postgres` como usuário `postgres` (`999:999`) |
 | Entry point | `/usr/local/bin/docker-entrypoint.sh` |
@@ -27,7 +28,7 @@ O `pgvector` está instalado, mas a extensão `vector` precisa ser habilitada em
 | Volume de dados | `/var/lib/postgresql` |
 | Diretório de trabalho | `/var/lib/postgresql` |
 | Health check | Comando `postgresql-healthcheck`, configurado pelos exemplos de runtime |
-| Código-fonte | <https://github.com/lzocateli/containers/tree/main/postgresql> |
+| Código-fonte | <https://github.com/lzocateli/containers/tree/main/postgres> |
 | Docker Hub | <https://hub.docker.com/r/lzocateli/postgresql> |
 
 O entrypoint pode iniciar como `root` para preparar diretórios e então reduz privilégios para o usuário `postgres`. O Dockerfile não declara `HEALTHCHECK`; o Compose e o script Podman configuram explicitamente o comando fornecido pela imagem.
@@ -38,7 +39,7 @@ O entrypoint pode iniciar como `root` para preparar diretórios e então reduz p
 
 | Arquivo | Responsabilidade |
 | --- | --- |
-| `Dockerfile` | Define PostgreSQL 18 com pgvector e preserva o entrypoint oficial da imagem base. |
+| `Dockerfile` | Compila pgvector 0.8.6 sobre PostgreSQL 18.4 e preserva o entrypoint oficial da imagem base. |
 | `init/00-extensions.sql` | Habilita `vector`, `pg_trgm`, `pgcrypto` e `citext` no database criado no primeiro bootstrap. |
 | `init/10-schemas.sql` | Cria o schema configurado para a aplicação. |
 | `init/20-roles.sh` | Cria, opcionalmente, uma role de runtime sem expor sua senha em arquivo SQL. |
@@ -67,13 +68,13 @@ O Docker Compose e o exemplo de configuração estão nas seções [Persistênci
 Baixe a imagem publicada:
 
 ```bash
-docker pull lzocateli/postgresql:18.4-pgvector0.8.5-bookworm
+docker pull lzocateli/postgresql:18.4-pgvector0.8.6-bookworm
 ```
 
 Ou com Podman:
 
 ```bash
-podman pull lzocateli/postgresql:18.4-pgvector0.8.5-bookworm
+podman pull lzocateli/postgresql:18.4-pgvector0.8.6-bookworm
 ```
 
 Exemplo mínimo com health check e persistência:
@@ -92,7 +93,7 @@ docker run --name postgresql \
   --health-interval 10s \
   --health-timeout 5s \
   --health-retries 6 \
-  lzocateli/postgresql:18.4-pgvector0.8.5-bookworm
+  lzocateli/postgresql:18.4-pgvector0.8.6-bookworm
 ```
 
 Confirme a inicialização com `docker inspect --format '{{.State.Health.Status}}' postgresql`.
@@ -244,7 +245,7 @@ O script:
 2. Cria o bind mount de dados e ajusta sua propriedade para o UID/GID do PostgreSQL no namespace rootless.
 3. Monta o diretório `init/` versionado como bootstrap somente leitura.
 4. Remove um contêiner parado com o mesmo nome.
-5. Inicia `lzocateli/postgresql:18.4-pgvector0.8.5-bookworm` com bind mounts para dados, scripts e backups.
+5. Inicia `lzocateli/postgresql:18.4-pgvector0.8.6-bookworm` com bind mounts para dados, scripts e backups.
 6. Aguarda o health check da imagem, que confirma disponibilidade do database e do servidor PostgreSQL definitivo.
 7. Habilita `vector`, `pg_trgm`, `pgcrypto` e `citext` no database configurado, mesmo quando o diretório externo não contém o script padrão de extensões.
 
@@ -272,7 +273,7 @@ Exemplo de montagem persistente:
 ```yaml
 services:
   db:
-    image: lzocateli/postgresql:18.4-pgvector0.8.5-bookworm
+    image: lzocateli/postgresql:18.4-pgvector0.8.6-bookworm
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
@@ -300,21 +301,21 @@ Execute os comandos a partir deste diretório.
 Build com Docker:
 
 ```bash
-docker build --pull --tag lzocateli/postgresql:18.4-pgvector0.8.5-bookworm .
+docker build --pull --tag lzocateli/postgresql:18.4-pgvector0.8.6-bookworm .
 ```
 
 Build com Podman:
 
 ```bash
-podman build --pull --tag lzocateli/postgresql:18.4-pgvector0.8.5-bookworm .
+podman build --pull --tag lzocateli/postgresql:18.4-pgvector0.8.6-bookworm .
 ```
 
 ## Tags e compatibilidade
 
 | Tag | Mutabilidade | Compatibilidade | Uso recomendado |
 | --- | --- | --- | --- |
-| `18.4-pgvector0.8.5-bookworm` | Imutável | PostgreSQL 18.4, pgvector 0.8.5 e Debian Bookworm | Produção |
-| `18.4-pgvector0.8.5-bookworm-rN` | Imutável | Revisão da mesma combinação upstream | Correções da imagem |
+| `18.4-pgvector0.8.6-bookworm` | Imutável | PostgreSQL 18.4, pgvector 0.8.6 e Debian Bookworm | Produção |
+| `18.4-pgvector0.8.6-bookworm-rN` | Imutável | Revisão da mesma combinação upstream | Correções da imagem |
 
 Não há política de publicação para `latest`. Novas versões do PostgreSQL, pgvector, Debian ou do contrato da imagem recebem uma nova tag. Para implantação reprodutível, registre também o digest publicado.
 
@@ -326,7 +327,7 @@ Use **Actions > Publicar imagem de container > Run workflow** com:
 | --- | --- |
 | `context_path` | `postgresql` |
 | `image_name` | `postgresql` |
-| `image_tag` | `18.4-pgvector0.8.5-bookworm` ou uma revisão imutável |
+| `image_tag` | `18.4-pgvector0.8.6-bookworm` ou uma revisão imutável |
 | `dockerfile` | `Dockerfile` |
 | `platforms` | `linux/amd64` |
 | `update_dockerhub_readme` | `true` |
@@ -344,7 +345,7 @@ docker buildx build --check --file Dockerfile .
 Confirme a versão do PostgreSQL:
 
 ```bash
-docker run --rm --entrypoint psql lzocateli/postgresql:18.4-pgvector0.8.5-bookworm --version
+docker run --rm --entrypoint psql lzocateli/postgresql:18.4-pgvector0.8.6-bookworm --version
 ```
 
 Inicie uma instância temporária apenas para validar saúde:
@@ -352,7 +353,7 @@ Inicie uma instância temporária apenas para validar saúde:
 ```bash
 docker run --rm \
   -e POSTGRES_PASSWORD=senha-temporaria-segura \
-  lzocateli/postgresql:18.4-pgvector0.8.5-bookworm
+  lzocateli/postgresql:18.4-pgvector0.8.6-bookworm
 ```
 
 Para uma validação completa, use um diretório temporário do host como bind mount, crie database e usuário, execute um script de inicialização e confirme que os dados permanecem após remover e recriar o contêiner.
@@ -434,7 +435,7 @@ O segundo comando altera o database de destino; use somente em uma instância de
 | --- | --- | --- | --- |
 | Configuração deste repositório | Atual | MIT | <https://github.com/lzocateli/containers> |
 | PostgreSQL | 18.4 | PostgreSQL License | <https://www.postgresql.org/about/licence/> |
-| pgvector | 0.8.5 | PostgreSQL License | <https://github.com/pgvector/pgvector> |
+| pgvector | 0.8.6 | PostgreSQL License | <https://github.com/pgvector/pgvector> |
 | Imagem oficial PostgreSQL | 18.4 Bookworm | Licenças dos componentes distribuídos | <https://github.com/docker-library/postgres> |
 | Debian | Bookworm | Licenças por pacote | <https://www.debian.org/legal/licenses/> |
 
@@ -444,5 +445,5 @@ O badge MIT descreve somente o conteúdo original deste repositório. PostgreSQL
 
 | Tag | Alteração observável |
 | --- | --- |
-| `18.4-pgvector0.8.5-bookworm` | PostgreSQL 18.4, pgvector 0.8.5, layout persistente do PostgreSQL 18 e health check que distingue o servidor definitivo do bootstrap. |
+| `18.4-pgvector0.8.6-bookworm` | PostgreSQL 18.4, pgvector 0.8.6, layout persistente do PostgreSQL 18 e health check que distingue o servidor definitivo do bootstrap. |
 Novas alterações observáveis devem ser registradas junto da respectiva tag imutável.
