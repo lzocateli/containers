@@ -1,1 +1,1 @@
-FROM frooodle/s-pdf:2.14.2
+FROM frooodle/s-pdf:2.14.3
