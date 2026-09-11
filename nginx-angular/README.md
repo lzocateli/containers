@@ -57,7 +57,33 @@ server {
 }
 ```
 
-Monte o conteúdo compilado do Angular em `/usr/share/nginx/html` como somente leitura ou crie uma imagem derivada desta que execute `COPY dist/ /usr/share/nginx/html/`.
+## Exemplo de Dockerfile Multi-Stage para Aplicação Angular
+
+As aplicações Angular no ecossistema `containers` devem utilizar a imagem de Node.js / Angular CLI para compilação e a imagem `lzocateli/nginx-angular:1.28.0-bookworm-r2` para o runtime final:
+
+```dockerfile
+# syntax=docker/dockerfile:1
+
+# 1. Estágio de build com a imagem Angular CLI / Node.js do projeto containers
+FROM lzocateli/angular-cli:22.1.0-node24.15.0-bookworm AS build
+
+WORKDIR /src
+
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
+
+COPY . ./
+RUN npm run build -- --configuration production
+
+# 2. Estágio de runtime com NGINX Angular
+FROM lzocateli/nginx-angular:1.28.0-bookworm-r2 AS runtime
+
+COPY --from=build /src/dist/meu-app/browser/ /usr/share/nginx/html/
+
+EXPOSE 80
+```
+
+Monte o conteúdo compilado do Angular em `/usr/share/nginx/html` como somente leitura ou crie uma imagem derivada usando o modelo multi-stage acima.
 
 ## Início rápido
 
