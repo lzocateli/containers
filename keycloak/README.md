@@ -3,22 +3,22 @@ SPDX-FileCopyrightText: 2024 Lincoln Zocateli
 SPDX-License-Identifier: MIT
 -->
 
-# Keycloak 26.7.0
+# Keycloak 26.7.2
 
 ![Docker Hub](https://img.shields.io/badge/image-lzocateli%2Fkeycloak-2496ED?logo=docker&logoColor=white)
-![Version](https://img.shields.io/badge/version-26.7.0-2E7D32)
+![Version](https://img.shields.io/badge/version-26.7.2-2E7D32)
 ![Base](https://img.shields.io/badge/base-quay.io%2Fkeycloak%2Fkeycloak-555555?logo=keycloak&logoColor=white)
 ![Platform](https://img.shields.io/badge/platform-linux%2Famd64-607D8B)
 ![Repository code license](https://img.shields.io/badge/repository_code-MIT-1565C0)
 
-Keycloak 26.7.0 configuravel em runtime para PostgreSQL ou Microsoft SQL Server. Health e metricas ficam habilitados por padrao na porta de gerenciamento `9000`.
+Keycloak 26.7.2 configuravel em runtime para PostgreSQL ou Microsoft SQL Server. Health e metricas ficam habilitados por padrao na porta de gerenciamento `9000`.
 
 ## Referencia da imagem
 
 | Item | Valor |
 | --- | --- |
-| Imagem | `lzocateli/keycloak:26.7.0` |
-| Imagem base | `quay.io/keycloak/keycloak:26.7.0`, fixada pelo digest `sha256:26939e...c2a7a` para `linux/amd64` |
+| Imagem | `lzocateli/keycloak:26.7.2` |
+| Imagem base | `quay.io/keycloak/keycloak:26.7.2`, fixada pelo digest `sha256:c2a17f...1463b0` para `linux/amd64` |
 | Plataforma | `linux/amd64` |
 | Usuario padrao | `keycloak`, UID `1000` |
 | Entry point | `/opt/keycloak/bin/kc.sh` |
@@ -29,11 +29,11 @@ Esta imagem preserva a distribuicao padrao, sem executar `kc.sh build` para um v
 
 ## Compatibilidade dos bancos do repositorio
 
-Verificacao realizada com a matriz oficial do Keycloak 26.7.0:
+Verificacao realizada com a matriz oficial do Keycloak 26.7.2:
 
 | Imagem do repositorio | Matriz oficial do Keycloak | Status |
 | --- | --- | --- |
-| `lzocateli/postgresql:18.4-pgvector0.8.5-bookworm` | PostgreSQL `18.x`, `17.x`, `16.x`, `15.x` e `14.x` | **Suportada oficialmente** |
+| `lzocateli/postgresql:18.4-pgvector0.8.6-bookworm` | PostgreSQL `18.x`, `17.x`, `16.x`, `15.x` e `14.x` | **Suportada oficialmente** |
 | `lzocateli/mssql-server:2025-CU7-ubuntu-24.04` | SQL Server `2022` e `2019` | **Nao suportada oficialmente** |
 
 SQL Server 2025 pode funcionar com o driver `mssql` incluido, mas fica fora da matriz suportada pelo Keycloak. Para producao com suporte do fornecedor, use PostgreSQL 18.4 deste repositorio ou uma versao SQL Server suportada. Azure SQL Database e Azure SQL Managed Instance `latest` aparecem separadamente como suportados e nao tornam SQL Server 2025 local uma configuracao suportada.
@@ -73,7 +73,7 @@ Esta e a combinacao recomendada entre as imagens atuais do repositorio:
 ```yaml
 services:
   postgres:
-    image: lzocateli/postgresql:18.4-pgvector0.8.5-bookworm
+    image: lzocateli/postgresql:18.4-pgvector0.8.6-bookworm
     environment:
       POSTGRES_USER: ${KC_DB_USERNAME}
       POSTGRES_PASSWORD: ${KC_DB_PASSWORD}
@@ -88,7 +88,7 @@ services:
       retries: 6
 
   keycloak:
-    image: lzocateli/keycloak:26.7.0
+    image: lzocateli/keycloak:26.7.2
     command: ["start"]
     restart: unless-stopped
     depends_on:
@@ -113,7 +113,7 @@ O caminho `./data/postgres` e relativo ao diretorio do arquivo Compose. Crie ess
 
 ## Docker Compose com SQL Server 2025 CU7
 
-O exemplo abaixo e experimental porque SQL Server 2025 nao consta na matriz suportada pelo Keycloak 26.7.0:
+O exemplo abaixo e experimental porque SQL Server 2025 nao consta na matriz suportada pelo Keycloak 26.7.2:
 
 ```yaml
 services:
@@ -132,7 +132,7 @@ services:
       - ./data/mssql:/var/opt/mssql
 
   keycloak:
-    image: lzocateli/keycloak:26.7.0
+    image: lzocateli/keycloak:26.7.2
     command: ["start"]
     restart: unless-stopped
     depends_on:
@@ -191,7 +191,7 @@ docker run --rm --replace \
   --env KC_BOOTSTRAP_ADMIN_USERNAME=admin \
   --env KC_BOOTSTRAP_ADMIN_PASSWORD='Troque_Esta_Senha_Administrativa_2026!' \
   --volume ./themes/minha-marca:/opt/keycloak/themes/minha-marca:ro,Z \
-  lzocateli/keycloak:26.7.0 \
+  lzocateli/keycloak:26.7.2 \
   start-dev \
     --spi-theme--static-max-age=-1 \
     --spi-theme--cache-themes=false \
@@ -221,7 +221,7 @@ docker buildx build --check --file keycloak/Dockerfile keycloak
 docker buildx build \
   --pull \
   --platform linux/amd64 \
-  --tag lzocateli/keycloak:26.7.0 \
+  --tag lzocateli/keycloak:26.7.2 \
   --load \
   keycloak
 ```
@@ -229,8 +229,8 @@ docker buildx build \
 ## Validacao
 
 ```bash
-docker run --rm lzocateli/keycloak:26.7.0 --version
-docker image inspect lzocateli/keycloak:26.7.0
+docker run --rm lzocateli/keycloak:26.7.2 --version
+docker image inspect lzocateli/keycloak:26.7.2
 ```
 
 Antes da publicacao, valide startup, readiness, conexao e migrations com o banco escolhido. Execute tambem Trivy, SBOM e proveniencia pelo workflow oficial.
@@ -239,7 +239,7 @@ Antes da publicacao, valide startup, readiness, conexao e migrations com o banco
 
 | Tag | Mutabilidade | Compatibilidade | Uso recomendado |
 | --- | --- | --- | --- |
-| `26.7.0` | Imutavel | Keycloak 26.7.0 | Producao apos validar migrations e extensoes |
+| `26.7.2` | Imutavel | Keycloak 26.7.2 | Producao apos validar migrations e extensoes |
 
 Nao sobrescreva a tag. Para atualizar, publique uma nova versao e teste providers, temas, clients, realms e rollback de banco em ambiente isolado.
 
@@ -257,11 +257,12 @@ Nao sobrescreva a tag. Para atualizar, publique uma nova versao e teste provider
 | Componente | Versao | Licenca | Fonte |
 | --- | --- | --- | --- |
 | Conteudo original deste repositorio | Atual | MIT | `https://github.com/lzocateli/containers` |
-| Keycloak | 26.7.0 | Apache-2.0 | `https://github.com/keycloak/keycloak` |
-| Imagem oficial | 26.7.0 | Apache-2.0 e licencas dos componentes | `https://quay.io/repository/keycloak/keycloak` |
+| Keycloak | 26.7.2 | Apache-2.0 | `https://github.com/keycloak/keycloak` |
+| Imagem oficial | 26.7.2 | Apache-2.0 e licencas dos componentes | `https://quay.io/repository/keycloak/keycloak` |
 
 O badge MIT descreve apenas o conteudo original deste repositorio. Componentes de terceiros permanecem sujeitos aos termos de suas fontes. Consulte a [politica de licenciamento](https://github.com/lzocateli/containers/blob/main/LICENSING.md).
 
 ## Historico de alteracoes
 
+- `26.7.2`: corrige vulnerabilidades de seguranca, incluindo a `CVE-2026-18963` no fluxo de redefinicao de credenciais.
 - `26.7.0`: atualiza a base, fixa digest `linux/amd64`, habilita health/metricas e documenta PostgreSQL 18.4 e SQL Server 2025 CU7.

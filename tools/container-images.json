@@ -185,6 +185,17 @@
       "validation": "build"
     },
     {
+      "id": "nginx-angular",
+      "imageName": "nginx-angular",
+      "context": "nginx-angular",
+      "dockerfile": "Dockerfile",
+      "platforms": [
+        "linux/amd64"
+      ],
+      "scanPlatform": "linux/amd64",
+      "validation": "build"
+    },
+    {
       "id": "geoipupdate",
       "imageName": "geoipupdate",
       "context": "geoipupdate",
