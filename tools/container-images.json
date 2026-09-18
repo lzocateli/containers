@@ -2,13 +2,31 @@
   "schemaVersion": 1,
   "images": [
     {
+      "id": "azure-monitor",
+      "imageName": "azure-monitor",
+      "context": "azure-monitor",
+      "dockerfile": "Dockerfile",
+      "platforms": ["linux/amd64"],
+      "scanPlatform": "linux/amd64",
+      "validation": "check",
+      "reason": "Imagem existente; validação integral depende do agente upstream e do ambiente Azure Monitor."
+    },
+    {
+      "id": "azure-servicebus",
+      "imageName": "azure-servicebus",
+      "context": "azure-servicebus",
+      "dockerfile": "Dockerfile",
+      "platforms": ["linux/amd64"],
+      "scanPlatform": "linux/amd64",
+      "validation": "check",
+      "reason": "Emulador local; build e smoke test dependem da licença e dos serviços upstream."
+    },
+    {
       "id": "angular-cli",
       "imageName": "angular-cli",
       "context": "angular-cli",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "build"
     },
@@ -17,9 +35,7 @@
       "imageName": "comentario",
       "context": "blog-comentario",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "build"
     },
@@ -28,9 +44,7 @@
       "imageName": "cosyvoice",
       "context": "blog-cosyvoice",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "check",
       "reason": "Build CUDA pesado; validado integralmente somente na release."
@@ -40,9 +54,7 @@
       "imageName": "hugo",
       "context": "hugo",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "build",
       "smokeTest": "scripts/smoke-test.sh"
@@ -52,9 +64,7 @@
       "imageName": "listmonk",
       "context": "blog-listmonk",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "build"
     },
@@ -63,9 +73,7 @@
       "imageName": "certbot-dns-cloudflare",
       "context": "certbot",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "build"
     },
@@ -74,9 +82,7 @@
       "imageName": "cloudbeaver",
       "context": "cloudbeaver",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "build"
     },
@@ -85,9 +91,7 @@
       "imageName": "devops",
       "context": "devops",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "check",
       "reason": "Build grande e parametrizado; validado integralmente somente na release."
@@ -97,10 +101,7 @@
       "imageName": "dotnet-aspnet",
       "context": "dotnet-aspnet",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64",
-        "linux/arm64"
-      ],
+      "platforms": ["linux/amd64", "linux/arm64"],
       "scanPlatform": "linux/amd64",
       "validation": "build"
     },
@@ -109,10 +110,7 @@
       "imageName": "dotnet-sdk",
       "context": "dotnet-sdk",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64",
-        "linux/arm64"
-      ],
+      "platforms": ["linux/amd64", "linux/arm64"],
       "scanPlatform": "linux/amd64",
       "validation": "build"
     },
@@ -121,9 +119,7 @@
       "imageName": "dotnet-sdk-devcontainer",
       "context": "dotnet-sdk-devcontainer",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "build"
     },
@@ -132,9 +128,7 @@
       "imageName": "k6",
       "context": "k6",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "build"
     },
@@ -143,9 +137,7 @@
       "imageName": "keycloak",
       "context": "keycloak",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "build"
     },
@@ -154,9 +146,7 @@
       "imageName": "mariadb",
       "context": "mariadb",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "check",
       "reason": "Espelho de imagem upstream sem customização relevante."
@@ -166,9 +156,7 @@
       "imageName": "mssql-server",
       "context": "mssql-server",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "check",
       "reason": "Build e smoke test exigem recursos e licença específicos."
@@ -178,9 +166,7 @@
       "imageName": "nginx",
       "context": "nginx",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "build"
     },
@@ -189,9 +175,7 @@
       "imageName": "nginx-angular",
       "context": "nginx-angular",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "build"
     },
@@ -200,9 +184,7 @@
       "imageName": "geoipupdate",
       "context": "geoipupdate",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "build"
     },
@@ -211,10 +193,7 @@
       "imageName": "gitleaks",
       "context": "gitleaks",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64",
-        "linux/arm64"
-      ],
+      "platforms": ["linux/amd64", "linux/arm64"],
       "scanPlatform": "linux/amd64",
       "validation": "build",
       "smokeTest": "scripts/smoke-test.sh"
@@ -224,9 +203,7 @@
       "imageName": "node",
       "context": "node",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "build"
     },
@@ -235,9 +212,7 @@
       "imageName": "oracle",
       "context": "oracle",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "check",
       "reason": "Build e smoke test exigem recursos e licença específicos."
@@ -247,9 +222,7 @@
       "imageName": "postgresql",
       "context": "postgres",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "build"
     },
@@ -258,9 +231,7 @@
       "imageName": "playwright-e2e",
       "context": "playwright-e2e",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "build",
       "smokeTest": "scripts/smoke-test.sh"
@@ -270,9 +241,7 @@
       "imageName": "python",
       "context": "python",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "check",
       "reason": "Dockerfile legado incompleto; manter check até saneamento."
@@ -282,9 +251,7 @@
       "imageName": "rclone-onedrive",
       "context": "rclone-onedrive",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "build"
     },
@@ -293,9 +260,7 @@
       "imageName": "redis",
       "context": "redis",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "build"
     },
@@ -304,9 +269,7 @@
       "imageName": "redis-gui",
       "context": "redis/gui",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "build"
     },
@@ -315,9 +278,7 @@
       "imageName": "stirling-pdf",
       "context": "stirling-pdf",
       "dockerfile": "Dockerfile",
-      "platforms": [
-        "linux/amd64"
-      ],
+      "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
       "validation": "check",
       "reason": "Espelho de imagem upstream sem customização relevante."
