@@ -2,7 +2,7 @@ services:
   db:
     build:
       context: .
-    image: lzocateli/postgresql:18.4-pgvector0.8.5-bookworm
+    image: lzocateli/postgresql:18.4-pgvector0.8.6-bookworm
     container_name: postgresql
     environment:
       POSTGRES_USER: ${POSTGRES_USER}

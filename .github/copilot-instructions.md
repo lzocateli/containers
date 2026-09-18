@@ -7,18 +7,18 @@
 - Antes de concluir que uma ferramenta não está instalada ou tentar instalá-la, execute `Get-Command <nome>` no PowerShell 7.
 - Os aliases abaixo executam a ferramenta em `lzocateli/devops:ubuntu-22.04` pelo Docker, em vez de chamar um binário local:
 
-| Alias | Ferramenta no container |
-| --- | --- |
-| `gh` | GitHub CLI |
-| `copilot` | GitHub Copilot via `gh copilot` |
-| `ghswitch` | troca da conta ativa do GitHub CLI |
-| `terraform` | Terraform |
-| `jq` | jq |
-| `az` | Azure CLI |
-| `ng` | Angular CLI |
-| `node` | Node.js |
-| `npm` | npm |
-| `sqlcmd` | sqlcmd |
+| Alias       | Ferramenta no container            |
+| ----------- | ---------------------------------- |
+| `gh`        | GitHub CLI                         |
+| `copilot`   | GitHub Copilot via `gh copilot`    |
+| `ghswitch`  | troca da conta ativa do GitHub CLI |
+| `terraform` | Terraform                          |
+| `jq`        | jq                                 |
+| `az`        | Azure CLI                          |
+| `ng`        | Angular CLI                        |
+| `node`      | Node.js                            |
+| `npm`       | npm                                |
+| `sqlcmd`    | sqlcmd                             |
 
 - Esses aliases são conveniências do terminal interativo. Scripts, tarefas automatizadas e CI não devem depender do profile pessoal; nesses casos, declare explicitamente o executável ou container utilizado.
 
@@ -26,6 +26,7 @@
 
 - O nome público deste projeto é `containers`.
 - Cada diretório de imagem é uma unidade independente de build, documentação e release.
+- Recursos Azure devem usar nomes compostos com o prefixo `azure-` e hífen entre palavras. Por exemplo, use `azure-monitor` e `azure-servicebus` para diretórios, IDs do catálogo, nomes de imagem, contextos e referências de documentação; não use `azuremonitor` ou `servicebus-emulator` como nomes públicos.
 - As imagens publicadas pertencem ao namespace Docker Hub `lzocateli`.
 - Preserve compatibilidade das tags publicadas e trate alteração de entrypoint, usuário, porta, volume ou variável como mudança de contrato.
 

@@ -1,0 +1,18 @@
+# Build context mínimo para a imagem
+.git
+.github
+.env
+.env.*
+secrets/
+credentials/
+*.key
+*.pem
+*.p12
+*.pfx
+bin/
+obj/
+*.log
+backups/
+data/
+README.md
+userapps/
