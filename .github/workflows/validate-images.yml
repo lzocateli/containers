@@ -244,13 +244,11 @@ jobs:
         if: matrix.image.validation == 'build'
         shell: bash
         env:
-          TRIVY_IGNORE_VULNERABILITIES: ${{ join(matrix.image.trivyIgnoreVulnerabilities, '\n') }}
+          TRIVY_IGNORE_VULNERABILITIES: ${{ toJSON(matrix.image.trivyIgnoreVulnerabilities || fromJSON('[]')) }}
         run: |
           set -euo pipefail
           : > trivy-ignore
-          if [[ -n "$TRIVY_IGNORE_VULNERABILITIES" ]]; then
-            printf '%s\n' "$TRIVY_IGNORE_VULNERABILITIES" > trivy-ignore
-          fi
+          jq -r '.[]' <<<"$TRIVY_IGNORE_VULNERABILITIES" > trivy-ignore
 
       - name: Bloquear vulnerabilidades críticas corrigíveis
         if: matrix.image.validation == 'build'
