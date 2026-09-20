@@ -50,6 +50,6 @@ entrypoint="$("$docker_command" image inspect --format '{{json .Config.Entrypoin
 [[ "$entrypoint" == '["uv","run","--frozen","pytest","--confcutdir=/app"]' ]] || fail "entrypoint inesperado"
 
 version_output="$("$docker_command" run --rm --entrypoint uv "$image_ref" run --frozen pytest --version)"
-[[ "$version_output" == pytest\ 8.3.4* ]] || fail "versao pytest inesperada: $version_output"
+[[ "$version_output" == pytest\ 9.0.3* ]] || fail "versao pytest inesperada: $version_output"
 
 echo "Smoke test concluido: $image_ref"
