@@ -1,0 +1,28 @@
+# Configuracao local e secrets
+.env
+.env.*
+!.env.example
+secrets/
+credentials/
+
+# Dados persistentes, logs e caches
+data/
+backups/
+logs/
+*.log
+.cache/
+tmp/
+temp/
+
+# Artefatos de build
+bin/
+obj/
+*.tar
+*.tar.gz
+*.zip
+
+# Editores e sistema operacional
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

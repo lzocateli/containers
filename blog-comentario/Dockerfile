@@ -2,7 +2,7 @@
 # Baseado na imagem oficial, configurado para aceitar variáveis de ambiente
 # Build: docker build -f Dockerfile.comentario -t lzocateli/comentario:v3.16.0 .
 
-FROM registry.gitlab.com/comentario/comentario:v3.17.0
+FROM registry.gitlab.com/comentario/comentario:v3.18.0
 
 # Metadata
 LABEL maintainer="Lincoln Zocateli"
