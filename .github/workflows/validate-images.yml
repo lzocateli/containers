@@ -249,6 +249,7 @@ jobs:
           format: table
           severity: CRITICAL
           ignore-unfixed: true
+          trivyignores: ${{ matrix.image.id == 'keycloak' && format('{0}/.trivyignore', matrix.image.context) || '' }}
           exit-code: "1"
 
       - name: Publicar relatório como artifact
