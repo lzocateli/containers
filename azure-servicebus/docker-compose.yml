@@ -1,0 +1,54 @@
+# Reusable local Azure Service Bus emulator stack (emulator + SQL backing store).
+#
+# Every value is parameterized via the invoking process environment — no `.env` file is used or
+# read (see README.md). Defaults below only need to be safe enough for `docker compose down` to work
+# without erroring; `sb-up.ps1` is the actual point of validation and always sets every variable
+# explicitly before calling `up`.
+name: ${COMPOSE_PROJECT_NAME:-sb-emulator}
+
+services:
+  emulator:
+    container_name: ${COMPOSE_PROJECT_NAME:-sb-emulator}-servicebus
+    image: ${SB_IMAGE:-mcr.microsoft.com/azure-messaging/servicebus-emulator:latest}
+    pull_policy: missing
+    volumes:
+      - "${SB_CONFIG_PATH:-./Config.default.json}:/ServiceBus_Emulator/ConfigFiles/Config.json:ro"
+    ports:
+      - "127.0.0.1:${SB_AMQP_PORT:-5672}:5672"
+      - "127.0.0.1:${SB_HTTP_PORT:-5300}:5300"
+    environment:
+      SQL_SERVER: sqledge
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:-}"
+      ACCEPT_EULA: "${ACCEPT_EULA:-N}"
+      SQL_WAIT_INTERVAL: "${SQL_WAIT_INTERVAL:-15}"
+    depends_on:
+      sqledge:
+        condition: service_healthy
+    networks:
+      - sb-emulator
+
+  sqledge:
+    container_name: ${COMPOSE_PROJECT_NAME:-sb-emulator}-sqledge
+    image: ${SB_SQL_IMAGE:-mcr.microsoft.com/azure-sql-edge:latest}
+    environment:
+      ACCEPT_EULA: "${ACCEPT_EULA:-N}"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:-}"
+    networks:
+      - sb-emulator
+    healthcheck:
+      # Tries the mssql-tools18 path (mcr.microsoft.com/mssql/server:2022-latest, -C skips cert
+      # validation) first, then falls back to the mssql-tools path (mcr.microsoft.com/azure-sql-edge).
+      # This keeps -SqlImage (K5) genuinely swappable without editing this healthcheck.
+      test:
+        [
+          "CMD-SHELL",
+          '/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P "$$MSSQL_SA_PASSWORD" -Q ''SELECT 1'' || /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "$$MSSQL_SA_PASSWORD" -Q ''SELECT 1''',
+        ]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+
+networks:
+  sb-emulator:
+    name: ${COMPOSE_PROJECT_NAME:-sb-emulator}-net

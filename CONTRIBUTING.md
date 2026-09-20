@@ -16,6 +16,19 @@
 5. Atualize `tools/container-images.json` quando criar ou publicar nova imagem.
 6. Execute validações locais antes do PR.
 
+## Hook de secrets
+
+O Gitleaks executa exclusivamente em container Docker com a imagem fixa
+`lzocateli/gitleaks:8.30.1`; não instale o executável no host. Após clonar,
+configure o hook uma vez na raiz:
+
+```powershell
+./tools/scripts/install-gitleaks-hook.ps1
+```
+
+O comando apenas configura `core.hooksPath=.githooks`. O pre-commit bloqueia
+commits quando Docker não está disponível ou quando encontra secrets staged.
+
 ## Validações mínimas
 
 - Validar catálogo:
