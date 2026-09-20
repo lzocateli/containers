@@ -1,11 +1,11 @@
-ARG KEYCLOAK_BASE_IMAGE=quay.io/keycloak/keycloak@sha256:26939e1318d6f008fc2ee6e10cec1cf8f1ba8a21846c1bc81b91ed0506bc2a7a
+ARG KEYCLOAK_BASE_IMAGE=quay.io/keycloak/keycloak@sha256:82a77884f3af238beab1e7afd63b5f530e1b5c0590bd7aa60b40a40463e29b2c
 FROM ${KEYCLOAK_BASE_IMAGE}
 
-LABEL org.opencontainers.image.title="Keycloak 26.7.0" \
+LABEL org.opencontainers.image.title="Keycloak 26.7.4" \
 	  org.opencontainers.image.description="Keycloak configuravel em runtime para PostgreSQL ou Microsoft SQL Server" \
 	  org.opencontainers.image.source="https://github.com/lzocateli/containers/tree/main/keycloak" \
 	  org.opencontainers.image.documentation="https://github.com/lzocateli/containers/tree/main/keycloak" \
-	  org.opencontainers.image.version="26.7.0" \
+	  org.opencontainers.image.version="26.7.4" \
 	  org.opencontainers.image.licenses="Apache-2.0"
 
 ENV KC_HEALTH_ENABLED=true \

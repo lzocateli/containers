@@ -96,6 +96,9 @@ web_modules/
 # Evidencias locais de scan de seguranca
 artifacts/security-local/
 
+# Configuracao local do Docker/registries
+files/.docker/
+
 # Yarn Integrity file
 .yarn-integrity
 

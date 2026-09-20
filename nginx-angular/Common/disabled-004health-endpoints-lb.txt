@@ -1,0 +1,319 @@
+# ============================================================================
+# Health Check Endpoints - Load Balancer Configuration
+# ============================================================================
+#
+# Arquivo: nginx/Common/004health-endpoints-lb.conf
+# 📁  Localização: /workspaces/pipelines-store/nginx/Common/
+# 🚀  Destino: /etc/nginx/conf.d/004health-endpoints-lb.conf
+#
+# 📖  Tipo: Configuração pronta para Load Balancer
+# 🔧  Uso: Include direto no nginx.conf do Load Balancer
+# 🖥️  Onde: APENAS Load Balancer
+#
+# Descrição:
+#   Configurações de health check específicas para Load Balancer.
+#   Inclui health check agregado via health-server (porta 8090).
+#
+# Pré-requisitos:
+#   - health-server.sh rodando na porta 8090
+#   - systemctl --user enable health-server
+#   - systemctl --user start health-server
+#
+# ============================================================================
+
+# ============================================================================
+# UPSTREAM - Health Server (porta 8090)
+# ============================================================================
+# Health server local que agrega status de todos os backends
+upstream health_server {
+    server localhost:8090;
+    keepalive 2;
+    keepalive_timeout 60s;
+    keepalive_requests 100;
+}
+
+# ============================================================================
+# CONFIGURAÇÕES COMPARTILHADAS - Map para variáveis
+# ============================================================================
+# Define tipo de host baseado em variável de ambiente
+map $server_name $host_type {
+    default "load-balancer";
+}
+
+# ============================================================================
+# LOCATIONS - Health Endpoints para Load Balancer
+# ============================================================================
+# INSTRUÇÕES:
+#   Copie os blocos "location" necessários para dentro do seu
+#   bloco "server { ... }" em proxy-loadbalancer-prd.conf
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# 1. Health Aggregated - Status de todos os backends
+# ----------------------------------------------------------------------------
+# Este endpoint faz proxy para o health-server (porta 8090)
+# que agrega status de todos os backends configurados
+#
+# Exemplo de resposta JSON:
+# {
+#   "status": "healthy",
+#   "timestamp": "2026-02-07T19:30:00Z",
+#   "backends": {
+#     "webserver1": {"status": "up", "response_time": "0.023s"},
+#     "webserver2": {"status": "up", "response_time": "0.019s"}
+#   }
+# }
+#
+# USO: Copie este bloco para seu server { ... }
+#
+# location /health {
+#     # Proxy para health-server local (porta 8090)
+#     proxy_pass http://health_server/health;
+#
+#     # HTTP/1.1 com keepalive
+#     proxy_http_version 1.1;
+#     proxy_set_header Connection "";
+#
+#     # Headers
+#     proxy_set_header Host $host;
+#     proxy_set_header X-Real-IP $remote_addr;
+#     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#     proxy_set_header X-Forwarded-Proto $scheme;
+#
+#     # Timeouts agressivos para health checks
+#     proxy_connect_timeout 2s;
+#     proxy_send_timeout 2s;
+#     proxy_read_timeout 2s;
+#
+#     # Sem cache
+#     proxy_cache_bypass 1;
+#     proxy_no_cache 1;
+#     add_header Cache-Control "no-cache, no-store, must-revalidate" always;
+#     add_header Pragma "no-cache" always;
+#     add_header Expires "0" always;
+#
+#     # Logs off para reduzir I/O
+#     access_log off;
+# }
+# ----------------------------------------------------------------------------
+# 2. NGINX Health (Simples) - Status do Load Balancer
+# ----------------------------------------------------------------------------
+# Verifica apenas se o NGINX Load Balancer está respondendo
+# NÃO verifica backends (use /health para isso)
+#
+# USO: Copie este bloco para seu server { ... }
+#
+# location /nginx-health {
+#     access_log off;
+#     return 200 '{"status":"ok","service":"nginx-loadbalancer","host":"$hostname","timestamp":"$time_iso8601"}';
+#     add_header Content-Type application/json;
+#     add_header Cache-Control "no-cache, no-store, must-revalidate";
+# }
+# ----------------------------------------------------------------------------
+# 3. Ping Endpoint - Resposta mais rápida possível
+# ----------------------------------------------------------------------------
+# Ideal para checks rápidos de conectividade
+# Responde apenas "pong" para economizar banda
+#
+# USO: Copie os blocos necessários para seu server { ... }
+#
+# location /ping {
+#     access_log off;
+#     return 200 "pong\n";
+#     add_header Content-Type text/plain;
+#     add_header Cache-Control "no-cache";
+# }
+#
+# location /health/ping {
+#     access_log off;
+#     return 200 "pong\n";
+#     add_header Content-Type text/plain;
+#     add_header Cache-Control "no-cache";
+# }
+# ----------------------------------------------------------------------------
+# 4. NGINX Status (Métricas) - RESTRITO ao localhost/redes privadas
+# ----------------------------------------------------------------------------
+# Expõe métricas do NGINX via stub_status
+# Útil para monitoramento (Prometheus, Grafana, etc.)
+#
+# ATENÇÃO: Acesso restrito apenas a redes privadas por segurança
+#
+# USO: Copie este bloco para seu server { ... }
+#
+# location /nginx-status {
+#     stub_status;
+#     access_log off;
+#
+#     # Apenas redes privadas e localhost
+#     allow 127.0.0.1;
+#     allow ::1;
+#     allow 10.0.0.0/8;
+#     allow 172.16.0.0/12;
+#     allow 192.168.0.0/16;
+#     deny all;
+# }
+# ============================================================================
+# EXEMPLO DE INTEGRAÇÃO em proxy-loadbalancer-prd.conf
+# ============================================================================
+#
+# server {
+#     listen 443 ssl http2;
+#     server_name loadbalancer.example.com;
+#
+#     # SSL configs
+#     include /etc/nginx/conf.d/ssl-settings-prd.conf;
+#
+#     # ========================================
+#     # Health Check Endpoints
+#     # ========================================
+#
+#     # Health agregado (status de todos os backends)
+#     location /health {
+#         proxy_pass http://health_server/health;
+#         proxy_http_version 1.1;
+#         proxy_set_header Connection "";
+#         proxy_connect_timeout 2s;
+#         proxy_read_timeout 2s;
+#         add_header Cache-Control "no-cache" always;
+#         access_log off;
+#     }
+#
+#     # NGINX Load Balancer health (apenas este servidor)
+#     location /nginx-health {
+#         access_log off;
+#         return 200 '{"status":"ok","service":"nginx-lb","host":"$hostname"}';
+#         add_header Content-Type application/json;
+#     }
+#
+#     # Ping rápido
+#     location /health/ping {
+#         access_log off;
+#         return 200 "pong\n";
+#         add_header Content-Type text/plain;
+#     }
+#
+#     # Métricas NGINX (restrito)
+#     location /nginx-status {
+#         stub_status;
+#         access_log off;
+#         allow 127.0.0.1;
+#         allow 10.0.0.0/8;
+#         deny all;
+#     }
+#
+#     # ========================================
+#     # Aplicações (proxy para WebServers)
+#     # ========================================
+#     location / {
+#         proxy_pass http://webservers_upstream;
+#         include /etc/nginx/conf.d/proxy-settings-prd.conf;
+#         include /etc/nginx/conf.d/timeouts-loadbalancer-prd.conf;
+#     }
+# }
+# ============================================================================
+# INSTALAÇÃO NO LOAD BALANCER
+# ============================================================================
+#
+# 1. Copiar este arquivo:
+#    sudo cp /workspaces/pipelines-store/nginx/Common/004health-endpoints-lb.conf \
+#            /etc/nginx/conf.d/004health-endpoints-lb.conf
+#
+# 2. Editar nginx.conf ou proxy-loadbalancer-prd.conf:
+#    - Adicionar upstream no contexto http:
+#      upstream health_server {
+#          server localhost:8090;
+#      }
+#
+#    - Copiar locations necessárias para dentro do server { ... }
+#
+# 3. Verificar se health-server está rodando:
+#    systemctl --user status health-server
+#    curl http://localhost:8090/health
+#
+# 4. Testar sintaxe NGINX:
+#    sudo nginx -t
+#
+# 5. Recarregar NGINX:
+#    sudo systemctl reload nginx
+#    # OU
+#    podman exec nginx nginx -s reload
+#
+# 6. Validar endpoints:
+#    curl https://loadbalancer.example.com/health | jq
+#    curl https://loadbalancer.example.com/nginx-health | jq
+#    curl https://loadbalancer.example.com/ping
+#
+# ============================================================================
+# TROUBLESHOOTING
+# ============================================================================
+#
+# Problema: "connect() failed (111: Connection refused)"
+# Solução: Health-server não está rodando
+#          systemctl --user start health-server
+#          curl http://localhost:8090/health
+#
+# Problema: "upstream 'health_server' not found"
+# Solução: Adicionar bloco upstream no contexto http
+#
+# Problema: 502 Bad Gateway em /health
+# Solução: Verificar logs do health-server
+#          journalctl --user -u health-server -n 50
+#
+# Problema: 404 Not Found
+# Solução: Locations devem estar dentro de server { ... }
+#
+# ============================================================================
+# SEGURANÇA E RATE LIMITING
+# ============================================================================
+#
+# 1. /nginx-status já está RESTRITO (allow/deny)
+#
+# 2. /health expõe status dos backends - considere restringir:
+#
+#    # No servidor Load Balancer apenas
+#    geo $internal_networks {
+#        default 0;
+#        10.0.0.0/8 1;
+#        172.16.0.0/12 1;
+#        192.168.0.0/16 1;
+#    }
+#
+#    location /health {
+#        if ($internal_networks = 0) {
+#            return 403;
+#        }
+#        proxy_pass http://health_server/health;
+#        # ... resto da config ...
+#    }
+#
+# 3. Rate limiting para endpoints públicos:
+#
+#    # No contexto http { ... }
+#    limit_req_zone $binary_remote_addr zone=healthcheck_lb:10m rate=10r/s;
+#
+#    # No contexto location
+#    location /health {
+#        limit_req zone=healthcheck_lb burst=20 nodelay;
+#        # ... resto da config ...
+#    }
+#
+# ============================================================================
+# MONITORAMENTO
+# ============================================================================
+#
+# Integração com ferramentas de monitoramento:
+#
+# 1. Prometheus NGINX Exporter:
+#    - Usa /nginx-status para coletar métricas
+#    - Configure prometheus.yml para scrape do endpoint
+#
+# 2. Health checks externos (DataDog, New Relic, etc.):
+#    - Use /health para validar backends
+#    - Use /nginx-health para validar Load Balancer
+#    - Use /ping para checks rápidos
+#
+# 3. Scripts personalizados:
+#    - curl -f https://lb.example.com/health || alert
+#    - Integre com Nagios, Zabbix, etc.
+#
+# ============================================================================

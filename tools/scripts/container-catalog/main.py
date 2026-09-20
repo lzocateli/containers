@@ -103,6 +103,21 @@ def validate_policy(image: dict[str, object], image_id: str) -> None:
     if validation == "check" and not image.get("reason"):
         fail(f"reason é obrigatório quando validation=check para {image_id}")
 
+    ignored_vulnerabilities = image.get("trivyIgnoreVulnerabilities", [])
+    if (
+        not isinstance(ignored_vulnerabilities, list)
+        or any(
+            not isinstance(vulnerability, str)
+            or not re.fullmatch(r"CVE-[0-9]{4}-[0-9]{4,}", vulnerability)
+            for vulnerability in ignored_vulnerabilities
+        )
+        or len(ignored_vulnerabilities) != len(set(ignored_vulnerabilities))
+    ):
+        fail(
+            "trivyIgnoreVulnerabilities deve ser uma lista de CVEs válidos e sem duplicatas "
+            f"para {image_id}"
+        )
+
 
 def validate_smoke_test(image: dict[str, object], image_id: str, root: Path) -> None:
     smoke_test_value = image.get("smokeTest")

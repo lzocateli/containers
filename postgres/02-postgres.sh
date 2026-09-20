@@ -22,7 +22,7 @@
 set -euo pipefail
 
 CONTAINER_NAME="postgres"
-IMAGE="lzocateli/postgresql:18.4-pgvector0.8.5-bookworm"
+IMAGE="lzocateli/postgresql:18.4-pgvector0.8.6-bookworm"
 NETWORK="lzo"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INIT_DIR="$SCRIPT_DIR/init"

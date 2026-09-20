@@ -188,10 +188,7 @@ if [[ "$MODE" == "rewrite" ]]; then
   exit 0
 fi
 
-if command -v gitleaks >/dev/null 2>&1; then
-  SCANNER=(gitleaks)
-  log INFO "Scanner: executavel local"
-elif command -v docker.exe >/dev/null 2>&1 || command -v docker >/dev/null 2>&1; then
+if command -v docker.exe >/dev/null 2>&1 || command -v docker >/dev/null 2>&1; then
   export MSYS_NO_PATHCONV=1
   export MSYS2_ARG_CONV_EXCL='*'
   if command -v docker.exe >/dev/null 2>&1; then
@@ -209,7 +206,7 @@ elif command -v docker.exe >/dev/null 2>&1 || command -v docker >/dev/null 2>&1;
   SCANNER=("$DOCKER_COMMAND" run --rm -v "$DOCKER_REPOSITORY_ROOT:/repo:ro" -v "$DOCKER_REPOSITORY_ROOT/.tmp:/reports:rw" -w /repo "$GITLEAKS_IMAGE")
   log INFO "Scanner: Docker $GITLEAKS_IMAGE"
 else
-  log_error "Nem gitleaks nem Docker estao disponiveis. Consulte --help."
+  log_error "Docker nao esta disponivel. O scanner Gitleaks executa exclusivamente em container."
   exit 1
 fi
 

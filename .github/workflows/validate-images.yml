@@ -240,6 +240,16 @@ jobs:
           severity: HIGH,CRITICAL
           exit-code: "0"
 
+      - name: Preparar exceções Trivy do catálogo
+        if: matrix.image.validation == 'build'
+        shell: bash
+        env:
+          TRIVY_IGNORE_VULNERABILITIES: ${{ toJSON(matrix.image.trivyIgnoreVulnerabilities || fromJSON('[]')) }}
+        run: |
+          set -euo pipefail
+          : > trivy-ignore
+          jq -r '.[]' <<<"$TRIVY_IGNORE_VULNERABILITIES" > trivy-ignore
+
       - name: Bloquear vulnerabilidades críticas corrigíveis
         if: matrix.image.validation == 'build'
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
@@ -249,6 +259,7 @@ jobs:
           format: table
           severity: CRITICAL
           ignore-unfixed: true
+          trivyignores: trivy-ignore
           exit-code: "1"
 
       - name: Publicar relatório como artifact

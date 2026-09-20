@@ -17,6 +17,10 @@ fail() {
 }
 
 image_ref=""
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+CONTEXT_DIR="$(dirname -- "$SCRIPT_DIR")"
+PYPROJECT_PATH="$CONTEXT_DIR/pyproject.toml"
+
 while (($# > 0)); do
   case "$1" in
     --image)
@@ -35,6 +39,7 @@ while (($# > 0)); do
 done
 
 [[ -n "$image_ref" ]] || fail "--image e obrigatorio"
+[[ -f "$PYPROJECT_PATH" ]] || fail "pyproject.toml nao encontrado em $PYPROJECT_PATH"
 
 if command -v docker.exe >/dev/null 2>&1; then
   docker_command=docker.exe
@@ -49,7 +54,10 @@ fi
 entrypoint="$("$docker_command" image inspect --format '{{json .Config.Entrypoint}}' "$image_ref")"
 [[ "$entrypoint" == '["uv","run","--frozen","pytest","--confcutdir=/app"]' ]] || fail "entrypoint inesperado"
 
+expected_pytest_version="$(sed -n 's/^[[:space:]]*"pytest==\([^"[:space:]]*\)".*/\1/p' "$PYPROJECT_PATH" | head -n 1)"
+[[ -n "$expected_pytest_version" ]] || fail "pytest nao encontrado no pyproject.toml"
+
 version_output="$("$docker_command" run --rm --entrypoint uv "$image_ref" run --frozen pytest --version)"
-[[ "$version_output" == pytest\ 9.0.3* ]] || fail "versao pytest inesperada: $version_output"
+[[ "$version_output" == pytest\ $expected_pytest_version* ]] || fail "versao pytest inesperada: $version_output (esperada: pytest $expected_pytest_version)"
 
 echo "Smoke test concluido: $image_ref"
