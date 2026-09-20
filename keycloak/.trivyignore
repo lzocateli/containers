@@ -1,5 +1,0 @@
-# Temporary vendor exception: Keycloak 26.7.4 and latest currently resolve to
-# the same upstream digest and still bundle these dependencies. Remove these
-# entries when the official image includes the fixed versions.
-CVE-2026-75595
-CVE-2026-8763

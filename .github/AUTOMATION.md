@@ -103,7 +103,7 @@ O workflow `validate-images.yml` usa o diff do pull request e o catálogo para s
 
 Para cada imagem selecionada, o workflow valida ignores, `README.md` e Dockerfile com BuildKit. Entradas com `validation: build` são construídas na plataforma `scanPlatform` e analisadas pelo Trivy. Quando a entrada declara `smokeTest`, o valor deve ser o caminho relativo de um script Bash dentro do contexto; o catálogo valida esse caminho e o workflow executa o script com `--image` antes do scan. Entradas `validation: check` executam somente validação estática e devem registrar a justificativa no catálogo.
 
-O gate bloqueia secrets no repositório e vulnerabilidades `CRITICAL` com correção disponível nas imagens construídas. Misconfigurações legadas, vulnerabilidades `HIGH` e críticas sem correção continuam visíveis nos relatórios. Pull requests internos enviam o SARIF das imagens ao Code Scanning; todos os PRs preservam os relatórios do repositório como artifacts.
+O gate bloqueia secrets no repositório e vulnerabilidades `CRITICAL` com correção disponível nas imagens construídas. Exceções temporárias e justificadas do gate devem ser declaradas na propriedade `trivyIgnoreVulnerabilities` da entrada correspondente em `tools/container-images.json`; não use arquivos `.trivyignore` versionados. Misconfigurações legadas, vulnerabilidades `HIGH` e críticas sem correção continuam visíveis nos relatórios. Pull requests internos enviam o SARIF das imagens ao Code Scanning; todos os PRs preservam os relatórios do repositório como artifacts.
 
 ## Publicar uma imagem
 

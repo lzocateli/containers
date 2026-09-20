@@ -139,7 +139,8 @@
       "dockerfile": "Dockerfile",
       "platforms": ["linux/amd64"],
       "scanPlatform": "linux/amd64",
-      "validation": "build"
+      "validation": "build",
+      "trivyIgnoreVulnerabilities": ["CVE-2026-75595", "CVE-2026-8763"]
     },
     {
       "id": "mariadb",
