@@ -11,7 +11,7 @@ body:
     id: image
     attributes:
       label: Imagem e tag
-      placeholder: lzocateli/postgresql:18.4-pgvector0.8.5-bookworm
+      placeholder: lzocateli/postgresql:18.4-pgvector0.8.6-bookworm
     validations:
       required: true
   - type: textarea

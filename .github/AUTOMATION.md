@@ -2,23 +2,27 @@
 
 Esta pasta centraliza padrões de criação, alteração, documentação, validação e publicação das imagens do projeto `containers`.
 
+## Nomenclatura de recursos Azure
+
+Use nomes compostos com o prefixo `azure-` e hífen entre palavras em diretórios de imagem, IDs do catálogo, `imageName`, contextos de build e documentação. Os nomes canônicos deste repositório são `azure-monitor` e `azure-servicebus`; `azuremonitor` e `servicebus-emulator` não devem ser usados como nomes públicos.
+
 ## Estrutura
 
-| Caminho | Finalidade |
-| --- | --- |
-| `copilot-instructions.md` | Regras gerais do repositório. |
-| `instructions/` | Regras aplicadas a Dockerfiles, READMEs e workflows. |
-| `skills/container-image-maintenance/` | Playbook completo de manutenção e release. |
-| `skills/container-vulnerability-remediation/` | Playbook de scan local com Trivy e correção de vulnerabilidades de imagens. |
-| `agents/container-image-reviewer.agent.md` | Revisor somente leitura especializado. |
-| `agents/container-vulnerability-remediator.agent.md` | Agente de remediação de vulnerabilidades com execução local de scan. |
-| `prompts/` | Atalhos para criar, revisar e preparar releases. |
-| `templates/container-README.template.md` | Estrutura canônica de documentação por imagem. |
-| `templates/ignore/` | Modelos obrigatórios de `.gitignore` e `.dockerignore` por imagem. |
-| `tools/container-images.json` | Fonte de verdade versionada para contextos, nomes, Dockerfiles, plataformas e nível de validação. |
-| `dependabot.yml` | Atualização semanal de Actions e imagens base. |
-| `workflows/validate-images.yml` | Checks seletivos de pull request, Trivy e Dependency Review. |
-| `workflows/publish-image.yml` | Build multi-plataforma, push e sincronização do Docker Hub. |
+| Caminho                                              | Finalidade                                                                                        |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `copilot-instructions.md`                            | Regras gerais do repositório.                                                                     |
+| `instructions/`                                      | Regras aplicadas a Dockerfiles, READMEs e workflows.                                              |
+| `skills/container-image-maintenance/`                | Playbook completo de manutenção e release.                                                        |
+| `skills/container-vulnerability-remediation/`        | Playbook de scan local com Trivy e correção de vulnerabilidades de imagens.                       |
+| `agents/container-image-reviewer.agent.md`           | Revisor somente leitura especializado.                                                            |
+| `agents/container-vulnerability-remediator.agent.md` | Agente de remediação de vulnerabilidades com execução local de scan.                              |
+| `prompts/`                                           | Atalhos para criar, revisar e preparar releases.                                                  |
+| `templates/container-README.template.md`             | Estrutura canônica de documentação por imagem.                                                    |
+| `templates/ignore/`                                  | Modelos obrigatórios de `.gitignore` e `.dockerignore` por imagem.                                |
+| `tools/container-images.json`                        | Fonte de verdade versionada para contextos, nomes, Dockerfiles, plataformas e nível de validação. |
+| `dependabot.yml`                                     | Atualização semanal de Actions e imagens base.                                                    |
+| `workflows/validate-images.yml`                      | Checks seletivos de pull request, Trivy e Dependency Review.                                      |
+| `workflows/publish-image.yml`                        | Build multi-plataforma, push e sincronização do Docker Hub.                                       |
 
 A ferramenta `tools/scripts/container-catalog/main.py` valida o catálogo de forma fail-closed e descobre imagens alteradas. Execute-a pelo projeto Python único do repositório:
 
@@ -86,6 +90,7 @@ tools/scripts/setup-github-governance.ps1 -RepoOwner lzocateli -RepoName contain
 Esse script aplica proteção na `main` com pull request e checks obrigatórios, sem aprovação obrigatória para o mantenedor solo e sem bypass administrativo. Também habilita Issues, Discussions, alertas de dependências vulneráveis, correções automáticas, Secret Scanning, Push Protection, reporte privado, squash/rebase e exclusão da branch após merge; define a variável `AUTHORIZED_WORKFLOW_DISPATCH_ACTOR` e configura o environment protegido `container-release` com confirmação manual pelo mantenedor autorizado.
 
 Pull requests de forks são aceitos e executam o workflow `validate-images.yml` com `contents: read`, sem acesso aos secrets de publicação. Relatórios SARIF de forks são preservados como artifacts, mas somente PRs internos podem enviá-los ao Code Scanning. Publicação continua restrita ao ator autorizado e ao environment protegido.
+
 > Limitação do GitHub: não existe bloqueio nativo por usuário no botão de `workflow_dispatch`; o bloqueio é aplicado na execução por validação de ator no workflow e gate de environment.
 
 O repositório não habilita auto-merge do Dependabot. Toda atualização de base ou Action passa pelos mesmos checks e por revisão humana, especialmente quando altera versão principal ou contrato público.
@@ -98,7 +103,7 @@ O workflow `validate-images.yml` usa o diff do pull request e o catálogo para s
 
 Para cada imagem selecionada, o workflow valida ignores, `README.md` e Dockerfile com BuildKit. Entradas com `validation: build` são construídas na plataforma `scanPlatform` e analisadas pelo Trivy. Quando a entrada declara `smokeTest`, o valor deve ser o caminho relativo de um script Bash dentro do contexto; o catálogo valida esse caminho e o workflow executa o script com `--image` antes do scan. Entradas `validation: check` executam somente validação estática e devem registrar a justificativa no catálogo.
 
-O gate bloqueia secrets no repositório e vulnerabilidades `CRITICAL` com correção disponível nas imagens construídas. Misconfigurações legadas, vulnerabilidades `HIGH` e críticas sem correção continuam visíveis nos relatórios. Pull requests internos enviam o SARIF das imagens ao Code Scanning; todos os PRs preservam os relatórios do repositório como artifacts.
+O gate bloqueia secrets no repositório e vulnerabilidades `CRITICAL` com correção disponível nas imagens construídas. Exceções temporárias e justificadas do gate devem ser declaradas na propriedade `trivyIgnoreVulnerabilities` da entrada correspondente em `tools/container-images.json`; não use arquivos `.trivyignore` versionados. Misconfigurações legadas, vulnerabilidades `HIGH` e críticas sem correção continuam visíveis nos relatórios. Pull requests internos enviam o SARIF das imagens ao Code Scanning; todos os PRs preservam os relatórios do repositório como artifacts.
 
 ## Publicar uma imagem
 

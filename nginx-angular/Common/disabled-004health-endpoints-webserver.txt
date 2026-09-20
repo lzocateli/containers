@@ -1,0 +1,376 @@
+# ============================================================================
+# Health Check Endpoints - WebServer/Proxy Reverso Configuration
+# ============================================================================
+#
+# Arquivo: nginx/Common/004health-endpoints-web.conf
+# 📁  Localização: /workspaces/pipelines-store/nginx/Common/
+# 🚀  Destino: /etc/nginx/conf.d/004health-endpoints-web.conf
+#
+# 📖  Tipo: Configuração pronta para WebServers (Proxy Reverso)
+# 🔧  Uso: Include direto no nginx.conf do WebServer
+# 🖥️  Onde: APENAS WebServers (Proxy Reverso)
+#
+# Descrição:
+#   Configurações de health check específicas para WebServers.
+#   Endpoints locais que verificam apenas se o WebServer está respondendo.
+#   NÃO inclui health check agregado (sem health-server).
+#
+# Diferenças do Load Balancer:
+#   ❌ Não tem upstream health_server
+#   ❌ Não tem location /health (agregado)
+#   ✅ Apenas endpoints locais (/nginx-health, /ping)
+#   ✅ Confirma que WebServer/containers estão acessíveis
+#
+# ============================================================================
+
+# ============================================================================
+# CONFIGURAÇÕES COMPARTILHADAS - Map para variáveis
+# ============================================================================
+# Define tipo de host baseado em variável de ambiente
+map $server_name $host_type {
+    default "webserver";
+}
+
+# ============================================================================
+# LOCATIONS - Health Endpoints para WebServer
+# ============================================================================
+# INSTRUÇÕES:
+#   Copie os blocos "location" necessários para dentro do seu
+#   bloco "server { ... }" em proxy-webserver-prd.conf
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# 1. NGINX Health (Simples) - Status do WebServer
+# ----------------------------------------------------------------------------
+# Verifica apenas se o NGINX WebServer está respondendo
+# Útil para Load Balancer verificar status dos WebServers
+#
+# Exemplo de resposta JSON:
+# {
+#   "status": "ok",
+#   "service": "nginx-webserver",
+#   "host": "webserver-01",
+#   "timestamp": "2026-02-07T19:30:00Z"
+# }
+#
+# USO: Copie este bloco para seu server { ... }
+#
+# location /nginx-health {
+#     access_log off;
+#     return 200 '{"status":"ok","service":"nginx-webserver","host":"$hostname","timestamp":"$time_iso8601"}';
+#     add_header Content-Type application/json;
+#     add_header Cache-Control "no-cache, no-store, must-revalidate";
+# }
+# ----------------------------------------------------------------------------
+# 2. [ALTERNATIVA] Health com verificação de container/backend
+# ----------------------------------------------------------------------------
+# Este endpoint faz proxy para um dos containers backend
+# Verifica se NGINX E o container estão respondendo
+#
+# IMPORTANTE: Escolha UM container/backend que seja crítico
+#             Este endpoint retornará erro se o container estiver down
+#
+# USO: Descomente e adapte para seu container principal
+#
+# location /health {
+#     # Proxy para container backend (exemplo: API principal)
+#     proxy_pass http://MainApi:5000/health;
+#
+#     # Timeout curto (falha rápida se container estiver down)
+#     proxy_connect_timeout 2s;
+#     proxy_send_timeout 2s;
+#     proxy_read_timeout 2s;
+#
+#     # Headers
+#     proxy_set_header Host $host;
+#     proxy_set_header X-Real-IP $remote_addr;
+#     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#
+#     # Sem cache
+#     add_header Cache-Control "no-cache, no-store, must-revalidate";
+#     access_log off;
+#
+#     # Fallback: retorna 200 mesmo se container não tiver /health
+#     proxy_intercept_errors on;
+#     error_page 404 502 503 504 = @health_fallback;
+# }
+#
+# location @health_fallback {
+#     return 200 '{"status":"degraded","service":"nginx-webserver","message":"backend check failed"}';
+#     add_header Content-Type application/json;
+# }
+# ----------------------------------------------------------------------------
+# 3. Ping Endpoint - Resposta mais rápida possível
+# ----------------------------------------------------------------------------
+# Ideal para checks rápidos de conectividade
+# Load Balancer pode usar este endpoint para verificar WebServers
+#
+# USO: Copie este bloco para seu server { ... }
+#
+# location /ping {
+#     access_log off;
+#     return 200 "pong\n";
+#     add_header Content-Type text/plain;
+#     add_header Cache-Control "no-cache";
+# }
+# ----------------------------------------------------------------------------
+# 4. NGINX Status (Métricas) - RESTRITO ao localhost/redes privadas
+# ----------------------------------------------------------------------------
+# Expõe métricas do NGINX via stub_status
+# Útil para monitoramento (Prometheus, Grafana, etc.)
+#
+# ATENÇÃO: Acesso restrito apenas a redes privadas por segurança
+#
+# USO: Copie este bloco para seu server { ... }
+#
+# location /nginx-status {
+#     stub_status;
+#     access_log off;
+#
+#     # Apenas redes privadas e localhost
+#     allow 127.0.0.1;
+#     allow ::1;
+#     allow 10.0.0.0/8;
+#     allow 172.16.0.0/12;
+#     allow 192.168.0.0/16;
+#     deny all;
+# }
+# ============================================================================
+# EXEMPLO DE INTEGRAÇÃO em proxy-webserver-prd.conf
+# ============================================================================
+#
+# server {
+#     listen 80;
+#     server_name _;
+#
+#     # ========================================
+#     # Health Check Endpoints
+#     # ========================================
+#
+#     # WebServer health (apenas este servidor)
+#     location /nginx-health {
+#         access_log off;
+#         return 200 '{"status":"ok","service":"nginx-webserver","host":"$hostname"}';
+#         add_header Content-Type application/json;
+#     }
+#
+#     # Ping rápido
+#     location /ping {
+#         access_log off;
+#         return 200 "pong\n";
+#         add_header Content-Type text/plain;
+#     }
+#
+#     # Métricas NGINX (restrito)
+#     location /nginx-status {
+#         stub_status;
+#         access_log off;
+#         allow 127.0.0.1;
+#         allow 10.0.0.0/8;
+#         deny all;
+#     }
+#
+#     # ========================================
+#     # Aplicações (proxy para containers)
+#     # ========================================
+#
+#     location /sgk {
+#         proxy_pass http://SgkApi:5000;
+#         include /etc/nginx/conf.d/proxy-settings-prd.conf;
+#         include /etc/nginx/conf.d/timeouts-webserver-prd.conf;
+#     }
+#
+#     location /credential {
+#         proxy_pass http://CredentialApi:5000;
+#         include /etc/nginx/conf.d/proxy-settings-prd.conf;
+#         include /etc/nginx/conf.d/timeouts-webserver-prd.conf;
+#     }
+#
+#     location /frontend {
+#         proxy_pass http://SgkUI:4200;
+#         include /etc/nginx/conf.d/proxy-settings-prd.conf;
+#         include /etc/nginx/conf.d/timeouts-webserver-prd.conf;
+#     }
+# }
+# ============================================================================
+# EXEMPLO com Health Check de Container Backend
+# ============================================================================
+#
+# server {
+#     listen 80;
+#     server_name _;
+#
+#     # Health simples (apenas NGINX)
+#     location /nginx-health {
+#         access_log off;
+#         return 200 '{"status":"ok","service":"nginx-webserver","host":"$hostname"}';
+#         add_header Content-Type application/json;
+#     }
+#
+#     # Health com validação de backend (verifica container)
+#     location /health {
+#         proxy_pass http://SgkApi:5000/health;
+#         proxy_connect_timeout 2s;
+#         proxy_read_timeout 2s;
+#         add_header Cache-Control "no-cache";
+#         access_log off;
+#
+#         # Fallback se container não responder
+#         proxy_intercept_errors on;
+#         error_page 502 503 504 = @health_degraded;
+#     }
+#
+#     location @health_degraded {
+#         return 503 '{"status":"degraded","message":"backend unavailable"}';
+#         add_header Content-Type application/json;
+#     }
+#
+#     # Aplicações
+#     location /sgk {
+#         proxy_pass http://SgkApi:5000;
+#         # ... config ...
+#     }
+# }
+# ============================================================================
+# INSTALAÇÃO NO WEBSERVER
+# ============================================================================
+#
+# 1. Copiar este arquivo:
+#    sudo cp /workspaces/pipelines-store/nginx/Common/004health-endpoints-web.conf \
+#            /etc/nginx/conf.d/004health-endpoints-web.conf
+#
+# 2. Editar nginx.conf ou proxy-webserver-prd.conf:
+#    - Copiar locations necessárias para dentro do server { ... }
+#    - Escolher entre /nginx-health (simples) ou /health (com backend check)
+#
+# 3. Testar sintaxe NGINX:
+#    sudo nginx -t
+#
+# 4. Recarregar NGINX:
+#    sudo systemctl reload nginx
+#    # OU
+#    podman exec nginx nginx -s reload
+#
+# 5. Validar endpoints:
+#    curl http://webserver-01/nginx-health | jq
+#    curl http://webserver-01/ping
+#
+# 6. Testar do Load Balancer:
+#    curl http://webserver-01:80/nginx-health
+#    curl http://webserver-02:80/nginx-health
+#
+# ============================================================================
+# TROUBLESHOOTING
+# ============================================================================
+#
+# Problema: 404 Not Found nos endpoints
+# Solução: Locations devem estar dentro de server { ... }
+#
+# Problema: 502 Bad Gateway em /health (com backend check)
+# Solução: Container backend está down ou não tem endpoint /health
+#          Use location @health_fallback para degradar gracefully
+#
+# Problema: Load Balancer marca WebServer como down
+# Solução: Verificar se /nginx-health ou /ping está respondendo 200
+#          curl http://webserver-ip/nginx-health
+#
+# ============================================================================
+# SEGURANÇA E RATE LIMITING
+# ============================================================================
+#
+# 1. /nginx-status já está RESTRITO (allow/deny)
+#
+# 2. /nginx-health e /ping são públicos mas não expõem dados sensíveis
+#
+# 3. Rate limiting para endpoints públicos:
+#
+#    # No contexto http { ... }
+#    limit_req_zone $binary_remote_addr zone=healthcheck_web:10m rate=20r/s;
+#
+#    # No contexto location
+#    location /nginx-health {
+#        limit_req zone=healthcheck_web burst=40 nodelay;
+#        # ... resto da config ...
+#    }
+#
+# 4. Restringir health checks apenas ao Load Balancer:
+#
+#    # Permitir apenas IP do Load Balancer
+#    geo $lb_network {
+#        default 0;
+#        10.0.1.10/32 1;  # IP do Load Balancer
+#        10.0.0.0/24 1;   # Rede do Load Balancer
+#    }
+#
+#    location /nginx-health {
+#        if ($lb_network = 0) {
+#            return 403;
+#        }
+#        # ... resto da config ...
+#    }
+#
+# ============================================================================
+# INTEGRAÇÃO COM LOAD BALANCER
+# ============================================================================
+#
+# No Load Balancer, configure health checks ativos para os WebServers:
+#
+# upstream webservers {
+#     # WebServer 1
+#     server 10.0.2.10:80 max_fails=3 fail_timeout=30s;
+#     # WebServer 2
+#     server 10.0.2.11:80 max_fails=3 fail_timeout=30s;
+#
+#     # Keepalive
+#     keepalive 32;
+# }
+#
+# # Health check passivo (NGINX Plus) ou use nginx_upstream_check_module
+# # Para NGINX Open Source, use health-server.sh no Load Balancer
+#
+# Exemplo de health-server.sh verificando WebServers:
+#
+# BACKENDS="
+# webserver1|http://10.0.2.10/nginx-health
+# webserver2|http://10.0.2.11/nginx-health
+# "
+#
+# ============================================================================
+# MONITORAMENTO
+# ============================================================================
+#
+# 1. Health check do Load Balancer:
+#    - Load Balancer verifica /nginx-health ou /ping dos WebServers
+#    - Se falhar, remove WebServer da rotação
+#
+# 2. Monitoramento externo:
+#    - Use /nginx-health para status básico
+#    - Use /health (com backend check) para validar stack completo
+#    - Use /nginx-status para métricas do NGINX
+#
+# 3. Logs de acesso:
+#    - Health checks têm access_log off para reduzir I/O
+#    - Se precisar auditar, habilite logs com nível específico:
+#
+#      location /nginx-health {
+#          access_log /var/log/nginx/health-access.log combined;
+#          error_log /var/log/nginx/health-error.log warn;
+#          # ... resto da config ...
+#      }
+#
+# ============================================================================
+# COMPARAÇÃO: Load Balancer vs WebServer
+# ============================================================================
+#
+# ┌─────────────────────┬──────────────────────┬────────────────────────┐
+# │ Endpoint            │ Load Balancer        │ WebServer              │
+# ├─────────────────────┼──────────────────────┼────────────────────────┤
+# │ /health             │ ✅ Agregado (8090)   │ ❌ ou ✅ Backend check │
+# │ /nginx-health       │ ✅ Status LB         │ ✅ Status WebServer    │
+# │ /ping               │ ✅ Ping LB           │ ✅ Ping WebServer      │
+# │ /nginx-status       │ ✅ Métricas LB       │ ✅ Métricas WebServer  │
+# │ health-server.sh    │ ✅ Requerido         │ ❌ Não necessário      │
+# │ Upstream backend    │ ✅ Para apps         │ ✅ Para containers     │
+# └─────────────────────┴──────────────────────┴────────────────────────┘
+#
+# ============================================================================
