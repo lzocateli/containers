@@ -54,16 +54,8 @@ fi
 entrypoint="$("$docker_command" image inspect --format '{{json .Config.Entrypoint}}' "$image_ref")"
 [[ "$entrypoint" == '["uv","run","--frozen","pytest","--confcutdir=/app"]' ]] || fail "entrypoint inesperado"
 
-expected_pytest_version="$(python - "$PYPROJECT_PATH" <<'PY'
-import re, pathlib, sys
-path = pathlib.Path(sys.argv[1])
-text = path.read_text(encoding='utf-8')
-match = re.search(r'"pytest"\s*==\s*"?([0-9]+(?:\.[0-9]+)*)"?', text)
-if not match:
-    raise SystemExit('pytest nao encontrado no pyproject.toml')
-print(match.group(1))
-PY
-)"
+expected_pytest_version="$(sed -n 's/^[[:space:]]*"pytest==\([^"[:space:]]*\)".*/\1/p' "$PYPROJECT_PATH" | head -n 1)"
+[[ -n "$expected_pytest_version" ]] || fail "pytest nao encontrado no pyproject.toml"
 
 version_output="$("$docker_command" run --rm --entrypoint uv "$image_ref" run --frozen pytest --version)"
 [[ "$version_output" == pytest\ $expected_pytest_version* ]] || fail "versao pytest inesperada: $version_output (esperada: pytest $expected_pytest_version)"
