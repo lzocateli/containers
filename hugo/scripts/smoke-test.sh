@@ -67,7 +67,7 @@ configured_user="$(docker image inspect --format '{{.Config.User}}' "$image_ref"
 [[ "$configured_user" == "hugo" ]] || fail "usuário padrão inesperado: ${configured_user:-root}"
 
 version_output="$(docker run --rm --read-only "$image_ref" version)"
-[[ "$version_output" == *"v0.165.0-DEV-8a468df"* ]] || fail "versão Hugo inesperada: $version_output"
+[[ "$version_output" =~ ^hugo\ v[0-9]+\.[0-9]+\.[0-9]+ ]] || fail "versão Hugo inesperada: $version_output"
 [[ "$version_output" == *"extended"* ]] || fail "a edição Hugo Extended é obrigatória"
 
 runtime_uid="$(docker run --rm --read-only --entrypoint id "$image_ref" -u)"

@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1
 
-FROM certbot/dns-cloudflare:v5.7.0
+FROM certbot/dns-cloudflare:v5.8.0
 
-ARG IMAGE_VERSION="5.7.0"
+ARG IMAGE_VERSION="5.8.0"
 
 LABEL org.opencontainers.image.title="lzocateli/certbot-dns-cloudflare" \
 	org.opencontainers.image.description="Certbot com plugin DNS Cloudflare para emissão e renovação de certificados Let's Encrypt via desafio DNS-01." \
