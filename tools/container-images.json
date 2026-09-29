@@ -181,6 +181,16 @@
       "validation": "build"
     },
     {
+      "id": "nextcloud",
+      "imageName": "nextcloud",
+      "context": "nextcloud",
+      "dockerfile": "Dockerfile",
+      "platforms": ["linux/amd64"],
+      "scanPlatform": "linux/amd64",
+      "validation": "build",
+      "smokeTest": "scripts/smoke-test.sh"
+    },
+    {
       "id": "geoipupdate",
       "imageName": "geoipupdate",
       "context": "geoipupdate",
