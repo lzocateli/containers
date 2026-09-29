@@ -1,0 +1,19 @@
+# A imagem e um wrapper sem arquivos de aplicacao
+*
+!Dockerfile
+
+# Bloqueio explicito de material local sensivel
+.git
+.env
+.env.*
+secrets/
+credentials/
+*.key
+*.pem
+*.p12
+*.pfx
+data/
+backups/
+backup/
+*.dump
+*.sql.gz
