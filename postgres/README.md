@@ -326,7 +326,7 @@ Use **Actions > Publicar imagem de container > Run workflow** com:
 
 | Entrada | Valor |
 | --- | --- |
-| `context_path` | `postgresql` |
+| `context_path` | `postgres` |
 | `image_name` | `postgresql` |
 | `image_tag` | `18.4-pgvector0.8.6-bookworm` ou uma revisão imutável |
 | `dockerfile` | `Dockerfile` |
@@ -447,4 +447,5 @@ O badge MIT descreve somente o conteúdo original deste repositório. PostgreSQL
 | Tag | Alteração observável |
 | --- | --- |
 | `18.4-pgvector0.8.6-bookworm` | PostgreSQL 18.4, pgvector 0.8.6, layout persistente do PostgreSQL 18 e health check que distingue o servidor definitivo do bootstrap. |
+
 Novas alterações observáveis devem ser registradas junto da respectiva tag imutável.
