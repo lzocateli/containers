@@ -142,7 +142,7 @@ Validados localmente: BuildKit `--check` sem warnings; build `linux/amd64`; `scr
 
 ## Publicacao
 
-Use o workflow oficial com contexto `nextcloud`, imagem `nextcloud`, tag imutavel `35.0.1-r1`, Dockerfile `Dockerfile` e plataforma `linux/amd64`. A publicacao atual confirmou o digest indicado em Referencia da imagem; não reutilize a tag para conteúdo diferente.
+Publicacoes futuras devem usar somente o workflow oficial, apos autorizacao explicita, com contexto `nextcloud`, imagem `nextcloud`, nova tag imutavel, Dockerfile `Dockerfile` e plataforma `linux/amd64`. A publicacao atual confirmou o digest indicado em Referencia da imagem; registre o digest de cada novo manifest no inventario Ansible depois de confirmar o resultado remoto. Nao reutilize a tag para conteudo diferente.
 
 ## Operacao
 
