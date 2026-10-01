@@ -29,7 +29,7 @@ Wrapper sem customizacao da imagem oficial Nextcloud Community Apache. A imagem 
 | Codigo-fonte | `https://github.com/lzocateli/containers/tree/main/nextcloud` |
 | Documentacao | `https://github.com/lzocateli/containers/tree/main/nextcloud` |
 
-O digest fixado no `Dockerfile` e o manifesto OCI multi-arquitetura consultado no Docker Hub. A publicacao deste wrapper continua pendente; nao ha digest `lzocateli/nextcloud` atribuido ainda.
+O wrapper foi publicado pelo workflow `publish-image.yml` em 2026-09-29. Digest do índice OCI: `sha256:d37bd86e18f9e60e700af4d40f6cc810dd4da411e66bdf0d18e10c8eef10c5d8`; manifesto `linux/amd64`: `sha256:356f612200cbf49565cf99e428eb2ec1c383af61ce64f40074169a6d29111dd6`. O workflow confirmou digest, plataforma e Trivy sem CRITICAL corrigível.
 
 ## Conteudo e finalidade
 
@@ -132,9 +132,9 @@ O wrapper nao adiciona dependencias, pacotes ou arquivos ao build context. Consu
 
 | Tag | Mutabilidade | Compatibilidade | Uso recomendado |
 | --- | --- | --- | --- |
-| `35.0.1-r1` | Imutavel apos publicacao | Nextcloud Community 35.0.1 Apache | Implantacao controlada apos valida e publicacao autorizadas |
+| `35.0.1-r1` | Imutavel | Nextcloud Community 35.0.1 Apache | Publicada e validada; usar por digest |
 
-Nao existe tag `latest` de producao. A tag nao deve ser reutilizada. Ainda nao publicada.
+Nao existe tag `latest` de producao. A tag nao deve ser reutilizada. O Ansible fixa o digest OCI confirmado; revalidar o registry antes de um novo release.
 
 ## Validacao
 
@@ -142,7 +142,7 @@ Validados localmente: BuildKit `--check` sem warnings; build `linux/amd64`; `scr
 
 ## Publicacao
 
-Publicacao somente pelo workflow oficial apos autorizacao explicita, com contexto `nextcloud`, imagem `nextcloud`, tag imutavel `35.0.1-r1`, Dockerfile `Dockerfile` e plataforma `linux/amd64`. Registre o digest do manifest publicado no inventario Ansible depois de confirmar o resultado remoto.
+Use o workflow oficial com contexto `nextcloud`, imagem `nextcloud`, tag imutavel `35.0.1-r1`, Dockerfile `Dockerfile` e plataforma `linux/amd64`. A publicacao atual confirmou o digest indicado em Referencia da imagem; não reutilize a tag para conteúdo diferente.
 
 ## Operacao
 
@@ -165,7 +165,7 @@ Publicacao somente pelo workflow oficial apos autorizacao explicita, com context
 - O release e o digest upstream foram consultados em 2026-09-28; confirmar novamente antes de publicar.
 - Trivy encontrou 19 vulnerabilidades HIGH corrigiveis herdadas da imagem upstream; zero CRITICAL corrigiveis. Reavaliar a release upstream e o scan antes de publicar.
 - A disponibilidade real de `pve_pool`, espaco livre, regras de rede, PostgreSQL, Redis, DNS, certificados e recursos do TrueNAS nao foi aferida.
-- O digest publicado do wrapper, SBOM/proveniencia, teste de persistencia/interop remota permanecem pendentes; o build, smoke e Trivy locais foram aprovados.
+- SBOM/proveniencia da release e interoperabilidade remota permanecem pendentes; build, smoke, Trivy e manifest publicado foram aprovados.
 - O uso de Redis e PostgreSQL externos exige preflight e credenciais reais provisionadas localmente em Vault.
 
 ## Licencas e fontes
@@ -180,4 +180,4 @@ O badge MIT descreve somente o conteudo original deste repositorio. A imagem inc
 
 ## Historico de alteracoes
 
-- 35.0.1-r1: primeira imagem wrapper, com base oficial por digest e health check local.
+- 35.0.1-r1: imagem wrapper publicada para `linux/amd64`, com base oficial por digest e health check local.

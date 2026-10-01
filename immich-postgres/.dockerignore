@@ -1,0 +1,21 @@
+# Wrapper sem arquivos de aplicacao
+*
+!Dockerfile
+
+# Bloqueio explicito de material local sensivel
+.git
+.github
+.env
+.env.*
+secrets/
+credentials/
+*.key
+*.pem
+*.p12
+*.pfx
+data/
+pgdata/
+backups/
+backup/
+*.dump
+*.sql.gz
