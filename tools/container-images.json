@@ -60,6 +60,36 @@
       "smokeTest": "scripts/smoke-test.sh"
     },
     {
+      "id": "immich-server",
+      "imageName": "immich-server",
+      "context": "immich-server",
+      "dockerfile": "Dockerfile",
+      "platforms": ["linux/amd64"],
+      "scanPlatform": "linux/amd64",
+      "validation": "check",
+      "reason": "Espelho da imagem upstream do Immich; smoke test requer a stack e dados isolados."
+    },
+    {
+      "id": "immich-ml",
+      "imageName": "immich-ml",
+      "context": "immich-ml",
+      "dockerfile": "Dockerfile",
+      "platforms": ["linux/amd64"],
+      "scanPlatform": "linux/amd64",
+      "validation": "check",
+      "reason": "Espelho da imagem upstream de inferência; teste funcional requer servidor e modelos."
+    },
+    {
+      "id": "immich-postgres",
+      "imageName": "immich-postgres",
+      "context": "immich-postgres",
+      "dockerfile": "Dockerfile",
+      "platforms": ["linux/amd64"],
+      "scanPlatform": "linux/amd64",
+      "validation": "check",
+      "reason": "Espelho do banco upstream; teste de migração requer banco descartável."
+    },
+    {
       "id": "blog-listmonk",
       "imageName": "listmonk",
       "context": "blog-listmonk",
