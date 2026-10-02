@@ -6,19 +6,19 @@ SPDX-License-Identifier: MIT
 # Immich Machine Learning
 
 ![Docker Hub](https://img.shields.io/badge/image-lzocateli%2Fimmich--ml-2496ED?logo=docker&logoColor=white)
-![Version](https://img.shields.io/badge/version-v3.2.4-2E7D32)
+![Version](https://img.shields.io/badge/version-v3.2.4--r1-2E7D32)
 ![Base](https://img.shields.io/badge/base-immich--machine--learning%3Av3.2.4-555555?logo=docker&logoColor=white)
 ![Platforms](https://img.shields.io/badge/platforms-linux%2Famd64-607D8B)
 ![Repository code license](https://img.shields.io/badge/repository_code-MIT-1565C0)
 ![Build](https://img.shields.io/badge/build-linux%2Famd64_local-success)
 
-Espelho da variante CPU do serviço de machine learning Immich v3.2.4 usado pelo Compose do TrueNAS. Adiciona apenas labels OCI, preservando usuário, entrypoint, comando e health check upstream.
+Variante CPU do serviço de machine learning Immich v3.2.4 usada pelo Compose do TrueNAS. Atualiza AnyIO 4.2.0 para 4.14.2 no virtualenv da aplicação para corrigir CVE-2026-63374. Preserva usuário, entrypoint, comando e health check upstream.
 
 ## Referência da imagem
 
 | Item | Valor |
 | --- | --- |
-| Imagem prevista | `lzocateli/immich-ml:v3.2.4` |
+| Imagem prevista | `lzocateli/immich-ml:v3.2.4-r1` |
 | Base | `ghcr.io/immich-app/immich-machine-learning:v3.2.4@sha256:e16c2f166a8174901959fdf85e2e4c7bd1ebc4b37e0b6655de97c41408a260c4` |
 | Plataformas declaradas | `linux/amd64` (upstream também fornece `linux/arm64`) |
 | Usuário, entrypoint e comando | Config.User vazio (root inicial); `tini --`, `python -m immich_ml`, herdados da base |
@@ -27,12 +27,12 @@ Espelho da variante CPU do serviço de machine learning Immich v3.2.4 usado pelo
 
 ## Conteúdo e finalidade
 
-Inclui a imagem oficial de inferência CPU. Não inclui modelos pré-baixados, dados de mídia, servidor, banco, cache nem aceleração CUDA/ROCm/OpenVINO. O servidor Immich solicita as tarefas de inferência na rede interna.
+Inclui a imagem oficial de inferência CPU com AnyIO 4.14.2 no lugar de 4.2.0. O build prepara o pacote em um estágio temporário usando a mesma base upstream; não inclui `pip` na imagem final. Não inclui modelos pré-baixados, dados de mídia, servidor, banco, cache nem aceleração CUDA/ROCm/OpenVINO. O servidor Immich solicita as tarefas de inferência na rede interna.
 
 ## Início rápido
 
 ```bash
-docker buildx build --pull --platform linux/amd64 --load -t lzocateli/immich-ml:v3.2.4 immich-ml
+docker buildx build --pull --platform linux/amd64 --load -t lzocateli/immich-ml:v3.2.4-r1 immich-ml
 ```
 
 Execute com o servidor do mesmo release, não isoladamente como serviço público.
@@ -42,7 +42,7 @@ Execute com o servidor do mesmo release, não isoladamente como serviço públic
 ```yaml
 services:
   immich-machine-learning:
-    image: lzocateli/immich-ml:v3.2.4
+    image: lzocateli/immich-ml:v3.2.4-r1
     env_file: .env
     volumes:
       - /mnt/pve_pool/immich/model-cache:/cache
@@ -70,24 +70,24 @@ Não publique a porta interna do serviço, não inclua modelos privados ou crede
 
 ```bash
 docker buildx build --check --file immich-ml/Dockerfile immich-ml
-docker buildx build --pull --platform linux/amd64 --load -t lzocateli/immich-ml:v3.2.4 immich-ml
+docker buildx build --pull --platform linux/amd64 --load -t lzocateli/immich-ml:v3.2.4-r1 immich-ml
 ```
 
 ## Tags e compatibilidade
 
 | Tag | Mutabilidade | Uso |
 | --- | --- | --- |
-| `v3.2.4` | Imutável após publicação | Servidor Immich da mesma release, variante CPU. |
+| `v3.2.4-r1` | Imutável após publicação | Servidor Immich da mesma release, variante CPU com AnyIO corrigido. |
 
-Não reutilize a tag nem publique `latest`; uma variante com GPU precisa de imagem/tag e validação próprias.
+Não reutilize `v3.2.4` nem `v3.2.4-r1` depois de publicadas e não publique `latest`; uma variante com GPU precisa de imagem/tag e validação próprias.
 
 ## Validação
 
-BuildKit `--check`, build `linux/amd64` e inspeção de usuário/entrypoint/health passaram para v3.2.4. Antes de publicar: `git check-ignore`, smoke test de inferência na stack descartável, teste do cache após recriação, Trivy sem CRITICAL corrigível, SBOM e proveniência.
+BuildKit `--check`, build `linux/amd64` e imports de `immich_ml`, Starlette e HTTPX com AnyIO 4.14.2 passaram para `v3.2.4-r1`; `pip` não está presente no runtime. Trivy 0.72.0 não encontrou CRITICAL corrigível no scan local. Antes de publicar: `git check-ignore`, teste funcional de inferência na stack descartável, teste do cache após recriação, SBOM e proveniência.
 
 ## Publicação
 
-No workflow **Publicar imagem de container**, use `context_path=immich-ml`, `image_name=immich-ml`, `image_tag=v3.2.4`, `dockerfile=Dockerfile`, `platforms=linux/amd64` após os gates da release. Nenhuma imagem foi publicada nesta mudança.
+No workflow **Publicar imagem de container**, use `context_path=immich-ml`, `image_name=immich-ml`, `image_tag=v3.2.4-r1`, `dockerfile=Dockerfile`, `platforms=linux/amd64` após os gates da release. Nenhuma imagem foi publicada nesta mudança.
 
 ## Operação
 
@@ -116,5 +116,6 @@ MIT cobre somente o conteúdo original deste repositório. Preserve avisos de te
 
 ## Histórico de alterações
 
+- `v3.2.4-r1`: corrige CVE-2026-63374 com AnyIO 4.14.2 no runtime.
 - `v3.2.4`: atualiza a base de inferência CPU para a release v3.2.4.
 - `v2.6.3`: wrapper inicial da variante CPU para TrueNAS.

@@ -6,19 +6,19 @@ SPDX-License-Identifier: MIT
 # Immich Server
 
 ![Docker Hub](https://img.shields.io/badge/image-lzocateli%2Fimmich--server-2496ED?logo=docker&logoColor=white)
-![Version](https://img.shields.io/badge/version-v3.2.4-2E7D32)
+![Version](https://img.shields.io/badge/version-v3.2.4--r1-2E7D32)
 ![Base](https://img.shields.io/badge/base-immich--server%3Av3.2.4-555555?logo=docker&logoColor=white)
 ![Platforms](https://img.shields.io/badge/platforms-linux%2Famd64-607D8B)
 ![Repository code license](https://img.shields.io/badge/repository_code-MIT-1565C0)
 ![Build](https://img.shields.io/badge/build-linux%2Famd64_local-success)
 
-Espelho do servidor Immich v3.2.4 para o Compose do TrueNAS. O wrapper só adiciona labels OCI; não altera a aplicação, o usuário, o entrypoint nem o health check upstream.
+Servidor Immich v3.2.4 para o Compose do TrueNAS. O wrapper substitui `node-tar` 7.5.16 da árvore pnpm por 7.5.19, já presente no npm da imagem upstream, para corrigir CVE-2026-59873. Preserva o usuário, o entrypoint e o health check upstream.
 
 ## Referência da imagem
 
 | Item | Valor |
 | --- | --- |
-| Imagem prevista | `lzocateli/immich-server:v3.2.4` |
+| Imagem prevista | `lzocateli/immich-server:v3.2.4-r1` |
 | Base | `ghcr.io/immich-app/immich-server:v3.2.4@sha256:d317916b28090c33eb36b308464ea391f8b7df1d850fcfea227a39ec879718c2` |
 | Plataformas declaradas | `linux/amd64` (upstream também fornece `linux/arm64`) |
 | Usuário, entrypoint e comando | Config.User vazio (root inicial); `tini -- /bin/bash -c`, `start.sh`, herdados da base |
@@ -27,14 +27,14 @@ Espelho do servidor Immich v3.2.4 para o Compose do TrueNAS. O wrapper só adici
 
 ## Conteúdo e finalidade
 
-Inclui o servidor oficial Immich e labels do repositório. Não inclui PostgreSQL, Valkey, machine learning, Nginx, biblioteca de fotos nem certificados. Esta imagem não adiciona pacotes ou arquivos de aplicação ao upstream.
+Inclui o servidor oficial Immich, `node-tar` 7.5.19 no lugar do 7.5.16 da aplicação e labels do repositório. A substituição preserva as dependências declaradas pela biblioteca e não reinstala a árvore pnpm. Não inclui PostgreSQL, Valkey, machine learning, Nginx, biblioteca de fotos nem certificados.
 
 ## Início rápido
 
 O serviço precisa da stack. Faça build local e suba o Compose existente no ambiente TrueNAS somente após fornecer a configuração de runtime:
 
 ```bash
-docker buildx build --pull --platform linux/amd64 --load -t lzocateli/immich-server:v3.2.4 immich-server
+docker buildx build --pull --platform linux/amd64 --load -t lzocateli/immich-server:v3.2.4-r1 immich-server
 ```
 
 ## Docker Compose
@@ -44,7 +44,7 @@ Trecho do contrato; as demais dependências devem estar na mesma rede do Compose
 ```yaml
 services:
   immich-server:
-    image: lzocateli/immich-server:v3.2.4
+    image: lzocateli/immich-server:v3.2.4-r1
     env_file: .env
     volumes:
       - ${UPLOAD_LOCATION}:/data
@@ -79,24 +79,24 @@ Mantenha os serviços internos na rede privada, forneça `.env` somente em runti
 
 ```bash
 docker buildx build --check --file immich-server/Dockerfile immich-server
-docker buildx build --pull --platform linux/amd64 --load -t lzocateli/immich-server:v3.2.4 immich-server
+docker buildx build --pull --platform linux/amd64 --load -t lzocateli/immich-server:v3.2.4-r1 immich-server
 ```
 
 ## Tags e compatibilidade
 
 | Tag | Mutabilidade | Uso |
 | --- | --- | --- |
-| `v3.2.4` | Imutável após publicação | Apenas com os serviços compatíveis da mesma release. |
+| `v3.2.4-r1` | Imutável após publicação | Immich v3.2.4 com `node-tar` 7.5.19; usar com serviços compatíveis da mesma release. |
 
-Sem `latest`. Uma nova base/digest requer outra tag; não sobrescreva `v2.6.3` nem `v3.2.4` depois de publicadas.
+Sem `latest`. Uma nova base, digest ou correção exige outra tag; não sobrescreva `v3.2.4` nem `v3.2.4-r1` depois de publicadas.
 
 ## Validação
 
-BuildKit `--check`, build `linux/amd64` e inspeção de usuário/entrypoint/porta/health passaram para v3.2.4. Antes da publicação: `git check-ignore`, smoke test com banco descartável, persistência, Trivy sem CRITICAL corrigível, SBOM e proveniência. Nada foi publicado ou implantado nesta mudança.
+BuildKit `--check`, build `linux/amd64` e carregamento de `node-tar` 7.5.19 passaram para `v3.2.4-r1`. Trivy 0.72.0 não encontrou CRITICAL corrigível no scan local pelo Docker daemon. Antes da publicação: `git check-ignore`, smoke test com banco descartável, persistência, SBOM e proveniência. Nada foi publicado ou implantado nesta mudança.
 
 ## Publicação
 
-No workflow **Publicar imagem de container**, use `context_path=immich-server`, `image_name=immich-server`, `image_tag=v3.2.4`, `dockerfile=Dockerfile`, `platforms=linux/amd64` após os gates da release.
+No workflow **Publicar imagem de container**, use `context_path=immich-server`, `image_name=immich-server`, `image_tag=v3.2.4-r1`, `dockerfile=Dockerfile`, `platforms=linux/amd64` após os gates da release.
 
 ## Operação
 
@@ -125,5 +125,6 @@ MIT cobre apenas o conteúdo original deste repositório. Dependências e a imag
 
 ## Histórico de alterações
 
+- `v3.2.4-r1`: corrige CVE-2026-59873 substituindo `node-tar` 7.5.16 por 7.5.19.
 - `v3.2.4`: atualiza a base do servidor para a release v3.2.4.
 - `v2.6.3`: wrapper inicial da release upstream para TrueNAS.
