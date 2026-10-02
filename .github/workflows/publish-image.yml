@@ -12,7 +12,7 @@ on:
         required: true
         type: string
       image_tag:
-        description: Tag imutável, por exemplo 18.4-pgvector0.8.6-bookworm
+        description: Tag imutável curta terminada em -vN, por exemplo 18.4-pgvector0.8.6-bookworm-v1
         required: true
         type: string
       dockerfile:
@@ -92,6 +92,7 @@ jobs:
           [[ "$IMAGE_NAME" =~ ^[a-z0-9]+([._-][a-z0-9]+)*$ ]] || { echo "image_name inválido"; exit 1; }
           [[ "$IMAGE_TAG" =~ ^[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$ ]] || { echo "image_tag inválida"; exit 1; }
           [[ ! "$IMAGE_TAG" =~ ^(latest|main|master|edge|nightly)$ ]] || { echo "image_tag móvel proibida: $IMAGE_TAG"; exit 1; }
+          [[ "$IMAGE_TAG" =~ -v[1-9][0-9]*$ ]] || { echo "image_tag deve terminar em -vN, por exemplo cuda-12.6.3-v1"; exit 1; }
           [[ "$PLATFORMS" =~ ^linux/(amd64|arm64|arm/v7)(,linux/(amd64|arm64|arm/v7))*$ ]] || { echo "platforms aceita apenas linux/amd64, linux/arm64 e linux/arm/v7"; exit 1; }
           [[ -d "$CONTEXT_PATH" ]] || { echo "Pasta não encontrada: $CONTEXT_PATH"; exit 1; }
           [[ -f "$CONTEXT_PATH/$DOCKERFILE_NAME" ]] || { echo "Dockerfile não encontrado"; exit 1; }
