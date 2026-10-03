@@ -118,7 +118,7 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 # ---- Venv base (sempre): Ansible + utilitários Python -----------------------
 RUN uv venv --python python3.12 /opt/venv \
     && uv pip install --python /opt/venv/bin/python \
-    ansible ansible-dev-tools passlib \
+    ansible ansible-dev-tools passlib "PyJWT>=2.14.0" \
     typer rich httpx python-dotenv
 
 # ---- ML opcional: PyTorch + openai-whisper ----------------------------------
