@@ -6,21 +6,21 @@ SPDX-License-Identifier: MIT
 # DEVOPS
 
 ![Docker Hub](https://img.shields.io/badge/image-lzocateli%2Fdevops-2496ED?logo=docker&logoColor=white)
-![Version](https://img.shields.io/badge/version-cuda--12.6.3--node24--terraform1.15.8-2E7D32)
+![Version](https://img.shields.io/badge/version-cuda--12.6.3--v1-2E7D32)
 ![Base](https://img.shields.io/badge/base-nvidia%2Fcuda%3A12.6.3--cudnn--runtime--ubuntu24.04-555555?logo=docker&logoColor=white)
 ![Platforms](https://img.shields.io/badge/platforms-linux%2Famd64-607D8B)
 ![Repository code license](https://img.shields.io/badge/repository_code-MIT-1565C0)
 ![Build](https://img.shields.io/badge/build-validado-success)
 
-Imagem multifuncional para automacao, IaC, CI local e fluxos de conteudo, unificando Python, Azure CLI, Terraform, Ansible, GitHub CLI, Node.js/Marp e utilitarios opcionais de ML no mesmo ambiente.
+Imagem multifuncional para automacao, IaC, CI local e fluxos de conteudo, unificando Python, Azure CLI, Terraform, Ansible, ferramentas de lint/teste, 7-Zip, GitHub CLI, Node.js/Marp e utilitarios opcionais de ML no mesmo ambiente.
 
 ## Referencia da imagem
 
 | Item | Valor |
 | --- | --- |
 | Imagem | `lzocateli/devops:<tag>` |
-| Tag recomendada (GPU) | `lzocateli/devops:cuda-12.6.3` |
-| Tag recomendada (CPU) | `lzocateli/devops:cpu` |
+| Tag recomendada (GPU) | `lzocateli/devops:cuda-12.6.3-v1` |
+| Tag recomendada (CPU) | `lzocateli/devops:cpu-v1` |
 | Imagem base padrao | `nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04` |
 | Node.js | `24.15.0` |
 | npm | `12.0.2` |
@@ -37,7 +37,9 @@ Imagem multifuncional para automacao, IaC, CI local e fluxos de conteudo, unific
 ### Incluido
 
 - Python 3.12 com `uv` e venv pre-aquecido em `/opt/venv`.
-- Azure CLI, Terraform 1.15.8 e Ansible (`ansible-dev-tools`, `passlib`).
+- Azure CLI, Terraform 1.15.8 e Ansible (`ansible-dev-tools`, `ansible-lint`, `yamllint`, `passlib`).
+- Testes, lint e formato de shell com Bats 1.10.0, ShellCheck 0.9.0 e shfmt 3.8.0.
+- 7-Zip 23.01 pelos comandos `7z`, `7za` e `7zr`.
 - GitHub CLI (`gh`) com versao pinada por `GH_VERSION`.
 - `sqlcmd` (go-sqlcmd Microsoft) com versao pinada por `SQLCMD_VERSION`.
 - Node.js 24.15.0 LTS, npm 12.0.2, npx, Corepack, Marp CLI, ffmpeg/ffprobe e dependencias de Chromium headless.
@@ -63,8 +65,8 @@ Esta imagem incorpora os contratos anteriormente publicados pelas imagens `node`
 ## Inicio rapido
 
 ```bash
-docker pull lzocateli/devops:cuda-12.6.3
-docker run --rm -it lzocateli/devops:cuda-12.6.3 zsh
+docker pull lzocateli/devops:cuda-12.6.3-v1
+docker run --rm -it lzocateli/devops:cuda-12.6.3-v1 zsh
 ```
 
 Exemplo minimo executavel (CPU):
@@ -72,7 +74,7 @@ Exemplo minimo executavel (CPU):
 ```bash
 docker run --rm -it \
   -v "$PWD:/workspace" -w /workspace \
-  lzocateli/devops:cpu zsh
+  lzocateli/devops:cpu-v1 zsh
 ```
 
 ## Docker Compose
@@ -80,7 +82,7 @@ docker run --rm -it \
 ```yaml
 services:
   devops:
-    image: lzocateli/devops:cuda-12.6.3
+    image: lzocateli/devops:cuda-12.6.3-v1
     restart: unless-stopped
     working_dir: /workspace
     volumes:
@@ -148,7 +150,7 @@ Build GPU (padrao):
 ```bash
 docker build \
   --pull \
-  --tag lzocateli/devops:cuda-12.6.3 \
+  --tag lzocateli/devops:cuda-12.6.3-v1 \
   devops
 ```
 
@@ -159,7 +161,7 @@ docker build \
   --build-arg NODE_VERSION=24.15.0 \
   --build-arg NPM_VERSION=12.0.2 \
   --build-arg TERRAFORM_VERSION=1.15.8 \
-  --tag lzocateli/devops:cuda-12.6.3 \
+  --tag lzocateli/devops:cuda-12.6.3-v1 \
   devops
 ```
 
@@ -171,7 +173,7 @@ docker build \
   --build-arg BASE_IMAGE=ubuntu:24.04 \
   --build-arg INSTALL_ML=false \
   --build-arg INSTALL_GOOGLE=false \
-  --tag lzocateli/devops:cpu-slim \
+  --tag lzocateli/devops:cpu-slim-v1 \
   devops
 ```
 
@@ -179,9 +181,9 @@ docker build \
 
 | Tag | Mutabilidade | Compatibilidade | Uso recomendado |
 | --- | --- | --- | --- |
-| `cuda-12.6.3` | Imutavel | GPU NVIDIA (quando disponivel) e CPU | Producao e automacao com ML |
-| `cpu` | Imutavel | Hosts sem GPU | Producao sem aceleracao CUDA |
-| `cpu-slim` | Imutavel | Hosts sem GPU, sem stack ML/Google | Automacao IaC e CI local |
+| `cuda-12.6.3-v1` | Imutavel | GPU NVIDIA (quando disponivel) e CPU | Producao e automacao com ML |
+| `cpu-v1` | Imutavel | Hosts sem GPU | Producao sem aceleracao CUDA |
+| `cpu-slim-v1` | Imutavel | Hosts sem GPU, sem stack ML/Google | Automacao IaC e CI local |
 
 Nao use `latest` como unica referencia em ambientes criticos.
 
@@ -194,6 +196,8 @@ Antes da publicacao, confirmar:
 - `.git` excluido do contexto Docker;
 - analise do Dockerfile com BuildKit;
 - smoke test de shell (`zsh`) e ferramentas-chave (`python`, `gh`, `az`, `ansible`, `sqlcmd`);
+- smoke test de lint e formato (`ansible-lint --version`, `yamllint --version`, `bats --version`, `shellcheck --version`, `shfmt --version`);
+- smoke test de compactacao e extracao (`7z i` e ciclo local criar/testar/extrair);
 - smoke test de Node (`node --version`, `npm --version`, `npx`) e Terraform (`terraform version`);
 - inspecao de vulnerabilidades, SBOM e proveniencia;
 - labels OCI e tag final coerentes com o release.
@@ -204,7 +208,7 @@ Use **Actions > Publicar imagem de container > Run workflow** com:
 
 - `context_path`: `devops`;
 - `image_name`: `devops`;
-- `image_tag`: tag imutavel (ex.: `cuda-12.6.3`);
+- `image_tag`: `cuda-12.6.3-v1`;
 - `dockerfile`: `Dockerfile`;
 - `platforms`: `linux/amd64`.
 
@@ -247,6 +251,10 @@ Para a imagem devops, use `context_path: devops`, `image_name: devops` e uma tag
 | Node.js | `24.15.0` | MIT | `https://github.com/nodejs/node/blob/main/LICENSE` |
 | npm | `12.0.2` | ISC | `https://github.com/npm/cli` |
 | Terraform | `1.15.8` | MPL-2.0 | `https://github.com/hashicorp/terraform` |
+| Bats | `1.10.0` | MIT | `https://github.com/bats-core/bats-core` |
+| ShellCheck | `0.9.0` | GPL-3.0 | `https://github.com/koalaman/shellcheck` |
+| shfmt | `3.8.0` | BSD-3-Clause | `https://github.com/mvdan/sh` |
+| 7-Zip | `23.01+dfsg-11` | LGPL-2.1+ | `https://www.7-zip.org/` |
 
 O badge MIT descreve apenas o conteudo original deste repositorio. Componentes de terceiros permanecem sob suas respectivas licencas. Consulte `https://github.com/lzocateli/containers/blob/main/LICENSING.md`.
 

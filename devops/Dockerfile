@@ -40,7 +40,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     UV_PROJECT_ENVIRONMENT=/opt/venv
 
 LABEL org.opencontainers.image.title="devops" \
-    org.opencontainers.image.description="Imagem multifuncional com Python, Azure CLI, Terraform 1.15.8, Ansible, GitHub CLI, Node.js 24 LTS/Marp e ferramentas opcionais de ML" \
+    org.opencontainers.image.description="Imagem multifuncional com Python, Azure CLI, Terraform 1.15.8, Ansible, linters, 7-Zip, GitHub CLI, Node.js 24 LTS/Marp e ferramentas opcionais de ML" \
     org.opencontainers.image.source="https://github.com/lzocateli/containers" \
     org.opencontainers.image.documentation="https://github.com/lzocateli/containers/tree/main/devops" \
     org.opencontainers.image.url="https://github.com/lzocateli/containers/tree/main/devops" \
@@ -55,7 +55,8 @@ RUN apt-get update -y && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends \
     ca-certificates curl wget gnupg gpg lsb-release software-properties-common \
     sudo sshpass openssh-client \
-    git jq aha less unzip zip bzip2 \
+    git jq aha less unzip zip bzip2 7zip \
+    bats shellcheck shfmt \
     ffmpeg \
     python3.12 python3.12-venv python3-pip \
     fonts-dejavu fonts-liberation \
