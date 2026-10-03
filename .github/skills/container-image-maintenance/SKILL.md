@@ -55,7 +55,7 @@ description: "Use para criar, alterar, otimizar, documentar, validar, versionar 
 
 ## Versionar e publicar
 
-1. Escolha tag imutável que represente versão upstream e variante.
+1. Escolha tag imutável e curta no formato `<versao-upstream>-vN`; incremente `vN` para diferenciar imagens com a mesma versão upstream e conteúdo distinto. Não inclua listas de ferramentas, datas ou hashes na tag.
 2. Não publique `latest` sem uma política explícita no README.
 3. Use `.github/workflows/publish-image.yml` para build e push no Docker Hub.
 4. Informe `context_path`, `image_name`, `image_tag`, Dockerfile e plataformas.

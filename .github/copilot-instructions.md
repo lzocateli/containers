@@ -40,6 +40,8 @@
 - Use o template `.github/templates/container-README.template.md` ao criar ou reestruturar documentação de imagem.
 - Use a skill `container-image-maintenance` para criação, alteração, validação ou release de imagens.
 - Não publique tags mutáveis como única referência. Toda release deve possuir uma tag imutável e descritiva.
+- Mantenha tags curtas no formato `<versao-upstream>-vN`, incrementando `vN` quando imagens com a mesma base ou versão upstream tiverem conteúdo diferente. Não inclua listas de ferramentas, datas ou hashes na tag.
+- Exemplos válidos: `cuda-12.6.3-v1`, `cuda-12.6.4-v1`, `cpu-v1`, `1.28.0-bookworm-v1`, `1.29.0-bookworm-v1` e `2.0.0-<nome>-v1`.
 - Não execute push ou deploy sem solicitação explícita e autenticação já configurada.
 
 ## Scripts e automação
