@@ -13,4 +13,4 @@ LABEL org.opencontainers.image.title="lzocateli/immich-server" \
   org.opencontainers.image.source="https://github.com/lzocateli/containers" \
   org.opencontainers.image.documentation="https://github.com/lzocateli/containers/tree/main/immich-server" \
   org.opencontainers.image.url="https://github.com/lzocateli/containers/tree/main/immich-server" \
-  org.opencontainers.image.version="v3.2.4-r1"
+  org.opencontainers.image.version="v3.2.4-v1"

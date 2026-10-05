@@ -19,4 +19,4 @@ LABEL org.opencontainers.image.title="lzocateli/immich-postgres" \
   org.opencontainers.image.source="https://github.com/lzocateli/containers" \
   org.opencontainers.image.documentation="https://github.com/lzocateli/containers/tree/main/immich-postgres" \
   org.opencontainers.image.url="https://github.com/lzocateli/containers/tree/main/immich-postgres" \
-  org.opencontainers.image.version="14-vc0.4.3-pgv0.2.0-r1"
+  org.opencontainers.image.version="14-vc0.4.3-pgv0.2.0-v1"
