@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 # Immich PostgreSQL
 
 ![Docker Hub](https://img.shields.io/badge/image-lzocateli%2Fimmich--postgres-2496ED?logo=docker&logoColor=white)
-![Version](https://img.shields.io/badge/version-14--vc0.4.3--pgv0.2.0--r1-2E7D32)
+![Version](https://img.shields.io/badge/version-14--vc0.4.3--pgv0.2.0--v1-2E7D32)
 ![Base](https://img.shields.io/badge/base-immich--postgres%3A14--vectorchord0.4.3-555555?logo=docker&logoColor=white)
 ![Platforms](https://img.shields.io/badge/platforms-linux%2Famd64-607D8B)
 ![Repository code license](https://img.shields.io/badge/repository_code-MIT-1565C0)
@@ -18,7 +18,7 @@ PostgreSQL 14 com VectorChord 0.4.3 e pgvectors 0.2.0 para Immich v3.2.4. O wrap
 
 | Item | Valor |
 | --- | --- |
-| Imagem prevista | `lzocateli/immich-postgres:14-vc0.4.3-pgv0.2.0-r1` |
+| Imagem prevista | `lzocateli/immich-postgres:14-vc0.4.3-pgv0.2.0-v1` |
 | Base | `ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23` |
 | Plataformas declaradas | `linux/amd64` (upstream também fornece `linux/arm64`) |
 | Usuário, entrypoint e comando | Config.User vazio (root inicial); `/usr/local/bin/immich-docker-entrypoint.sh`, `postgres -c config_file=/etc/postgresql/postgresql.conf` |
@@ -32,7 +32,7 @@ Inclui o banco e as extensões empacotadas no upstream para o Immich, pacotes De
 ## Início rápido
 
 ```bash
-docker buildx build --pull --platform linux/amd64 --load -t lzocateli/immich-postgres:14-vc0.4.3-pgv0.2.0-r1 immich-postgres
+docker buildx build --pull --platform linux/amd64 --load -t lzocateli/immich-postgres:14-vc0.4.3-pgv0.2.0-v1 immich-postgres
 ```
 
 Não execute contra o volume de produção para testar a imagem.
@@ -42,7 +42,7 @@ Não execute contra o volume de produção para testar a imagem.
 ```yaml
 services:
   database:
-    image: lzocateli/immich-postgres:14-vc0.4.3-pgv0.2.0-r1
+    image: lzocateli/immich-postgres:14-vc0.4.3-pgv0.2.0-v1
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_USER: ${DB_USERNAME}
@@ -78,16 +78,16 @@ Limite acesso ao volume e à rede Compose, injete a senha em runtime, mantenha o
 
 ```bash
 docker buildx build --check --file immich-postgres/Dockerfile immich-postgres
-docker buildx build --pull --platform linux/amd64 --load -t lzocateli/immich-postgres:14-vc0.4.3-pgv0.2.0-r1 immich-postgres
+docker buildx build --pull --platform linux/amd64 --load -t lzocateli/immich-postgres:14-vc0.4.3-pgv0.2.0-v1 immich-postgres
 ```
 
 ## Tags e compatibilidade
 
 | Tag | Mutabilidade | Uso |
 | --- | --- | --- |
-| `14-vc0.4.3-pgv0.2.0-r1` | Imutável após publicação | Mesmo PostgreSQL 14 e extensões, com Debian atualizado e `gosu` corrigido. |
+| `14-vc0.4.3-pgv0.2.0-v1` | Imutável após publicação | Mesmo PostgreSQL 14 e extensões, com Debian atualizado e `gosu` corrigido. |
 
-Não publique `latest` nem sobrescreva `14-vc0.4.3-pgv0.2.0` ou `14-vc0.4.3-pgv0.2.0-r1` depois de publicadas.
+Não publique `latest` nem sobrescreva `14-vc0.4.3-pgv0.2.0` ou `14-vc0.4.3-pgv0.2.0-v1` depois de publicadas.
 
 ## Validação
 
@@ -95,7 +95,7 @@ BuildKit `--check`, build `linux/amd64`, troca para o usuário `postgres` via `g
 
 ## Publicação
 
-No workflow **Publicar imagem de container**, use `context_path=immich-postgres`, `image_name=immich-postgres`, `image_tag=14-vc0.4.3-pgv0.2.0-r1`, `dockerfile=Dockerfile`, `platforms=linux/amd64` após os gates da release. Não houve publicação nesta mudança.
+No workflow **Publicar imagem de container**, use `context_path=immich-postgres`, `image_name=immich-postgres`, `image_tag=14-vc0.4.3-pgv0.2.0-v1`, `dockerfile=Dockerfile`, `platforms=linux/amd64` após os gates da release. Não houve publicação nesta mudança.
 
 ## Operação
 
@@ -124,5 +124,5 @@ MIT cobre apenas o conteúdo original deste repositório. Confirme os avisos de 
 
 ## Histórico de alterações
 
-- `14-vc0.4.3-pgv0.2.0-r1`: atualiza Debian e recompila `gosu` para sanar o gate CRITICAL.
+- `14-vc0.4.3-pgv0.2.0-v1`: atualiza Debian e recompila `gosu` para sanar o gate CRITICAL.
 - `14-vc0.4.3-pgv0.2.0`: wrapper inicial do banco da release Immich v2.6.3.
