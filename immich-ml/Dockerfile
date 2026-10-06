@@ -7,6 +7,10 @@ RUN /opt/venv/bin/python -m ensurepip \
 
 FROM ghcr.io/immich-app/immich-machine-learning:v3.2.4@sha256:e16c2f166a8174901959fdf85e2e4c7bd1ebc4b37e0b6655de97c41408a260c4 AS runtime
 
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends --only-upgrade perl-base \
+  && rm -rf /var/lib/apt/lists/*
+
 RUN rm -rf /opt/venv/lib/python3.11/site-packages/anyio /opt/venv/lib/python3.11/site-packages/anyio-4.2.0.dist-info
 
 COPY --from=build /tmp/anyio-patch/anyio /opt/venv/lib/python3.11/site-packages/anyio
@@ -17,4 +21,4 @@ LABEL org.opencontainers.image.title="lzocateli/immich-ml" \
   org.opencontainers.image.source="https://github.com/lzocateli/containers" \
   org.opencontainers.image.documentation="https://github.com/lzocateli/containers/tree/main/immich-ml" \
   org.opencontainers.image.url="https://github.com/lzocateli/containers/tree/main/immich-ml" \
-  org.opencontainers.image.version="v3.2.4-v1"
+  org.opencontainers.image.version="v3.2.4-v2"
