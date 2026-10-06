@@ -6,19 +6,19 @@ SPDX-License-Identifier: MIT
 # Immich PostgreSQL
 
 ![Docker Hub](https://img.shields.io/badge/image-lzocateli%2Fimmich--postgres-2496ED?logo=docker&logoColor=white)
-![Version](https://img.shields.io/badge/version-14--vc0.4.3--pgv0.2.0--v1-2E7D32)
+![Version](https://img.shields.io/badge/version-14--vc0.4.3--pgv0.2.0--v2-2E7D32)
 ![Base](https://img.shields.io/badge/base-immich--postgres%3A14--vectorchord0.4.3-555555?logo=docker&logoColor=white)
 ![Platforms](https://img.shields.io/badge/platforms-linux%2Famd64-607D8B)
 ![Repository code license](https://img.shields.io/badge/repository_code-MIT-1565C0)
 ![Build](https://img.shields.io/badge/build-linux%2Famd64_local-success)
 
-PostgreSQL 14 com VectorChord 0.4.3 e pgvectors 0.2.0 para Immich v3.2.4. O wrapper atualiza `libgnutls30`, `libssl3` e `openssl` no Debian e substitui o `gosu` upstream por 1.19 compilado com Go 1.27.1. Preserva scripts, usuário, entrypoint, volume e health check oficiais.
+PostgreSQL 14 com VectorChord 0.4.3 e pgvectors 0.2.0 para Immich v3.2.4. O wrapper atualiza `libgnutls30`, `libssl3`, `openssl` e a família Perl para `5.36.0-7+deb12u4`, corrigindo os CVEs Perl bloqueantes do scan. Também substitui o `gosu` upstream por 1.19 compilado com Go 1.27.1. Preserva scripts, usuário, entrypoint, volume e health check oficiais.
 
 ## Referência da imagem
 
 | Item | Valor |
 | --- | --- |
-| Imagem prevista | `lzocateli/immich-postgres:14-vc0.4.3-pgv0.2.0-v1` |
+| Imagem prevista | `lzocateli/immich-postgres:14-vc0.4.3-pgv0.2.0-v2` |
 | Base | `ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23` |
 | Plataformas declaradas | `linux/amd64` (upstream também fornece `linux/arm64`) |
 | Usuário, entrypoint e comando | Config.User vazio (root inicial); `/usr/local/bin/immich-docker-entrypoint.sh`, `postgres -c config_file=/etc/postgresql/postgresql.conf` |
@@ -32,7 +32,7 @@ Inclui o banco e as extensões empacotadas no upstream para o Immich, pacotes De
 ## Início rápido
 
 ```bash
-docker buildx build --pull --platform linux/amd64 --load -t lzocateli/immich-postgres:14-vc0.4.3-pgv0.2.0-v1 immich-postgres
+docker buildx build --pull --platform linux/amd64 --load -t lzocateli/immich-postgres:14-vc0.4.3-pgv0.2.0-v2 immich-postgres
 ```
 
 Não execute contra o volume de produção para testar a imagem.
@@ -42,7 +42,7 @@ Não execute contra o volume de produção para testar a imagem.
 ```yaml
 services:
   database:
-    image: lzocateli/immich-postgres:14-vc0.4.3-pgv0.2.0-v1
+    image: lzocateli/immich-postgres:14-vc0.4.3-pgv0.2.0-v2
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_USER: ${DB_USERNAME}
@@ -78,24 +78,24 @@ Limite acesso ao volume e à rede Compose, injete a senha em runtime, mantenha o
 
 ```bash
 docker buildx build --check --file immich-postgres/Dockerfile immich-postgres
-docker buildx build --pull --platform linux/amd64 --load -t lzocateli/immich-postgres:14-vc0.4.3-pgv0.2.0-v1 immich-postgres
+docker buildx build --pull --platform linux/amd64 --load -t lzocateli/immich-postgres:14-vc0.4.3-pgv0.2.0-v2 immich-postgres
 ```
 
 ## Tags e compatibilidade
 
 | Tag | Mutabilidade | Uso |
 | --- | --- | --- |
-| `14-vc0.4.3-pgv0.2.0-v1` | Imutável após publicação | Mesmo PostgreSQL 14 e extensões, com Debian atualizado e `gosu` corrigido. |
+| `14-vc0.4.3-pgv0.2.0-v2` | Imutável após publicação | Mesmo PostgreSQL 14 e extensões, com Debian e Perl atualizados e `gosu` corrigido. |
 
-Não publique `latest` nem sobrescreva `14-vc0.4.3-pgv0.2.0` ou `14-vc0.4.3-pgv0.2.0-v1` depois de publicadas.
+Não publique `latest` nem sobrescreva `14-vc0.4.3-pgv0.2.0-v2` depois de publicada. A tag `v1` não foi encontrada no Docker Hub.
 
 ## Validação
 
-BuildKit `--check`, build `linux/amd64`, troca para o usuário `postgres` via `gosu`, inspeção de entrypoint/porta/volume/health e `git check-ignore` passaram. Um cluster **descartável**, isolado da rede e dos volumes de produção, iniciou e expôs `vchord`, `vector` e `vectors`. `libgnutls30` está em `3.7.9-2+deb12u7`, `libssl3` e `openssl` em `3.0.22-1~deb12u1`; Trivy 0.72.0 não encontrou CRITICAL corrigível na imagem final local. Antes da publicação: testar persistência após recriação, gerar SBOM e proveniência. O estágio Go de build é descartado; apenas o binário `gosu` é copiado para a imagem final.
+O run de publicação da tag `v1` foi bloqueado pelo Trivy 0.70.0: os pacotes `libperl5.36`, `perl`, `perl-base` e `perl-modules-5.36` estavam em `5.36.0-7+deb12u2`, com correção `5.36.0-7+deb12u4` para os CVEs `CVE-2026-13221`, `CVE-2026-42496` e `CVE-2026-8376`. A revisão `v2` atualiza explicitamente essa família Perl junto dos pacotes de segurança já atualizados. Build `linux/amd64`, gate local do Trivy 0.72.0 com banco atualizado, inicialização PostgreSQL descartável e disponibilidade de `vchord`, `vector` e `vectors` passaram. Os quatro pacotes Perl estão em `5.36.0-7+deb12u4`; o gate encontrou zero CRITICAL corrigíveis. O relatório completo mantém 93 HIGH e 3 CRITICAL sem versão corrigida: `CVE-2023-45853` (`zlib1g`), `CVE-2025-7458` (`libsqlite3-0`) e `CVE-2026-6653` (`libxml2`). Esses achados permanecem visíveis e devem ser reavaliados quando houver versões corrigidas; nenhuma exceção foi adicionada. O estágio Go de build é descartado; apenas o binário `gosu` é copiado para a imagem final.
 
 ## Publicação
 
-No workflow **Publicar imagem de container**, use `context_path=immich-postgres`, `image_name=immich-postgres`, `image_tag=14-vc0.4.3-pgv0.2.0-v1`, `dockerfile=Dockerfile`, `platforms=linux/amd64` após os gates da release. Não houve publicação nesta mudança.
+No workflow **Publicar imagem de container**, use `context_path=immich-postgres`, `image_name=immich-postgres`, `image_tag=14-vc0.4.3-pgv0.2.0-v2`, `dockerfile=Dockerfile`, `platforms=linux/amd64` após os gates da release. Não publique antes do gate Trivy passar.
 
 ## Operação
 
@@ -124,5 +124,6 @@ MIT cobre apenas o conteúdo original deste repositório. Confirme os avisos de 
 
 ## Histórico de alterações
 
-- `14-vc0.4.3-pgv0.2.0-v1`: atualiza Debian e recompila `gosu` para sanar o gate CRITICAL.
+- `14-vc0.4.3-pgv0.2.0-v2`: atualiza a família Perl para corrigir os CVEs bloqueantes do Trivy.
+- `14-vc0.4.3-pgv0.2.0-v1`: primeira revisão de segurança; a publicação foi bloqueada por CVEs corrigíveis na família Perl.
 - `14-vc0.4.3-pgv0.2.0`: wrapper inicial do banco da release Immich v2.6.3.
