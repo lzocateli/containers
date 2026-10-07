@@ -130,6 +130,13 @@ RUN npm install --global "npm@${NPM_VERSION}" \
 # ---- uv (gerenciador Python) -------------------------------------------------
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
+# ---- Corrigir PyJWT no ambiente isolado do Azure CLI -------------------------
+RUN AZURE_CLI_SITE_PACKAGES="$(/opt/az/bin/python3 -c 'import sysconfig; print(sysconfig.get_path("purelib"))')" \
+    && rm -rf "${AZURE_CLI_SITE_PACKAGES}"/PyJWT-*.dist-info \
+    "${AZURE_CLI_SITE_PACKAGES}"/pyjwt-*.dist-info \
+    "${AZURE_CLI_SITE_PACKAGES}"/jwt \
+    && uv pip install --target "$AZURE_CLI_SITE_PACKAGES" "PyJWT>=2.14.0"
+
 # ---- Venv base (sempre): Ansible + utilitários Python -----------------------
 RUN uv venv --python python3.12 /opt/venv \
     && uv pip install --python /opt/venv/bin/python \
