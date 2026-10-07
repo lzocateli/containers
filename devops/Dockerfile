@@ -81,6 +81,21 @@ RUN ARCH=$(dpkg --print-architecture) \
     && mv "/tmp/gh_${GH_VERSION}_linux_${ARCH}/bin/gh" /usr/local/bin/gh \
     && rm -rf /tmp/gh.tar.gz "/tmp/gh_${GH_VERSION}_linux_${ARCH}"
 
+# ---- 1Password CLI (op) -----------------------------------------------------
+RUN ARCH=$(dpkg --print-architecture) \
+    && case "$ARCH" in \
+    amd64|arm64) : ;; \
+    *) echo "Arquitetura não suportada para 1Password CLI: $ARCH" && exit 1 ;; \
+    esac \
+    && curl -fsSL https://downloads.1password.com/linux/keys/1password.asc \
+    | gpg --dearmor -o /usr/share/keyrings/1password-archive-keyring.gpg \
+    && echo "deb [arch=${ARCH} signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/${ARCH} stable main" \
+    > /etc/apt/sources.list.d/1password.list \
+    && apt-get update -y \
+    && apt-get install -y --no-install-recommends 1password-cli \
+    && rm -rf /var/lib/apt/lists/* \
+    && op --version
+
 # ---- sqlcmd (go-sqlcmd) — binário oficial Microsoft -------------------------
 # https://github.com/microsoft/go-sqlcmd/releases
 # Não exige aceite de EULA (ao contrário do mssql-tools clássico) e é um
