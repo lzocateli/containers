@@ -40,16 +40,14 @@ LABEL org.opencontainers.image.title="lzocateli/nginx" \
   org.opencontainers.image.source="https://github.com/lzocateli/containers" \
   org.opencontainers.image.documentation="https://github.com/lzocateli/containers/tree/main/nginx" \
   org.opencontainers.image.url="https://github.com/lzocateli/containers/tree/main/nginx" \
-  org.opencontainers.image.version="${NGINX_VERSION}-bookworm"
+  org.opencontainers.image.version="${NGINX_VERSION}-bookworm-v1"
 
 RUN mkdir -p /etc/nginx/modules-enabled
 
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libmaxminddb0 \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends --only-upgrade \
-        libgnutls30 \
-        libssl3 \
-        openssl \
+    && apt-mark hold nginx \
+    && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=module-builder /tmp/nginx-${NGINX_VERSION}/objs/ngx_http_headers_more_filter_module.so /etc/nginx/modules/ngx_http_headers_more_filter_module.so
