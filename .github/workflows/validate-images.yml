@@ -44,7 +44,7 @@ jobs:
           fetch-depth: 0
 
       - name: Configurar uv
-        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         with:
           version: "0.9.26"
           enable-cache: false
@@ -134,7 +134,7 @@ jobs:
 
       - name: Publicar relatório do repositório
         if: always() && (hashFiles('trivy-secrets.sarif') != '' || hashFiles('trivy-misconfigurations.sarif') != '')
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: trivy-repository-${{ github.run_id }}
           path: |
@@ -264,7 +264,7 @@ jobs:
 
       - name: Publicar relatório como artifact
         if: always() && matrix.image.validation == 'build' && hashFiles(format('trivy-{0}.sarif', matrix.image.id)) != ''
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: trivy-${{ matrix.image.id }}-${{ github.run_id }}
           path: trivy-${{ matrix.image.id }}.sarif
@@ -272,7 +272,7 @@ jobs:
 
       - name: Enviar resultado ao Code Scanning
         if: always() && matrix.image.validation == 'build' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && hashFiles(format('trivy-{0}.sarif', matrix.image.id)) != ''
-        uses: github/codeql-action/upload-sarif@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
         with:
           sarif_file: trivy-${{ matrix.image.id }}.sarif
           category: trivy-${{ matrix.image.id }}
