@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 # Node.js 24 LTS hardened
 
 ![Docker Hub](https://img.shields.io/badge/image-lzocateli%2Fnode-2496ED?logo=docker&logoColor=white)
-![Version](https://img.shields.io/badge/version-24.22.1--bookworm-2E7D32)
+![Version](https://img.shields.io/badge/version-24.22.1--bookworm--v1-2E7D32)
 ![Base](https://img.shields.io/badge/base-node%3A24.22.1--bookworm-555555?logo=docker&logoColor=white)
 ![Platforms](https://img.shields.io/badge/platforms-linux%2Famd64-607D8B)
 ![Repository code license](https://img.shields.io/badge/repository_code-MIT-1565C0)
@@ -18,7 +18,7 @@ Imagem baseada em Node.js 24 LTS (Debian Bookworm), com `npm`, `npx` e `corepack
 
 | Item | Valor |
 | --- | --- |
-| Imagem | `lzocateli/node:24.22.1-bookworm` |
+| Imagem | `lzocateli/node:24.22.1-bookworm-v1` |
 | Imagem base | `node:24.22.1-bookworm` |
 | Plataformas | `linux/amd64` |
 | Usuario padrao | `node` |
@@ -52,8 +52,8 @@ Esta imagem e base generica para workloads Node.js e TypeScript. Para uso com An
 ## Inicio rapido
 
 ```bash
-docker pull lzocateli/node:24.22.1-bookworm
-docker run --rm lzocateli/node:24.22.1-bookworm node --version
+docker pull lzocateli/node:24.22.1-bookworm-v1
+docker run --rm lzocateli/node:24.22.1-bookworm-v1 node --version
 ```
 
 Exemplo com projeto Node local:
@@ -62,7 +62,7 @@ Exemplo com projeto Node local:
 docker run --rm \
   --workdir /workspace \
   --volume "$(pwd):/workspace" \
-  lzocateli/node:24.22.1-bookworm \
+  lzocateli/node:24.22.1-bookworm-v1 \
   sh -lc "npm ci && npm run -s build || npm test"
 ```
 
@@ -71,7 +71,7 @@ docker run --rm \
 ```yaml
 services:
   node:
-    image: lzocateli/node:24.22.1-bookworm
+    image: lzocateli/node:24.22.1-bookworm-v1
     working_dir: /workspace
     user: "node"
     volumes:
@@ -117,20 +117,20 @@ O entrypoint da imagem base Node e preservado. O processo padrao executa `node -
 ## Build local
 
 ```bash
-docker build --pull --tag lzocateli/node:24.22.1-bookworm node
+docker build --pull --tag lzocateli/node:24.22.1-bookworm-v1 node
 ```
 
 Para validar Angular 22 localmente:
 
 ```bash
-docker run --rm lzocateli/node:24.22.1-bookworm sh -lc "npx -y @angular/cli@22 version"
+docker run --rm lzocateli/node:24.22.1-bookworm-v1 sh -lc "npx -y @angular/cli@22 version"
 ```
 
 ## Tags e compatibilidade
 
 | Tag | Mutabilidade | Compatibilidade | Uso recomendado |
 | --- | --- | --- | --- |
-| `24.22.1-bookworm` | Imutavel | Node.js 24 LTS hardened | Producao e CI |
+| `24.22.1-bookworm-v1` | Imutavel | Node.js 24 LTS hardened | Producao e CI |
 | `24-bookworm` | Movel | Ultimo patch da linha 24 LTS | Homologacao controlada |
 
 Prefira tags imutaveis em pipelines e releases.
@@ -154,7 +154,7 @@ Use **Actions > Publicar imagem de container > Run workflow** com:
 
 - `context_path`: `node`;
 - `image_name`: `node`;
-- `image_tag`: `24.22.1-bookworm`;
+- `image_tag`: `24.22.1-bookworm-v1`;
 - `dockerfile`: `Dockerfile`;
 - `platforms`: `linux/amd64`.
 
@@ -184,6 +184,6 @@ O badge MIT descreve somente o conteudo original deste repositorio. Componentes 
 
 ## Historico de alteracoes
 
-- `24.22.1-bookworm`: atualiza para Node.js 24.22.1 LTS e npm 12.2.1, mantendo o hardening da versao anterior; atualiza `libbrotli1` (CVE-2026-111497) e troca o undici empacotado no npm de 6.29.0 para 6.29.1 (CVE-2026-109869).
+- `24.22.1-bookworm-v1`: atualiza para Node.js 24.22.1 LTS e npm 12.2.1, mantendo o hardening da versao anterior; atualiza `libbrotli1` (CVE-2026-111497) e troca o undici empacotado no npm de 6.29.0 para 6.29.1 (CVE-2026-109869).
 - `24.15.0-bookworm`: adiciona hardening de seguranca (upgrade de `libgnutls30`, npm 12.0.2 e remocao de pacotes Debian desnecessarios) para uso generico como base Node LTS.
 
