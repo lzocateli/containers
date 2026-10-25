@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
-ARG NODE_BASE_IMAGE=lzocateli/node:24.15.0-bookworm
-ARG NODE_VERSION=24.15.0
-ARG ANGULAR_CLI_VERSION=22.1.0
+ARG NODE_BASE_IMAGE=lzocateli/node:24.22.1-bookworm
+ARG NODE_VERSION=24.22.1
+ARG ANGULAR_CLI_VERSION=22.2.4
 
 FROM ${NODE_BASE_IMAGE} AS runtime
 
