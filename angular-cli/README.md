@@ -6,20 +6,20 @@ SPDX-License-Identifier: MIT
 # Angular CLI 22 sobre Node.js 24 LTS
 
 ![Docker Hub](https://img.shields.io/badge/image-lzocateli%2Fangular--cli-2496ED?logo=docker&logoColor=white)
-![Version](https://img.shields.io/badge/version-22.2.4--node24.22.1--bookworm-2E7D32)
-![Base](https://img.shields.io/badge/base-lzocateli%2Fnode%3A24.22.1--bookworm-555555?logo=docker&logoColor=white)
+![Version](https://img.shields.io/badge/version-22.2.4--node24.22.1--bookworm--v1-2E7D32)
+![Base](https://img.shields.io/badge/base-lzocateli%2Fnode%3A24.22.1--bookworm--v1-555555?logo=docker&logoColor=white)
 ![Platforms](https://img.shields.io/badge/platforms-linux%2Famd64-607D8B)
 ![Repository code license](https://img.shields.io/badge/repository_code-MIT-1565C0)
 ![Build](https://img.shields.io/badge/build-validado-success)
 
-Imagem para uso de Angular CLI 22 em ambiente containerizado, baseada em `lzocateli/node:24.22.1-bookworm` e preparada para scaffolding, build e `ng serve` em projetos Angular.
+Imagem para uso de Angular CLI 22 em ambiente containerizado, baseada em `lzocateli/node:24.22.1-bookworm-v1` e preparada para scaffolding, build e `ng serve` em projetos Angular.
 
 ## Referencia da imagem
 
 | Item | Valor |
 | --- | --- |
-| Imagem | `lzocateli/angular-cli:22.2.4-node24.22.1-bookworm` |
-| Imagem base | `lzocateli/node:24.22.1-bookworm` |
+| Imagem | `lzocateli/angular-cli:22.2.4-node24.22.1-bookworm-v1` |
+| Imagem base | `lzocateli/node:24.22.1-bookworm-v1` |
 | Angular CLI | `22.2.4` |
 | Node.js | `24.22.1` |
 | Plataformas | `linux/amd64` |
@@ -48,8 +48,8 @@ Imagem para uso de Angular CLI 22 em ambiente containerizado, baseada em `lzocat
 ## Inicio rapido
 
 ```bash
-docker pull lzocateli/angular-cli:22.2.4-node24.22.1-bookworm
-docker run --rm lzocateli/angular-cli:22.2.4-node24.22.1-bookworm ng version
+docker pull lzocateli/angular-cli:22.2.4-node24.22.1-bookworm-v1
+docker run --rm lzocateli/angular-cli:22.2.4-node24.22.1-bookworm-v1 ng version
 ```
 
 Executar comandos `ng` em projeto local:
@@ -59,7 +59,7 @@ docker run --rm -it \
   -v "$(pwd):/workspace" \
   -w /workspace \
   -p 4200:4200 \
-  lzocateli/angular-cli:22.2.4-node24.22.1-bookworm \
+  lzocateli/angular-cli:22.2.4-node24.22.1-bookworm-v1 \
   ng serve --host 0.0.0.0
 ```
 
@@ -68,7 +68,7 @@ docker run --rm -it \
 ```yaml
 services:
   angular-cli:
-    image: lzocateli/angular-cli:22.2.4-node24.22.1-bookworm
+    image: lzocateli/angular-cli:22.2.4-node24.22.1-bookworm-v1
     working_dir: /workspace
     user: "node"
     command: ["ng", "version"]
@@ -115,23 +115,23 @@ O entrypoint `angular-entrypoint.sh` executa o comando recebido; quando o primei
 
 ## Build local
 
-Como a base `lzocateli/node:24.22.1-bookworm` ainda nao foi publicada no registry, gere localmente antes:
+Como a base `lzocateli/node:24.22.1-bookworm-v1` pode nao estar disponivel localmente, gere-a antes:
 
 ```bash
-docker build --pull --tag lzocateli/node:24.22.1-bookworm node
+docker build --pull --tag lzocateli/node:24.22.1-bookworm-v1 node
 ```
 
 Depois, gere a imagem angular-cli:
 
 ```bash
-docker build --pull --tag lzocateli/angular-cli:22.2.4-node24.22.1-bookworm angular-cli
+docker build --pull --tag lzocateli/angular-cli:22.2.4-node24.22.1-bookworm-v1 angular-cli
 ```
 
 ## Tags e compatibilidade
 
 | Tag | Mutabilidade | Compatibilidade | Uso recomendado |
 | --- | --- | --- | --- |
-| `22.2.4-node24.22.1-bookworm` | Imutavel | Angular CLI 22.2.4 + Node 24.22.1 LTS | Producao e CI |
+| `22.2.4-node24.22.1-bookworm-v1` | Imutavel | Angular CLI 22.2.4 + Node 24.22.1 LTS | Producao e CI |
 
 Use sempre tags imutaveis em pipeline.
 
@@ -152,7 +152,7 @@ Use **Actions > Publicar imagem de container > Run workflow** com:
 
 - `context_path`: `angular-cli`;
 - `image_name`: `angular-cli`;
-- `image_tag`: `22.2.4-node24.22.1-bookworm`;
+- `image_tag`: `22.2.4-node24.22.1-bookworm-v1`;
 - `dockerfile`: `Dockerfile`;
 - `platforms`: `linux/amd64`.
 
@@ -168,7 +168,7 @@ Use **Actions > Publicar imagem de container > Run workflow** com:
 
 - Plataforma validada neste repositorio: `linux/amd64`.
 - Imagem nao inclui navegador para E2E.
-- Requer imagem base `lzocateli/node:24.22.1-bookworm` disponivel localmente ou publicada.
+- Requer imagem base `lzocateli/node:24.22.1-bookworm-v1` disponivel localmente ou publicada.
 
 ## Licencas e fontes
 
@@ -177,11 +177,11 @@ Use **Actions > Publicar imagem de container > Run workflow** com:
 | Conteudo original deste repositorio | Atual | MIT | `https://github.com/lzocateli/containers` |
 | Angular CLI | 22.2.4 | MIT | `https://github.com/angular/angular-cli` |
 | Node.js | 24.22.1 | MIT | `https://github.com/nodejs/node/blob/main/LICENSE` |
-| Imagem base `lzocateli/node` | 24.22.1-bookworm | MIT (conteudo empacotado pelo projeto) | `https://github.com/lzocateli/containers/tree/main/node` |
+| Imagem base `lzocateli/node` | 24.22.1-bookworm-v1 | MIT (conteudo empacotado pelo projeto) | `https://github.com/lzocateli/containers/tree/main/node` |
 
 O badge MIT descreve somente o conteudo original deste repositorio. Componentes de terceiros permanecem sujeitos aos seus termos e avisos de licenca. Consulte a politica de licenciamento: https://github.com/lzocateli/containers/blob/main/LICENSING.md.
 
 ## Historico de alteracoes
 
-- `22.2.4-node24.22.1-bookworm`: atualiza para Angular CLI 22.2.4 sobre `lzocateli/node:24.22.1-bookworm` (Node.js 24.22.1 LTS e npm 12.2.1).
+- `22.2.4-node24.22.1-bookworm-v1`: atualiza para Angular CLI 22.2.4 sobre `lzocateli/node:24.22.1-bookworm-v1` (Node.js 24.22.1 LTS e npm 12.2.1).
 - `22.1.0-node24.15.0-bookworm`: atualiza base para Node 24 LTS, adota Angular CLI 22 e padroniza contrato da imagem.

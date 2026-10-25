@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-ARG NODE_BASE_IMAGE=lzocateli/node:24.22.1-bookworm
+ARG NODE_BASE_IMAGE=lzocateli/node:24.22.1-bookworm-v1
 ARG NODE_VERSION=24.22.1
 ARG ANGULAR_CLI_VERSION=22.2.4
 
@@ -13,7 +13,7 @@ LABEL org.opencontainers.image.title="lzocateli/angular-cli" \
   org.opencontainers.image.source="https://github.com/lzocateli/containers" \
   org.opencontainers.image.documentation="https://github.com/lzocateli/containers/tree/main/angular-cli" \
   org.opencontainers.image.url="https://github.com/lzocateli/containers/tree/main/angular-cli" \
-  org.opencontainers.image.version="${ANGULAR_CLI_VERSION}-node${NODE_VERSION}-bookworm"
+  org.opencontainers.image.version="${ANGULAR_CLI_VERSION}-node${NODE_VERSION}-bookworm-v1"
 
 ENV NG_CLI_ANALYTICS=false \
   NPM_CONFIG_UPDATE_NOTIFIER=false
