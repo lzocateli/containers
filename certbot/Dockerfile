@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM certbot/dns-cloudflare:v5.8.0
+FROM certbot/dns-cloudflare:v5.9.0
 
 ARG IMAGE_VERSION="5.8.0"
 
