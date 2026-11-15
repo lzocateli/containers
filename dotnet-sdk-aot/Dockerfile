@@ -13,6 +13,11 @@ LABEL org.opencontainers.image.title="lzocateli/dotnet-sdk-aot" \
 	org.opencontainers.image.url="https://github.com/lzocateli/containers/tree/main/dotnet-sdk-aot" \
 	org.opencontainers.image.version="${IMAGE_VERSION}"
 
+# Correções do Ubuntu publicadas depois da base: os headers do kernel (linux-libc-dev) vêm com o toolchain do AOT.
+RUN apt-get update \
+	&& apt-get install --yes --no-install-recommends --only-upgrade linux-libc-dev \
+	&& rm -rf /var/lib/apt/lists/*
+
 RUN install --directory --owner="${APP_UID}" --group="${APP_UID}" /workspace
 
 WORKDIR /workspace
