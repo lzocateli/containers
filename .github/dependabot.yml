@@ -60,6 +60,12 @@ updates:
       day: monday
       time: "06:00"
       timezone: America/Sao_Paulo
+    # As imagens .NET seguem a linha LTS publicada; troca de versão major é decisão manual.
+    ignore:
+      - dependency-name: "dotnet/aspnet"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "dotnet/sdk"
+        update-types: ["version-update:semver-major"]
     groups:
       container-bases:
         patterns:
