@@ -2,7 +2,7 @@
 
 # Imagem oficial do .NET 10 SDK com os pré-requisitos de Native AOT (clang, lld e zlib).
 # mcr.microsoft.com/dotnet/sdk:10.0.403-noble-aot
-FROM mcr.microsoft.com/dotnet/sdk@sha256:e5b1f5150f66079aa409eec64042a13de475530864825bf85d575188d3c8d3f9 AS runtime
+FROM mcr.microsoft.com/dotnet/sdk:10.0.403-noble-aot@sha256:e5b1f5150f66079aa409eec64042a13de475530864825bf85d575188d3c8d3f9 AS runtime
 
 ARG IMAGE_VERSION="10.0.403-noble-aot-v1"
 
@@ -12,6 +12,11 @@ LABEL org.opencontainers.image.title="lzocateli/dotnet-sdk-aot" \
 	org.opencontainers.image.documentation="https://github.com/lzocateli/containers/tree/main/dotnet-sdk-aot" \
 	org.opencontainers.image.url="https://github.com/lzocateli/containers/tree/main/dotnet-sdk-aot" \
 	org.opencontainers.image.version="${IMAGE_VERSION}"
+
+# Correções do Ubuntu publicadas depois da base: os headers do kernel (linux-libc-dev) vêm com o toolchain do AOT.
+RUN apt-get update \
+	&& apt-get install --yes --no-install-recommends --only-upgrade linux-libc-dev \
+	&& rm -rf /var/lib/apt/lists/*
 
 RUN install --directory --owner="${APP_UID}" --group="${APP_UID}" /workspace
 
