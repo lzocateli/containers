@@ -1,20 +1,19 @@
 # syntax=docker/dockerfile:1
-ARG NGINX_VERSION=1.28.0
+ARG NGINX_VERSION=1.30.6
 
-FROM nginx:${NGINX_VERSION}-bookworm AS module-builder
+FROM nginx:${NGINX_VERSION}-alpine AS module-builder
 
 ARG NGINX_VERSION
 
-RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        build-essential \
+RUN apk add --no-cache \
+        build-base \
         ca-certificates \
         curl \
         libmaxminddb-dev \
-        libpcre2-dev \
-        libssl-dev \
-        zlib1g-dev \
-    && rm -rf /var/lib/apt/lists/*
+        linux-headers \
+        openssl-dev \
+        pcre2-dev \
+        zlib-dev
 
 WORKDIR /tmp
 
@@ -31,7 +30,7 @@ RUN cd "nginx-${NGINX_VERSION}" \
         --add-dynamic-module=../ngx_http_geoip2_module-3.4 \
     && make modules
 
-FROM nginx:${NGINX_VERSION}-bookworm
+FROM nginx:${NGINX_VERSION}-alpine
 
 ARG NGINX_VERSION
 
@@ -40,15 +39,14 @@ LABEL org.opencontainers.image.title="lzocateli/nginx" \
   org.opencontainers.image.source="https://github.com/lzocateli/containers" \
   org.opencontainers.image.documentation="https://github.com/lzocateli/containers/tree/main/nginx" \
   org.opencontainers.image.url="https://github.com/lzocateli/containers/tree/main/nginx" \
-  org.opencontainers.image.version="${NGINX_VERSION}-bookworm-v1"
+  org.opencontainers.image.version="${NGINX_VERSION}-alpine-v1"
 
 RUN mkdir -p /etc/nginx/modules-enabled
 
-RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libmaxminddb0 \
-    && apt-mark hold nginx \
-    && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/*
+# Pacotes do Alpine atualizados no build, menos o nginx e os módulos dele: os módulos dinâmicos abaixo são compilados
+# contra esta versão exata.
+RUN apk add --no-cache libmaxminddb \
+    && apk upgrade --no-cache $(apk info | grep -vE '^nginx($|-)')
 
 COPY --from=module-builder /tmp/nginx-${NGINX_VERSION}/objs/ngx_http_headers_more_filter_module.so /etc/nginx/modules/ngx_http_headers_more_filter_module.so
 COPY --from=module-builder /tmp/nginx-${NGINX_VERSION}/objs/ngx_http_geoip2_module.so /etc/nginx/modules/ngx_http_geoip2_module.so
