@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-ARG NGINX_VERSION=1.30.6
+ARG NGINX_VERSION=1.30.7
 
 FROM nginx:${NGINX_VERSION}-alpine AS module-builder
 
