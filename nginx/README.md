@@ -6,20 +6,20 @@ SPDX-License-Identifier: MIT
 # NGINX com headers-more e GeoIP2 dinâmicos
 
 ![Docker Hub](https://img.shields.io/badge/image-lzocateli%2Fnginx-2496ED?logo=docker&logoColor=white)
-![Version](https://img.shields.io/badge/version-1.30.6--alpine--v1-2E7D32)
-![Base](https://img.shields.io/badge/base-nginx%3A1.30.6--alpine-555555?logo=docker&logoColor=white)
+![Version](https://img.shields.io/badge/version-1.30.7--alpine--v1-2E7D32)
+![Base](https://img.shields.io/badge/base-nginx%3A1.30.7--alpine-555555?logo=docker&logoColor=white)
 ![Platforms](https://img.shields.io/badge/platforms-linux%2Famd64-607D8B)
 ![Repository code license](https://img.shields.io/badge/repository_code-MIT-1565C0)
 ![Build](https://img.shields.io/badge/build-validado-success)
 
-Imagem NGINX estável baseada em `nginx:1.30.6-alpine`, com módulos dinâmicos `headers-more` e `geoip2` compilados em build multi-stage. O contrato da imagem prioriza configuração por bind mount em `/etc/nginx/conf.d`.
+Imagem NGINX estável baseada em `nginx:1.30.7-alpine`, com módulos dinâmicos `headers-more` e `geoip2` compilados em build multi-stage. O contrato da imagem prioriza configuração por bind mount em `/etc/nginx/conf.d`.
 
 ## Referência da imagem
 
 | Item | Valor |
 | --- | --- |
-| Imagem | `lzocateli/nginx:1.30.6-alpine-v1` |
-| Imagem base | `nginx:1.30.6-alpine` |
+| Imagem | `lzocateli/nginx:1.30.7-alpine-v1` |
+| Imagem base | `nginx:1.30.7-alpine` |
 | Plataformas | `linux/amd64` |
 | Usuário padrão | `root` (herdado da imagem base) |
 | Entry point | `/docker-entrypoint.sh` |
@@ -34,7 +34,7 @@ Imagem NGINX estável baseada em `nginx:1.30.6-alpine`, com módulos dinâmicos 
 
 ### Incluído
 
-- NGINX Open Source 1.30.6 (linha estável) sobre Alpine 3.24, com os pacotes Alpine atualizados no build (`apk upgrade`), exceto o `nginx` e os módulos dele, para manter a compatibilidade binária dos módulos dinâmicos compilados contra a mesma versão.
+- NGINX Open Source 1.30.7 (linha estável) sobre Alpine 3.24, com os pacotes Alpine atualizados no build (`apk upgrade`), exceto o `nginx` e os módulos dele, para manter a compatibilidade binária dos módulos dinâmicos compilados contra a mesma versão.
 - Módulo `headers-more` carregado automaticamente em `/etc/nginx/modules-enabled/50-mod-http-headers-more-filter.conf`.
 - Módulo `geoip2` carregado automaticamente em `/etc/nginx/modules-enabled/51-mod-http-geoip2.conf`.
 - Conteúdo estático de erro customizado em `/usr/share/nginx/html/custom-error-page/`.
@@ -52,7 +52,7 @@ Imagem NGINX estável baseada em `nginx:1.30.6-alpine`, com módulos dinâmicos 
 Baixe a imagem:
 
 ```bash
-docker pull lzocateli/nginx:1.30.6-alpine-v1
+docker pull lzocateli/nginx:1.30.7-alpine-v1
 ```
 
 Exemplo mínimo com configuração e dados GeoIP por bind mount:
@@ -65,7 +65,7 @@ docker run --name nginx \
   --publish 127.0.0.1:8080:80 \
   --mount type=bind,src="$(pwd)/conf.d",dst=/etc/nginx/conf.d,readonly \
   --mount type=bind,src="$(pwd)/geoip-data",dst=/usr/share/GeoIP,readonly \
-  lzocateli/nginx:1.30.6-alpine-v1
+  lzocateli/nginx:1.30.7-alpine-v1
 ```
 
 Antes de subir, valide a configuração montada:
@@ -75,7 +75,7 @@ docker run --rm \
   --mount type=bind,src="$(pwd)/nginx.conf",dst=/etc/nginx/nginx.conf,readonly \
   --mount type=bind,src="$(pwd)/conf.d",dst=/etc/nginx/conf.d,readonly \
   --mount type=bind,src="$(pwd)/geoip-data",dst=/usr/share/GeoIP,readonly \
-  lzocateli/nginx:1.30.6-alpine-v1 nginx -t
+  lzocateli/nginx:1.30.7-alpine-v1 nginx -t
 ```
 
 ## Execução com Podman
@@ -94,7 +94,7 @@ podman run -d \
   -v /userapps/configs/geoip2/data:/usr/share/GeoIP:ro \
   -v /userapps/configs/nginx:/etc/nginx/conf.d:ro \
   -v /var/log/nginx:/var/log/nginx \
-  lzocateli/nginx:1.30.6-alpine-v1
+  lzocateli/nginx:1.30.7-alpine-v1
 ```
 
 Validação de sintaxe com Podman:
@@ -104,7 +104,7 @@ podman run --rm \
   -v /userapps/configs/nginx/nginx.conf:/etc/nginx/nginx.conf:ro \
   -v /userapps/configs/nginx:/etc/nginx/conf.d:ro \
   -v /userapps/configs/geoip2/data:/usr/share/GeoIP:ro \
-  lzocateli/nginx:1.30.6-alpine-v1 nginx -t
+  lzocateli/nginx:1.30.7-alpine-v1 nginx -t
 ```
 
 Em ambiente Windows/PowerShell, ajuste os caminhos para o formato absoluto local, como `c:/Users/...`.
@@ -204,7 +204,7 @@ O `compose.yaml` define um healthcheck leve com `curl` contra `http://127.0.0.1:
 A partir da raiz do repositório:
 
 ```bash
-docker build --pull --tag lzocateli/nginx:1.30.6-alpine-v1 nginx
+docker build --pull --tag lzocateli/nginx:1.30.7-alpine-v1 nginx
 ```
 
 Validação de sintaxe do Dockerfile com BuildKit:
@@ -217,11 +217,11 @@ docker buildx build --check --file nginx/Dockerfile nginx
 
 | Tag | Mutabilidade | Compatibilidade | Uso recomendado |
 | --- | --- | --- | --- |
-| `1.30.6-alpine-v1` | Imutável | NGINX 1.30.6 + módulos dinâmicos `headers-more` e `geoip2`, com pacotes Alpine atualizados no build | Produção |
+| `1.30.7-alpine-v1` | Imutável | NGINX 1.30.7 + módulos dinâmicos `headers-more` e `geoip2`, com pacotes Alpine atualizados no build | Produção |
 | `1.28.0-bookworm-v1` | Imutável | NGINX 1.28.0 + módulos dinâmicos `headers-more` e `geoip2`, com pacotes Debian atualizados no build | Substituir: 15 vulnerabilidades `HIGH` sem correção no Debian 12 (Kerberos e linux-pam); o Debian 13 tem 42 |
 | `1.28.0-bookworm` | Imutável | NGINX 1.28.0 + módulos dinâmicos `headers-more` e `geoip2` | Substituir: `perl-base` afetado por CVE-2026-13221, CVE-2026-42496 e CVE-2026-8376 (críticas) |
 
-Revisões do mesmo upstream com ajustes de imagem incrementam o sufixo `-vN` (`1.30.6-alpine-v2`, ...).
+Revisões do mesmo upstream com ajustes de imagem incrementam o sufixo `-vN` (`1.30.7-alpine-v2`, ...).
 
 Não há política de publicação para `latest`. Toda mudança de contrato (base, módulos, entrypoint, portas, mounts ou configuração esperada) deve receber nova tag imutável.
 
@@ -245,7 +245,7 @@ Use **Actions > Publicar imagem de container > Run workflow** com:
 
 - `context_path`: `nginx`;
 - `image_name`: `nginx`;
-- `image_tag`: `1.30.6-alpine-v1`;
+- `image_tag`: `1.30.7-alpine-v1`;
 - `dockerfile`: `Dockerfile`;
 - `platforms`: `linux/amd64`.
 
@@ -270,14 +270,14 @@ Use **Actions > Publicar imagem de container > Run workflow** com:
 - Plataforma publicada e validada: somente `linux/amd64`.
 - A imagem não distribui banco GeoIP nem certificados TLS.
 - Não há `HEALTHCHECK` definido no Dockerfile; configure no runtime quando necessário.
-- Em 2026-11-14, o Trivy 0.72.0 não encontrou vulnerabilidades `HIGH` ou `CRITICAL` (com ou sem correção) na imagem local `linux/amd64` (Alpine 3.24.4, NGINX 1.30.6). A `1.28.0-bookworm-v1` tinha 15 `HIGH` sem correção no Debian 12, e uma variante Debian 13 (`1.28.3-trixie`) tinha 42.
+- Em 2026-11-14, o Trivy 0.72.0 não encontrou vulnerabilidades `HIGH` ou `CRITICAL` (com ou sem correção) na imagem local `linux/amd64` (Alpine 3.24.4, NGINX 1.30.7). A `1.28.0-bookworm-v1` tinha 15 `HIGH` sem correção no Debian 12, e uma variante Debian 13 (`1.28.3-trixie`) tinha 42.
 
 ## Licenças e fontes
 
 | Componente | Versão | Licença | Fonte |
 | --- | --- | --- | --- |
 | Conteúdo original deste repositório | Atual | MIT | `https://github.com/lzocateli/containers` |
-| NGINX | 1.30.6 | BSD-2-Clause | `https://nginx.org/en/LICENSE` |
+| NGINX | 1.30.7 | BSD-2-Clause | `https://nginx.org/en/LICENSE` |
 | Módulo headers-more | 0.38 | BSD-2-Clause | `https://github.com/openresty/headers-more-nginx-module` |
 | Módulo ngx_http_geoip2_module | 3.4 | BSD-2-Clause | `https://github.com/leev/ngx_http_geoip2_module` |
 
@@ -285,7 +285,7 @@ O badge MIT descreve somente o conteúdo original deste repositório. Componente
 
 ## Histórico de alterações
 
-- `1.30.6-alpine-v1`: troca a base para NGINX 1.30.6 sobre Alpine (`nginx:1.30.6-alpine`), com os módulos dinâmicos recompilados contra ela e os pacotes Alpine atualizados no build; elimina as vulnerabilidades `HIGH` sem correção do Debian.
+- `1.30.7-alpine-v1`: troca a base para NGINX 1.30.7 sobre Alpine (`nginx:1.30.7-alpine`), com os módulos dinâmicos recompilados contra ela e os pacotes Alpine atualizados no build; elimina as vulnerabilidades `HIGH` sem correção do Debian.
 - `1.28.0-bookworm-v1`: atualiza os pacotes Debian no build (corrige CVE-2026-13221, CVE-2026-42496 e CVE-2026-8376 em `perl-base` e 43 vulnerabilidades `HIGH`), mantendo NGINX 1.28.0 travado; primeira tag no formato `<versao-upstream>-vN`.
 - `1.28.0-bookworm`: atualiza a base para NGINX 1.28.0 (Bookworm), adiciona build multi-stage e padroniza carregamento dos módulos dinâmicos `headers-more` e `geoip2`.
 
